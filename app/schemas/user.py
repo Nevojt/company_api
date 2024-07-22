@@ -43,8 +43,7 @@ class UserCreate(BaseModel):
     user_name: str
     password: str
     avatar: str
-    # verified: bool = Field(False)
-    # role: UserRole = UserRole.user
+
    
 class UserCreateV2(BaseModel):
     email: EmailStr
@@ -53,6 +52,7 @@ class UserCreateV2(BaseModel):
     
 class UserCreateDel(UserCreate):
     verified: bool
+    company_id: int
     
 class UserUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)

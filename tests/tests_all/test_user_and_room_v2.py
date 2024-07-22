@@ -192,14 +192,15 @@ def test_user_delete_login():
         "email": "userdelete@delete.userdel",
         "user_name": "userdelete",
         "avatar": "userdelete",
-        "password": "password123"
+        "password": "password123",
+        "company_id": 1
     }
 
 
 @pytest.mark.asyncio
 async def test_create_user_v2_del(test_user_delete_login, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
-
+        
         response = await client.post(
             "/users/test",
             json={
@@ -207,7 +208,8 @@ async def test_create_user_v2_del(test_user_delete_login, async_session):
                 "user_name": test_user_delete_login["user_name"],
                 "avatar": test_user_delete_login["avatar"],  # Додано поле avatar
                 "password": test_user_delete_login["password"],
-                "verified": True
+                "verified": True,
+                "company_id": test_user_delete_login["company_id"],
             }
         )
 
@@ -267,12 +269,14 @@ async def test_created_rooms(test_user, test_room, async_session):
         headers = {"Authorization": f"Bearer {token}"}
         
         
-        
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.post("/rooms/",
+        response = await client.post("/rooms/v2",
                             headers=headers, 
-                            json=test_room,
-                            follow_redirects=False)
+                            data={
+                                "name_room": test_room['name_room'],
+                                "image_room": test_room['image_room'],
+                                "secret_room": test_room['secret_room']},
+                            files={"file": (None, "", "application/octet-stream")})
         assert response.status_code == 201
 
     
