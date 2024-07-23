@@ -27,10 +27,11 @@ jobs:
       run: |
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
-          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
-          echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> $GITHUB_ENV
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> $GITHUB_ENV
           echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_ENV
           echo "MAIL_SERVER=${{ secrets.MAIL_SERVER }}" >> $GITHUB_ENV
+          echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> $GITHUB_ENV
+          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
           echo "DATABASE_HOSTNAME=${{ secrets.DATABASE_HOSTNAME }}" >> $GITHUB_ENV
           echo "DATABASE_HOSTNAME_COMPANY=${{ secrets.DATABASE_HOSTNAME_COMPANY }}" >> $GITHUB_ENV
           echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
