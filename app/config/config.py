@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     mail_port: int
     mail_server: str
     mail_from_name: str
+    mail_from_name_company: str
     database_hostname_company: str
     database_hostname: str
     database_port: str
