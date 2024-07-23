@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     backblaze_id: str
     backblaze_key: str
     url_address_dns: str
+    url_address_dns_company: str
     key_crypto: str
     rout_image: str
     bucket_name_user_avatar: str
