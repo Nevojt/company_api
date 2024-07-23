@@ -56,13 +56,13 @@ jobs:
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
 
-    # - name: Deploy to Server
-    #   env:
-    #     SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-    #     SSH_HOST: ${{ secrets.SSH_HOST }}
-    #     SSH_USER: ${{ secrets.SSH_USER }}
-    #   run: |
-    #     sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-    #     cd /home/$SSH_USER/api && \
-    #     ./key_git_script"
+    - name: Deploy to Server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+        cd /home/$SSH_USER/api && \
+        ./key_git_script"
     
