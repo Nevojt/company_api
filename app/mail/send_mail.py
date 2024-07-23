@@ -13,7 +13,7 @@ conf = ConnectionConfig(
     MAIL_FROM=settings.mail_from,
     MAIL_PORT=settings.mail_port,
     MAIL_SERVER=settings.mail_server,
-    MAIL_FROM_NAME=settings.mail_from_name,
+    MAIL_FROM_NAME=settings.mail_from_name_company,
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,  
 )
