@@ -51,7 +51,7 @@ async def reset_password(request: PasswordResetRequest, db: Session = Depends(ge
                             detail=f"User with email: {request.email} not verification")
     if user is not None:
         token = await oauth2.create_access_token(data={"user_id": user.id})
-        reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
+        reset_link = f"https://{settings.url_address_dns_company}/api/reset?token={token}"
         
         await password_reset("Password Reset", user.email,
             {

@@ -67,7 +67,7 @@ async def reset(password: user.UserUpdatePassword,
     await db.commit()
     
     token = current_user.refresh_token
-    blocked_link = f"https://{settings.url_address_dns}/api/manipulation/blocked?token={token}"
+    blocked_link = f"https://{settings.url_address_dns_company}/api/manipulation/blocked?token={token}"
     await send_mail.send_mail_for_change_password("Changing your account password", current_user.email,
             {
                 "title": "Changing your account password",
