@@ -9,8 +9,11 @@ class Settings(BaseSettings):
     mail_port: int
     mail_server: str
     mail_from_name: str
+    mail_from_name_company: str
+    database_hostname_company: str
     database_hostname: str
     database_port: str
+    database_password_company: str
     database_password: str
     database_name: str
     database_username: str
@@ -22,6 +25,7 @@ class Settings(BaseSettings):
     backblaze_id: str
     backblaze_key: str
     url_address_dns: str
+    url_address_dns_company: str
     key_crypto: str
     rout_image: str
     bucket_name_user_avatar: str
