@@ -28,11 +28,13 @@ jobs:
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
           echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
+          echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> $GITHUB_ENV
           echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_ENV
           echo "MAIL_SERVER=${{ secrets.MAIL_SERVER }}" >> $GITHUB_ENV
-          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
+          echo "DATABASE_HOSTNAME=${{ secrets.DATABASE_HOSTNAME }}" >> $GITHUB_ENV
           echo "DATABASE_HOSTNAME_COMPANY=${{ secrets.DATABASE_HOSTNAME_COMPANY }}" >> $GITHUB_ENV
           echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
           echo "DATABASE_PASSWORD_COMPANY=${{ secrets.DATABASE_PASSWORD_COMPANY }}" >> $GITHUB_ENV
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> $GITHUB_ENV
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $GITHUB_ENV
@@ -43,6 +45,7 @@ jobs:
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> $GITHUB_ENV
           echo "BACKBLAZE_ID=${{ secrets.BACKBLAZE_ID }}" >> $GITHUB_ENV
           echo "BACKBLAZE_KEY=${{ secrets.BACKBLAZE_KEY }}" >> $GITHUB_ENV
+          echo "URL_ADDRESS_DNS=${{ secrets.URL_ADDRESS_DNS }}" >> $GITHUB_ENV
           echo "URL_ADDRESS_DNS_COMPANY=${{ secrets.URL_ADDRESS_DNS_COMPANY }}" >> $GITHUB_ENV
           echo "KEY_CRYPTO=${{ secrets.KEY_CRYPTO }}" >> $GITHUB_ENV
           echo "ROUT_IMAGE=${{ secrets.ROUT_IMAGE }}" >> $GITHUB_ENV
