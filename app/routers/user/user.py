@@ -75,7 +75,7 @@ async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_asy
     await db.commit()
     await db.refresh(post)
     
-    registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    registration_link = f"http://{settings.url_address_dns_company}/api/success_registration?token={new_user.token_verify}"
     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
                                            {
                                             "title": "Registration",
@@ -172,7 +172,7 @@ async def created_user_v2(email: str = Form(...),
     await db.commit()
     await db.refresh(post)
     
-    registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    registration_link = f"http://{settings.url_address_dns_company}/api/success_registration?token={new_user.token_verify}"
     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
                                            {
                                             "title": "Registration",
