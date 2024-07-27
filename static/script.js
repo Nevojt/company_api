@@ -22,7 +22,7 @@ document.getElementById('submitBtn').addEventListener('click', async function() 
         const data = await response.json();
         if (response.ok) {
             // Успішне скидання пароля
-            window.location.href = '/success-page'; // Перенаправлення на сторінку успіху
+            window.location.href = '/success-page'; 
         } else {
             console.error('Error resetting password:', data);
             document.getElementById('message').textContent = 'Error resetting password';
