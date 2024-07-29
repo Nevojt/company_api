@@ -146,6 +146,7 @@ async def create_room(room: room_schema.RoomCreate,
 
 @router.post("/v2", status_code=status.HTTP_201_CREATED)
 async def create_room_v2(name_room: str =Form(...),
+                        description: str = Form(None),
                         file: UploadFile = File(None),
                         secret: bool = False,
                         db: AsyncSession = Depends(get_async_session), 
@@ -169,7 +170,7 @@ async def create_room_v2(name_room: str =Form(...),
                      "https://f003.backblazeb2.com/file/imagesapp/DALLE_3.webp",
                      "https://f003.backblazeb2.com/file/imagesapp/DALLE_2.webp"]
     
-    room_data = room_schema.RoomCreateV2(name_room=name_room, secret_room=secret)
+    room_data = room_schema.RoomCreateV2(name_room=name_room, secret_room=secret, description=description)
     
     if current_user.blocked == True or current_user.verified == False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
