@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     rout_image: str
     bucket_name_user_avatar: str
     bucket_name_room_image: str
+    openai_api_key: str
+
+    
     model_config = SettingsConfigDict(env_file = ".env")
    
 

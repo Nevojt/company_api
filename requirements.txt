@@ -16,6 +16,7 @@ click==8.1.7
 colorclass==2.2.2
 cryptography==42.0.8
 deprecation==2.1.0
+distro==1.9.0
 dnspython==2.6.1
 docopt==0.6.2
 ecdsa==0.19.0
@@ -51,6 +52,7 @@ markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
 mimetype==0.1.5
+openai==1.37.1
 orjson==3.10.6
 packaging==24.1
 passlib==1.7.4
@@ -94,6 +96,7 @@ supabase==2.5.1
 supafunc==0.4.7
 terminaltables==3.1.10
 tomli==2.0.1
+tqdm==4.66.4
 typer==0.12.3
 typing==3.7.4.3
 typing_extensions==4.12.2
