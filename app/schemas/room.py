@@ -18,6 +18,7 @@ class RoomBase(BaseModel):
     created_at: datetime
     secret_room: bool
     block: Optional[bool] = None
+    description: Optional[str] = None
         
 class RoomFavorite(RoomBase):
     favorite: bool
@@ -50,6 +51,9 @@ class RoomUpdate(BaseModel):
     created_at: datetime
     secret_room: Optional[Optional[bool]]
        
+class RoomUpdateDescription(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    description: Optional[str] = None
         
 class RoomManager(BaseModel):
     model_config = ConfigDict(from_attributes=True)

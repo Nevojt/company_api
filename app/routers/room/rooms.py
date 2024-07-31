@@ -49,6 +49,7 @@ async def get_rooms_info(db: Session = Depends(get_db)):
         room_model.Rooms.secret_room,
         room_model.Rooms.block,
         room_model.Rooms.delete_at,
+        room_model.Rooms.description,
         func.count(messages_model.Socket.id).label('count_messages')
     ).outerjoin(messages_model.Socket, room_model.Rooms.name_room == messages_model.Socket.rooms) \
     .filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True) \
@@ -79,7 +80,8 @@ async def get_rooms_info(db: Session = Depends(get_db)):
             "count_messages": next((mc.count for mc in messages_count if mc.rooms == room.name_room), 0),
             "created_at": room.created_at,
             "secret_room": room.secret_room,
-            "block": room.block
+            "block": room.block,
+            "description": room.description,
         }
         rooms_info.append(room_schema.RoomBase(**room_info))
 
@@ -328,6 +330,40 @@ async def update_room(room_id: int,
             await db.commit()
 
     return room
+
+@router.put("/description/{room_id}", response_model=room_schema.RoomUpdateDescription)  # Assuming you're using room_id
+async def update_room_description(room_id: int, 
+                      update_room: room_schema.RoomUpdateDescription, 
+                      db: AsyncSession = Depends(get_async_session), 
+                      current_user: user_model.User = Depends(oauth2.get_current_user)):
+    """
+    Update a room by ID.
+    """
+    if current_user.blocked or not current_user.verified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Access denied for user {current_user.id}")
+
+    # Fetch room
+    room_query = await db.execute(select(room_model.Rooms).where(room_model.Rooms.id == room_id))
+    room = room_query.scalar_one_or_none()
+    
+    if room is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Room with ID {room_id} not found")
+
+    # Check user permissions
+    if current_user.id != room.owner:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Insufficient permissions to modify room")
+
+    # Update the room with new data provided by update_room
+    room.description = update_room.description
+
+    await db.commit()  # Commit changes
+    await db.refresh(room)  # Refresh the instance to get updated values
+
+    return room
+
 
 
 @router.put('/block/{room_id}', status_code=status.HTTP_200_OK)
