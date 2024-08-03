@@ -124,9 +124,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/", include_in_schema=False)
-async def home():
-    return RedirectResponse(url="https://sayorama.eu/chat", status_code=307)
+# @app.get("/", include_in_schema=False)
+# async def home():
+#     return RedirectResponse(url="https://sayorama.eu/chat", status_code=307)
 
 
 @app.get("/reset", include_in_schema=False)

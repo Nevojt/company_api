@@ -3,9 +3,9 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_home():
-    response = client.get("/", allow_redirects=False)
-    assert response.status_code == 307
+# def test_home():
+#     response = client.get("/", allow_redirects=False)
+#     assert response.status_code == 307
     
 def test_reset():
     response = client.get("/reset")
