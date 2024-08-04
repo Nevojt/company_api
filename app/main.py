@@ -1,4 +1,5 @@
 
+from re import template
 from sched import scheduler
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -124,9 +125,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# @app.get("/", include_in_schema=False)
-# async def home():
-#     return RedirectResponse(url="https://sayorama.eu/chat", status_code=307)
+@app.get("/", include_in_schema=False)
+async def home(request: Request):
+    return templates.TemplateResponse("home_page.html", {"request": request})
 
 
 @app.get("/reset", include_in_schema=False)
