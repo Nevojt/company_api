@@ -38,7 +38,8 @@ async def ask_to_gpt(ask_to_chat: str,
         if num == 1:
             response_1 = chat_completion.choices[0].model_dump()
             response_1 = response_1["message"]["content"]
-            return response_1
+            response = [response_1]
+            return response
         
         elif num == 2:
             response_1 = chat_completion.choices[0].model_dump()
