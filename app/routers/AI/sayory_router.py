@@ -16,7 +16,8 @@ router = APIRouter(
 
 @router.post("/say")
 async def say_to_sayori(say_to_chat: str,
-                        temperature: Optional[float]):
+                        temperature: Optional[float],
+                        num: int = 1) -> dict:
     """
     This function sends a text query to a GPT model and returns the response.
 
@@ -36,7 +37,7 @@ async def say_to_sayori(say_to_chat: str,
     """
     
     try:
-        response = await ask_to_gpt(say_to_chat, temperature)
+        response = await ask_to_gpt(say_to_chat, temperature, num)
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

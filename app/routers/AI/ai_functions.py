@@ -1,5 +1,6 @@
 
 import os
+from turtle import mode
 from typing import Optional
 
 from fastapi import HTTPException, status
@@ -16,7 +17,8 @@ client = AsyncOpenAI(
 )
 
 async def ask_to_gpt(ask_to_chat: str,
-                     temperature: Optional[float]) -> str:
+                     temperature: Optional[float],
+                     num: int) -> str:
     try:
         chat_completion = await client.chat.completions.create(
             model="gpt-4o-mini",
@@ -28,12 +30,25 @@ async def ask_to_gpt(ask_to_chat: str,
             ],
             temperature=temperature,
             max_tokens=256,
+            n=num,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0
             )
-        response = chat_completion.choices[0].model_dump()
-        return response["message"]["content"]
+        if num == 1:
+            response_1 = chat_completion.choices[0].model_dump()
+            response_1 = response_1["message"]["content"]
+            return response_1
+        
+        elif num == 2:
+            response_1 = chat_completion.choices[0].model_dump()
+            response_1 = response_1["message"]["content"]
+            response_2 = chat_completion.choices[1].model_dump()
+            response_2 = response_2["message"]["content"]
+        
+            response = [response_1, response_2]
+            return response
+
     except Exception as e:
         return "Sorry, I couldn't process your request."
     
