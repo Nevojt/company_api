@@ -96,7 +96,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
 
 async def create_refresh_token(user_id: str):
-    expire = datetime.now(timezone.utc) + timedelta(days=7) 
+    expire = datetime.now(timezone.utc) + timedelta(days=100) 
     to_encode = {"exp": expire, "user_id": user_id}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
