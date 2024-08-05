@@ -16,7 +16,8 @@ router = APIRouter(
 
 @router.post("/say")
 async def say_to_sayori(say_to_chat: str,
-                        temperature: Optional[float]):
+                        temperature: Optional[float],
+                        num: int):
     """
     This function sends a text query to a GPT model and returns the response.
 
