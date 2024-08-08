@@ -42,15 +42,6 @@ async def get_user_rooms(db: Session = Depends(get_db),
     ).filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.owner == current_user.id
     ).order_by(asc(room_model.Rooms.id)).all()
     
-
-    # Fetch message and user count for each user-associated room
-    # message_and_user_counts = db.query(
-    #     messages_model.Socket.rooms.label('name_room'),
-    #     func.count(messages_model.Socket.id).label('count_messages'),
-    #     func.count(user_model.User_Status.id).label('count_users')
-    # ).join(user_model.User_Status, user_model.User_Status.name_room == messages_model.Socket.rooms
-    # ).group_by(messages_model.Socket.rooms
-    # ).filter(messages_model.Socket.rooms != 'Hell').all()
     
     messages_count = db.query(
         messages_model.Socket.rooms, 
@@ -65,7 +56,7 @@ async def get_user_rooms(db: Session = Depends(get_db),
 
     rooms_info = []
     for room, favorite in rooms:
-        # count_data = next((count for count in message_and_user_counts if count.name_room == room.name_room), None)
+        
         room_info = room_schema.RoomFavorite(
             id=room.id,
             owner=room.owner,

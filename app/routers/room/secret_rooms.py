@@ -52,30 +52,30 @@ async def get_user_rooms_secret(db: Session = Depends(get_db),
     messages_count = db.query(
         messages_model.Socket.rooms, 
         func.count(messages_model.Socket.id).label('count')
-    ).group_by(messages_model.Socket.rooms).filter(messages_model.Socket.rooms.in_(user_room_ids)).all()
+    ).group_by(messages_model.Socket.rooms).filter(messages_model.Socket.rooms != 'Hell').all()
 
-    # Fetch user count for each user-associated room
+    # Count users for room
     users_count = db.query(
         user_model.User_Status.name_room, 
         func.count(user_model.User_Status.id).label('count')
-    ).group_by(user_model.User_Status.name_room).filter(user_model.User_Status.name_room.in_(user_room_ids)).all()
+    ).group_by(user_model.User_Status.name_room).filter(user_model.User_Status.name_room != 'Hell').all()
 
-    # Merging room info, message count, and user count
     rooms_info = []
     for room, favorite in rooms:
-        room_info = {
-            "id": room.id,
-            "owner": room.owner,
-            "name_room": room.name_room,
-            "image_room": room.image_room,
-            "count_users": next((uc.count for uc in users_count if uc.name_room == room.name_room), 0),
-            "count_messages": next((mc.count for mc in messages_count if mc.rooms == room.name_room), 0),
-            "created_at": room.created_at,
-            "secret_room": room.secret_room,
-            "favorite": favorite,
-            "block": room.block
-        }
-        rooms_info.append(room_schema.RoomFavorite(**room_info))
+        
+        room_info = room_schema.RoomFavorite(
+            id=room.id,
+            owner=room.owner,
+            name_room=room.name_room,
+            image_room=room.image_room,
+            count_users=next((uc.count for uc in users_count if uc.name_room == room.name_room), 0),
+            count_messages=next((mc.count for mc in messages_count if mc.rooms == room.name_room), 0),
+            created_at=room.created_at,
+            secret_room=room.secret_room,
+            favorite=favorite if favorite is not None else False,
+            block=room.block
+        )
+        rooms_info.append(room_info)
         rooms_info.sort(key=lambda x: x.favorite, reverse=True)
 
     return rooms_info
