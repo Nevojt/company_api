@@ -17,7 +17,7 @@ from .created_image import generate_image_with_letter
 from ...auth import oauth2
 from ...database.async_db import get_async_session
 from ...database.database import get_db
-from app.models import user_model, room_model
+from app.models import user_model, room_model, company_model
 from app.schemas import user
 
 
@@ -30,65 +30,9 @@ router = APIRouter(
     tags=['Users'],
 )
 
-
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
-async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_async_session)):
-    """
-    This function creates a new user in the database.
-
-    Args:
-        user (schemas.UserCreate): The user data to create.
-        db (AsyncSession): The database session to use.
-
-    Returns:
-        schemas.UserOut: The newly created user.
-
-    Raises:
-        HTTPException: If a user with the given email already exists.
-    """
-    
-    # Check if a user with the given email already exists
-    query = select(user_model.User).where(user_model.User.email == user.email)
-    result = await db.execute(query)
-    existing_user = result.scalar_one_or_none()
-
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
-                            detail=f"User {existing_user.email} already exists")
-    
-    # Hash the user's password
-    hashed_password = utils.hash(user.password)
-    user.password = hashed_password
-    
-    verification_token = utils.generate_unique_token(user.email)
-    
-    # Create a new user and add it to the database
-    new_user = user_model.User(**user.model_dump(),
-                           token_verify=verification_token)
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    
-    # Create a User_Status entry for the new user
-    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
-    db.add(post)
-    await db.commit()
-    await db.refresh(post)
-    
-    registration_link = f"http://{settings.url_address_dns_company}/api/success_registration?token={new_user.token_verify}"
-    await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
-                                           {
-                                            "title": "Registration",
-                                            "name": user.user_name,
-                                            "registration_link": registration_link
-                                            })
-    await say_hello_system(new_user.id)
-    
-    return new_user
-
-
 @router.post("/v2", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
-async def created_user_v2(email: str = Form(...),
+async def created_user_v2(subdomain: str = Form(...),
+                          email: str = Form(...),
                           user_name: str = Form(...),
                           password: str = Form(...),
                           file: UploadFile = File(None),
@@ -111,7 +55,13 @@ async def created_user_v2(email: str = Form(...),
         HTTPException: If a user with the given email already exists.
     """
     
-    company = 1
+    company = select(company_model.Company.id).where(company_model.Company.subdomain == subdomain)
+    company_id = await db.execute(company)
+    company_id = company_id.scalar_one_or_none()
+
+    if company_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Company with subdomain {subdomain} does not exist.")
     
     existing_deactivated_user = select(user_model.UserDeactivation).where((user_model.UserDeactivation.email == email) |
         (user_model.UserDeactivation.user_name == user_name))
@@ -125,7 +75,7 @@ async def created_user_v2(email: str = Form(...),
                             detail=f"User with email {email} or user_name {user_name} is deactivated")
 
     
-    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password)
+    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password, company_id=company_id)
 
 # Check if a user with the given email already exists
     email_query = select(user_model.User).where(user_model.User.email == user_data.email)
@@ -160,7 +110,6 @@ async def created_user_v2(email: str = Form(...),
     # Create a new user and add it to the database
     new_user = user_model.User(**user_data.model_dump(),
                            avatar=avatar,
-                           company_id=company, # Default company id
                            token_verify=verification_token)
     db.add(new_user)
     await db.commit()

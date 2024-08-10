@@ -49,6 +49,7 @@ class UserCreateV2(BaseModel):
     email: EmailStr
     user_name: str
     password: str
+    company_id: int
     
 class UserCreateDel(UserCreate):
     verified: bool

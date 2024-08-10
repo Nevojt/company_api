@@ -83,7 +83,7 @@ async def created_user_admin(email: str = Form(...),
         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
                             detail=f"User with email {email} or user_name {user_name} is deactivated")
     
-    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password)
+    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password, company_id=company)
 
 # Check if a user with the given email already exists
     email_query = select(user_model.User).where(user_model.User.email == user_data.email)
@@ -118,7 +118,6 @@ async def created_user_admin(email: str = Form(...),
     # Create a new user and add it to the database
     new_user = user_model.User(**user_data.model_dump(),
                            avatar=avatar,
-                           company_id=company, # Default company id
                            token_verify=verification_token)
     db.add(new_user)
     await db.commit()
