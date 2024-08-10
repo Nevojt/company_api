@@ -57,6 +57,7 @@ cover/
 #  Castom
 *.png
 
+start_uvicorn
 # Translations
 *.mo
 *.pot
