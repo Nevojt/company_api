@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
 
 
@@ -33,7 +33,10 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[room_schema.RoomBase])
-async def get_rooms_info(db: Session = Depends(get_db)):
+async def get_rooms_info(db: Session = Depends(get_db),
+                         count_messages_sort: Optional[bool] = False,
+                         count_users_sort: Optional[bool] = False,
+                         current_user: user_model.User = Depends(oauth2.get_current_user)):
     
     """
     Retrieves information about chat rooms, excluding a specific room ('Hell'), along with associated message and user counts.
@@ -47,6 +50,12 @@ async def get_rooms_info(db: Session = Depends(get_db)):
     
     # get info rooms and not room "Hell"
     # rooms = db.query(room_model.Rooms).filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True).order_by(asc(room_model.Rooms.id)).all()
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"User with ID {current_user.id} not admin")
+    
+    
+    
     rooms = db.query(
         room_model.Rooms.id,
         room_model.Rooms.owner,
@@ -77,18 +86,23 @@ async def get_rooms_info(db: Session = Depends(get_db)):
     # merge result
     rooms_info = []
     for room in rooms:
-        room_info = {
-            "id": room.id,
-            "owner": room.owner,
-            "name_room": room.name_room,
-            "image_room": room.image_room,
-            "count_users": next((uc.count for uc in users_count if uc.name_room == room.name_room), 0),
-            "count_messages": next((mc.count for mc in messages_count if mc.rooms == room.name_room), 0),
-            "created_at": room.created_at,
-            "secret_room": room.secret_room,
-            "block": room.block
-        }
-        rooms_info.append(room_schema.RoomBase(**room_info))
+        
+        room_info = room_schema.RoomBase(
+            id=room.id,
+            owner=room.owner,
+            name_room=room.name_room,
+            image_room=room.image_room,
+            count_users=next((uc.count for uc in users_count if uc.name_room == room.name_room), 0),
+            count_messages=next((mc.count for mc in messages_count if mc.rooms == room.name_room), 0),
+            created_at=room.created_at,
+            secret_room=room.secret_room,
+            block=room.block
+        )
+        rooms_info.append(room_info)
+        if count_messages_sort:
+            rooms_info.sort(key=lambda x: x.count_messages, reverse=True)
+        elif count_users_sort:
+            rooms_info.sort(key=lambda x: x.count_users, reverse=True)
 
     return rooms_info
 
