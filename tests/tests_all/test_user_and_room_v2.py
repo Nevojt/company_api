@@ -29,7 +29,8 @@ async def async_session():
 @pytest.fixture
 def test_user_create():
     return {"email": random_email(),
-            "password": "password123"}
+            "password": "password123",
+            "subdomain": "sayorama"}
 
 @pytest.mark.asyncio
 async def test_create_user_v2(test_user_create, async_session):
@@ -37,13 +38,15 @@ async def test_create_user_v2(test_user_create, async_session):
         user_name = random_lower_string()
         email = test_user_create["email"]
         password = test_user_create["password"]
+        subdomain = test_user_create["subdomain"]
 
         response = await client.post(
             "/users/v2",
             data={
                 "email": email,
                 "user_name": user_name,
-                "password": password
+                "password": password,
+                "subdomain": subdomain
             },
             files={"file": (None, "", "application/octet-stream")}
         )
