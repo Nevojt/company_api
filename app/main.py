@@ -17,7 +17,7 @@ from .routers.invitations import invitation_secret_room
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form
-from .routers.company import company
+from .superAdmin import company
 
 from .config.scheduler import setup_scheduler#, scheduler
 from .database.database import engine

@@ -1,13 +1,18 @@
 
-from sqlalchemy import JSON, Column, Integer, String
+from sqlalchemy import JSON, Column, Integer, String, Enum
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
+from enum import Enum as PythonEnum
 
-
-
+class StatusSubscription(str, PythonEnum):
+    active = "active"
+    suspend = "suspended"
+    inactive = "inactive"
+    wait = "wait"
+    
 
 class Company(Base):
     __tablename__ = 'companies'
@@ -20,7 +25,7 @@ class Company(Base):
     address = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-    subscription_status = Column(String(50))
+    subscription_status = Column(Enum(StatusSubscription), default=StatusSubscription.wait)
     subscription_end_date = Column(String)
     subscription_type = Column(String(50))
     paid_services = Column(String)

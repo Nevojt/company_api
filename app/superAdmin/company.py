@@ -1,4 +1,5 @@
 
+from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 
@@ -38,6 +39,21 @@ def create_company(company: CompanyCreate, db: Session = Depends(get_db),
     db.commit()
     db.refresh(db_company)
     return db_company
+
+@router.get("/companies",response_model=List[CompanySchema])
+def read_companies(db: Session = Depends(get_db),
+                   current_user: int = Depends(oauth2.get_current_user)):
+    
+    if current_user.role!= "super_admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            detail="The user is not a super admin, access is denied.")
+    all_companies = db.query(Company).filter(Company.subscription_status == 'active').all()
+    list_companys = []
+    for company in all_companies:
+        list_companys.append(company)
+
+    return list_companys
+
 
 @router.get("/companies/{company_id}", response_model=CompanySchema)
 def read_company(company_id: int, db: Session = Depends(get_db),
