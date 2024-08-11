@@ -13,7 +13,7 @@ def setup_scheduler(db_session_factory):
     scheduler = AsyncIOScheduler()
     scheduler.add_job(delete_old_rooms, 'cron', day='*', hour='0', args=[db_session_factory])
     scheduler.add_job(delete_test_users, 'cron', day='*', hour='0', args=[db_session_factory])
-    scheduler.add_job(update_access_token, 'interval', hours=4, args=[db_session_factory])
+    scheduler.add_job(update_access_token, 'interval', hours=12, args=[db_session_factory])
     # scheduler.add_job(update_access_token, 'interval', minutes=1, args=[db_session_factory]) # test functionality
 
     scheduler.start()

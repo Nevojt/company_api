@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import oauth2
 from app.database.database import get_db
+from app.config.utils import generate_random_code
 
 from app.models.company_model import Company
 from app.schemas.company import CompanyCreate, CompanyUpdate, CompanySchema
@@ -29,7 +30,9 @@ def create_company(company: CompanyCreate, db: Session = Depends(get_db),
     if db_company is not None:
         raise HTTPException(status_code=400, detail="Company with the same subdomain already exists")
     
-    db_company = Company(**company.model_dump())
+    code_verification = generate_random_code()
+    
+    db_company = Company(**company.model_dump(), code_verification=code_verification)
     db.add(db_company)
     db.commit()
     db.refresh(db_company)
