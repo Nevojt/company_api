@@ -36,21 +36,39 @@ def create_company(company: CompanyCreate, db: Session = Depends(get_db),
     return db_company
 
 @router.get("/companies/{company_id}", response_model=CompanySchema)
-def read_company(company_id: int, db: Session = Depends(get_db)):
+def read_company(company_id: int, db: Session = Depends(get_db),
+                 current_user: int = Depends(oauth2.get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            detail="The user is not a super admin, access is denied.")
+        
     db_company = db.query(Company).filter(Company.id == company_id).first()
     if db_company is None:
         raise HTTPException(status_code=404, detail="Company not found")
     return db_company
 
-@router.get("/subdomain/{subdomain}", response_model=CompanySchema)
-def read_company_by_subdomain(subdomain: str, db: Session = Depends(get_db)):
+@router.get("/subdomain/{subdomain}")
+def read_company_by_subdomain(subdomain: str, db: Session = Depends(get_db),
+                              current_user: int = Depends(oauth2.get_current_user)):
+    
+    if current_user.role != "super_admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            detail="The user is not a super admin, access is denied.")
+        
     db_company = db.query(Company).filter(Company.subdomain == subdomain).first()
     if db_company is None:
         raise HTTPException(status_code=404, detail="Company not found")
     return db_company
 
-@router.put("/companies/{company_id}", response_model=CompanySchema)
-def update_company(company_id: int, company: CompanyUpdate, db: Session = Depends(get_db)):
+@router.put("/companies/{company_id}", response_model=CompanySchema,)
+def update_company(company_id: int, company: CompanyUpdate, 
+                   db: Session = Depends(get_db),
+                   current_user: int = Depends(oauth2.get_current_user)):
+    
+    if current_user.role != "super_admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            detail="The user is not a super admin, access is denied.")
+        
     db_company = db.query(Company).filter(Company.id == company_id).first()
     if db_company is None:
         raise HTTPException(status_code=404, detail="Company not found")

@@ -32,7 +32,7 @@ class CompanySchema(BaseModel):
     name: str
     subdomain: str
     subscription_status: str
-    subscription_end_date: str
+    subscription_end_date: Optional[str] = None
 
 class CompanyUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
