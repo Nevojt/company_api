@@ -12,7 +12,8 @@ from app.schemas.company import CompanyCreate, CompanyUpdate, CompanySchema
 
 router = APIRouter(
     prefix="/company",
-    tags=['Company'],
+    tags=['Function for super admin'],
+
 )
 
 

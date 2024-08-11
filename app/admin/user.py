@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.mail import send_mail
 
-
 from app.config.config import settings
 from app.config import utils
 from app.routers.user.hello import say_hello_system, system_notification_change_owner
@@ -16,7 +15,7 @@ from app.routers.user.created_image import generate_image_with_letter
 from app.auth import oauth2
 from app.database.async_db import get_async_session
 
-from app.models import models, user_model, room_model
+from app.models import user_model, room_model
 from app.schemas import user
 
 
