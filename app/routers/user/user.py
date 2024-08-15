@@ -354,7 +354,7 @@ async def update_user_v2(file: UploadFile = File(...),
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User status for ID: {current_user.id} not found"
         )
-    avatar = await utils.upload_to_backblaze(file)
+    avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
     
     update = user.UserUpdateAvatar(avatar=avatar)
     update_data = update.model_dump()
