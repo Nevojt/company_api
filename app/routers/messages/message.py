@@ -1,5 +1,5 @@
 from fastapi import status, HTTPException, Depends, APIRouter
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
 
@@ -111,6 +111,36 @@ async def check_room_blocked(room_id: int, session: AsyncSession):
         return True
     except NoResultFound:
         return False
+
+@router.get("/{room_id}/{message_id}")
+async def get_count_message_room(room_id: int,
+                                 message_id: int, 
+                                 session: AsyncSession = Depends(get_async_session)):
+
+    get_room_name = select(room_model.Rooms).where(room_model.Rooms.id == room_id)
+    result = await session.execute(get_room_name)
+    existing_room = result.scalar_one_or_none()
+    
+    if existing_room is None:
+        raise HTTPException(status_code=404, detail="Room not found")
+    name_room = existing_room.name_room
+    
+    count_messages_after_message_id = select(messages_model.Socket).where(
+        and_(
+            messages_model.Socket.rooms == name_room,
+            messages_model.Socket.id > message_id
+        )
+    )
+    result = await session.execute(count_messages_after_message_id)
+    raw_messages = result.all()
+    
+    count_messages_after = len(raw_messages)
+    
+    return count_messages_after
+    
+
+
+
 
 @router.get("/{room_id}", response_model=List[message.SocketModel])
 async def get_messages_room(room_id: int, 
