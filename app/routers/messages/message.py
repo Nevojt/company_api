@@ -1,3 +1,4 @@
+import time
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,7 +93,7 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
                 message=decrypted_message,
                 fileUrl=socket.fileUrl,
                 user_name=user.user_name if user is not None else "Unknown user",
-                avatar=user.avatar if user is not None else "https://example.com/default_avatar.webp",
+                avatar=user.avatar if user is not None else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/photo_2024-06-14_19-20-40.jpg",
                 verified=user.verified if user is not None else None,
                 id=socket.id,
                 vote=votes,
@@ -116,27 +117,51 @@ async def check_room_blocked(room_id: int, session: AsyncSession):
 async def get_count_message_room(room_id: int,
                                  message_id: int, 
                                  session: AsyncSession = Depends(get_async_session)):
+    """
+    Retrieves the count of messages in a specific room that have an ID greater than a given message ID.
 
-    get_room_name = select(room_model.Rooms).where(room_model.Rooms.id == room_id)
-    result = await session.execute(get_room_name)
-    existing_room = result.scalar_one_or_none()
+    Args:
+        room_id (int): The ID of the room.
+        message_id (int): The ID of the message.
+        session (AsyncSession, optional): Asynchronous database session. Defaults to Depends(get_async_session).
+
+    Returns:
+        int: The count of messages in the room that have an ID greater than the given message ID.
+    """
+    get_room_and_message = (
+        select(room_model.Rooms.name_room, messages_model.Socket.id)
+        .join(messages_model.Socket, 
+              and_(
+                  room_model.Rooms.name_room == messages_model.Socket.rooms,
+                  messages_model.Socket.id == message_id
+              ), isouter=True)
+        .where(room_model.Rooms.id == room_id)
+    )
+    result = await session.execute(get_room_and_message)
+    room_message_data = result.first()
     
-    if existing_room is None:
+    if room_message_data is None or room_message_data[0] is None:
         raise HTTPException(status_code=404, detail="Room not found")
-    name_room = existing_room.name_room
     
-    count_messages_after_message_id = select(messages_model.Socket).where(
-        and_(
-            messages_model.Socket.rooms == name_room,
-            messages_model.Socket.id > message_id
+    name_room, message_id_check = room_message_data
+
+    if message_id_check is None:
+        return 0
+
+    count_query = (
+        select(func.count())
+        .select_from(messages_model.Socket)
+        .where(
+            and_(
+                messages_model.Socket.rooms == name_room,
+                messages_model.Socket.id > message_id
+            )
         )
     )
-    result = await session.execute(count_messages_after_message_id)
-    raw_messages = result.all()
-    
-    count_messages_after = len(raw_messages)
-    
+    result = await session.execute(count_query)
+    count_messages_after = result.scalar()
     return count_messages_after
+
     
 
 

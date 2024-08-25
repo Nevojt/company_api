@@ -36,6 +36,7 @@ async def created_user_v2(subdomain: str = Form(...),
                           user_name: str = Form(...),
                           password: str = Form(...),
                           file: UploadFile = File(None),
+                          description: str = Form(None),
                           db: AsyncSession = Depends(get_async_session)):
     """
     This function creates a new user in the database.
@@ -110,6 +111,8 @@ async def created_user_v2(subdomain: str = Form(...),
     # Create a new user and add it to the database
     new_user = user_model.User(**user_data.model_dump(),
                            avatar=avatar,
+                           description=description,
+                           company_id=company, # Default company id
                            token_verify=verification_token)
     db.add(new_user)
     await db.commit()
@@ -303,16 +306,52 @@ async def update_user_v2(file: UploadFile = File(...),
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User status for ID: {current_user.id} not found"
         )
-    avatar = await utils.upload_to_backblaze(file)
+    avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
     
     update = user.UserUpdateAvatar(avatar=avatar)
     update_data = update.model_dump()
 
     user_query.update(update_data, synchronize_session=False)
     db.commit()
-
- 
     return "updated avatar"
+
+@router.put('/v2/description')
+async def description_user_v2(description: str = Form(...), 
+                        db: Session = Depends(get_db), 
+                        current_user: user_model.User = Depends(oauth2.get_current_user)):
+
+        
+    if not current_user.verified or current_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not verification or blocked."
+        )
+        
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_data = user_query.first()
+    
+    if user_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID: {current_user.id} not found"
+        )
+    
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
+    
+    if user_status is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User status for ID: {current_user.id} not found"
+        )
+    
+    
+    update = user.UserUpdateDescription(description=description)
+    update_data = update.model_dump()
+
+    user_query.update(update_data, synchronize_session=False)
+    db.commit()
+    return "updated description"
 
 @router.put('/v2/username')
 async def update_user_v2(user_name: str = Form(...),
@@ -453,7 +492,25 @@ async def read_users(db: AsyncSession = Depends(get_async_session)):
 
 @router.post("/test", status_code=status.HTTP_201_CREATED, response_model=user.UserOut, include_in_schema=False)
 async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends(get_async_session)):
+    """
+    This function creates a new user in the database. It takes a UserCreateDel object as input, which contains the user's details.
 
+    Parameters:
+    - user (user.UserCreateDel): An object containing the user's details, including their email, password, and user name.
+    - db (AsyncSession): The database session used to perform database operations.
+
+    The function performs the following steps:
+    1. Hashes the user's password using the utils.hash() function.
+    2. Creates a new User object using the user.model_dump() method.
+    3. Adds the new user to the database using the db.add() method.
+    4. Commits the changes to the database using the await db.commit() method.
+    5. Refreshes the new user object in the database using the await db.refresh() method.
+    6. Creates a new User_Status object for the new user.
+    7. Adds the new User_Status object to the database using the db.add() method.
+    8. Commits the changes to the database using the await db.commit() method.
+    9. Refreshes the new User_Status object in the database using the await db.refresh() method.
+    10. Returns the new user object.
+    """
     # Hash the user's password
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -471,3 +528,67 @@ async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends
     await db.refresh(post)
     
     return new_user
+
+
+
+
+
+
+
+
+#  OLD CODE
+
+# @router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
+# async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_async_session)):
+#     """
+#     This function creates a new user in the database.
+
+#     Args:
+#         user (schemas.UserCreate): The user data to create.
+#         db (AsyncSession): The database session to use.
+
+#     Returns:
+#         schemas.UserOut: The newly created user.
+
+#     Raises:
+#         HTTPException: If a user with the given email already exists.
+#     """
+    
+#     # Check if a user with the given email already exists
+#     query = select(user_model.User).where(user_model.User.email == user.email)
+#     result = await db.execute(query)
+#     existing_user = result.scalar_one_or_none()
+
+#     if existing_user:
+#         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+#                             detail=f"User {existing_user.email} already exists")
+    
+#     # Hash the user's password
+#     hashed_password = utils.hash(user.password)
+#     user.password = hashed_password
+    
+#     verification_token = utils.generate_unique_token(user.email)
+    
+#     # Create a new user and add it to the database
+#     new_user = user_model.User(**user.model_dump(),
+#                            token_verify=verification_token)
+#     db.add(new_user)
+#     await db.commit()
+#     await db.refresh(new_user)
+    
+#     # Create a User_Status entry for the new user
+#     post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+#     db.add(post)
+#     await db.commit()
+#     await db.refresh(post)
+    
+#     registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+#     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
+#                                            {
+#                                             "title": "Registration",
+#                                             "name": user.user_name,
+#                                             "registration_link": registration_link
+#                                             })
+#     await say_hello_system(new_user.id)
+    
+#     return new_user

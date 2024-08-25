@@ -66,6 +66,9 @@ class UserUpdateAvatar(BaseModel):
         
 class UserUpdateUsername(BaseModel):
     user_name: str
+    
+class UserUpdateDescription(BaseModel):
+    description: str
             
 class UserLogin(BaseModel):
     email: EmailStr
@@ -79,6 +82,7 @@ class UserInfo(BaseModel):
     email: str
     user_name: str
     avatar: str
+    description: Optional[str]
     created_at: datetime
     role: Optional[str]
     verified: bool
