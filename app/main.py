@@ -1,5 +1,5 @@
 
-from re import template
+
 from sched import scheduler
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware

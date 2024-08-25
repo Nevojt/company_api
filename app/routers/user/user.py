@@ -504,7 +504,25 @@ async def read_users(db: AsyncSession = Depends(get_async_session)):
 
 @router.post("/test", status_code=status.HTTP_201_CREATED, response_model=user.UserOut, include_in_schema=False)
 async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends(get_async_session)):
+    """
+    This function creates a new user in the database. It takes a UserCreateDel object as input, which contains the user's details.
 
+    Parameters:
+    - user (user.UserCreateDel): An object containing the user's details, including their email, password, and user name.
+    - db (AsyncSession): The database session used to perform database operations.
+
+    The function performs the following steps:
+    1. Hashes the user's password using the utils.hash() function.
+    2. Creates a new User object using the user.model_dump() method.
+    3. Adds the new user to the database using the db.add() method.
+    4. Commits the changes to the database using the await db.commit() method.
+    5. Refreshes the new user object in the database using the await db.refresh() method.
+    6. Creates a new User_Status object for the new user.
+    7. Adds the new User_Status object to the database using the db.add() method.
+    8. Commits the changes to the database using the await db.commit() method.
+    9. Refreshes the new User_Status object in the database using the await db.refresh() method.
+    10. Returns the new user object.
+    """
     # Hash the user's password
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
