@@ -112,7 +112,7 @@ async def created_user_v2(subdomain: str = Form(...),
     new_user = user_model.User(**user_data.model_dump(),
                            avatar=avatar,
                            description=description,
-                           company_id=company, # Default company id
+                        #    company_id=company, # Default company id
                            token_verify=verification_token)
     db.add(new_user)
     await db.commit()
