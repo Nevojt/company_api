@@ -1,6 +1,5 @@
 
 import os
-from turtle import mode
 from typing import Optional
 
 from fastapi import HTTPException, status

@@ -22,7 +22,7 @@ class Socket(Base):
     id_return = Column(Integer)
     fileUrl = Column(String)
     edited = Column(Boolean, server_default='false') 
-    
+    return_message = Column(JSON, server_default=None)
     
     
 class PrivateMessage(Base):

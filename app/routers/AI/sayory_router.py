@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import File, UploadFile, status, HTTPException, Depends, APIRouter
 from .ai_functions import ask_to_gpt, transcriptions
-
+from .ai_spech_function import speech_engine
 
 
 
@@ -62,3 +62,6 @@ async def transcribe_audio_from_url(url: str):
     """
     return transcriptions(url)
 
+@router.post("/speech")
+async def speaker_in_text(text: str):
+  return await speech_engine(text)
