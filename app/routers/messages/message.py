@@ -1,6 +1,6 @@
-import time
+
 from fastapi import status, HTTPException, Depends, APIRouter
-from openai import models
+
 from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
@@ -107,8 +107,9 @@ async def get_count_message_room(room_id: int,
     count_messages_after = result.scalar()
     return count_messages_after
 
-    
+
 @router.get("/message_id")
+
 async def fetch_message_by_id(message_id: int,
                               session: AsyncSession = Depends(get_async_session)):
     """
@@ -127,6 +128,7 @@ async def fetch_message_by_id(message_id: int,
         user_model.User
     ).outerjoin(
         user_model.User, messages_model.Socket.receiver_id == user_model.User.id
+
     ).filter(
         messages_model.Socket.id == message_id
     ).group_by(
@@ -153,6 +155,7 @@ async def fetch_message_by_id(message_id: int,
         )
 
         return return_message
+
     else:
         return None
 
