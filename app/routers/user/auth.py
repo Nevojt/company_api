@@ -66,9 +66,9 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
         if not utils.verify(user_credentials.password, user.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
 
-        access_token = await oauth2.create_access_token(data={"user_id": user.id})
+        access_token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
         
-        refresh_token = await oauth2.create_refresh_token(user.id)
+        refresh_token = await oauth2.create_refresh_token(user.id, db=db)
         user.refresh_token = refresh_token
         await db.commit()
 
@@ -125,7 +125,7 @@ async def refresh_access_token(refresh_token: str, db: AsyncSession = Depends(as
         if user_id is None:
             raise credentials_exception
         
-        new_access_token = await oauth2.create_access_token({"user_id": user_id})
+        new_access_token = await oauth2.create_access_token({"user_id": user_id}, db=db)
         return {"access_token": new_access_token, "token_type": "bearer"}
     except JWTError:
         raise credentials_exception
