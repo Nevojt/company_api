@@ -24,7 +24,7 @@ async def send_report(
     if message is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
     
-    await add_report_message(db=db, report_data=report_data)
+    await add_report_message(db=db, report_data=report_data, user_id=current_user.id)
     
     room_id = await get_room_id(db, report_data.message_id)
     if room_id is None:
@@ -43,11 +43,11 @@ async def check_message_id(db, message_id):
     message = result.scalar_one_or_none()
     return message is not None
 
-async def add_report_message(db, report_data):
+async def add_report_message(db, report_data, user_id):
     
     new_report = reports_model.Report(
         message_id=report_data.message_id,
-        reported_by_user_id=report_data.report_by_user_id,
+        reported_by_user_id=user_id,
         reason=report_data.reason,
         additional_info=report_data.additional_info
     )
