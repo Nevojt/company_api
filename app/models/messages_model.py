@@ -3,7 +3,7 @@
 from sqlalchemy import JSON, Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-
+from sqlalchemy.orm import relationship
 from app.database.database import Base
 
 
@@ -22,6 +22,9 @@ class Socket(Base):
     edited = Column(Boolean, server_default='false') 
     return_message = Column(JSON, server_default=None)
     
+    # Relationships
+    reports = relationship("Report", back_populates="message")
+    notifications = relationship("Notification", back_populates="message")
     
 class PrivateMessage(Base):
     __tablename__ = 'private_messages'
