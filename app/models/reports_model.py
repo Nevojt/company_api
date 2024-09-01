@@ -31,6 +31,7 @@ class Notification(Base):
     moderator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     seen = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    report_id = Column(Integer, ForeignKey("reports.id"), nullable=False)
 
     # Relationships
     room = relationship("Rooms", back_populates="notifications")

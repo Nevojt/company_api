@@ -9,44 +9,15 @@ from app.auth import oauth2
 from app.database.async_db import get_async_session
 from app.models import user_model, room_model, messages_model
 from app.schemas import message
-from app.config.config import settings
 from sqlalchemy.future import select
 from typing import List
 
-import base64
-from cryptography.fernet import Fernet, InvalidToken
+from app.config.crypto_encrypto import async_decrypt
 
 router = APIRouter(
     prefix="/messages",
     tags=['Message'],
 )
-
-
-
-
-
-key = settings.key_crypto
-cipher = Fernet(key)
-
-def is_base64(s):
-    try:
-        return base64.b64encode(base64.b64decode(s)).decode('utf-8') == s
-    except Exception:
-        return False
-
-
-async def async_decrypt(encoded_data: str):
-    if not is_base64(encoded_data):
-       
-        return encoded_data  
-
-    try:
-        encrypted = base64.b64decode(encoded_data.encode('utf-8'))
-        decrypted = cipher.decrypt(encrypted).decode('utf-8')
-        return decrypted
-    except InvalidToken:
-        return None
-
 
 
 async def check_room_blocked(room_id: int, session: AsyncSession):
