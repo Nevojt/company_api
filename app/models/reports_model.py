@@ -17,6 +17,9 @@ class Report(Base):
     additional_info = Column(Text, nullable=True)
     status = Column(String, nullable=False, default="Pending")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    responsive_id = Column(Integer, nullable=True)
+    reaction_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    
 
     # Relationships
     message = relationship("Socket", back_populates="reports")
