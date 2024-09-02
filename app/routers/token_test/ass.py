@@ -31,7 +31,7 @@ def ass_endpoint(token: str, session: Session = Depends(get_db)):
     """
     
     try:
-        user_data = oauth2.verify_access_token(token, credentials_exception)
+        user_data = oauth2.verify_access_token(token, credentials_exception, session)
         user = session.query(User).filter(User.id == user_data.id).first()
         
         if user.blocked == True:
