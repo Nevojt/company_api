@@ -11,8 +11,8 @@ from app.mail import send_mail
 
 from ...config import utils
 from app.config.config import settings
+from app.config.hello import say_hello_system, system_notification_sayory
 
-from .hello import say_hello_system, system_notification_change_owner
 from .created_image import generate_image_with_letter
 from ...auth import oauth2
 from ...database.async_db import get_async_session
@@ -249,7 +249,7 @@ async def delete_user(
         if moderator:
             room.owner = moderator.user_id
             moderator.role = 'owner'
-            await system_notification_change_owner(moderator.user_id, message)
+            await system_notification_sayory(moderator.user_id, message)
         else:
             room.owner = 0
         room.delete_at = datetime.now(pytz.utc)

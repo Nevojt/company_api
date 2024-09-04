@@ -11,7 +11,8 @@ from app.mail import send_mail
 
 from app.config.config import settings
 from app.config import utils
-from app.routers.user.hello import say_hello_system, system_notification_change_owner
+from app.config.hello import say_hello_system, system_notification_sayory
+
 from app.routers.user.created_image import generate_image_with_letter
 from app.auth import oauth2
 from app.database.async_db import get_async_session
@@ -225,7 +226,7 @@ async def deactivation_user(
             if moderator:
                 room.owner = moderator.user_id
                 moderator.role = 'owner'
-                await system_notification_change_owner(moderator.user_id, message)
+                await system_notification_sayory(moderator.user_id, message)
             else:
                 room.owner = current_user.id
 
