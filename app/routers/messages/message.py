@@ -80,7 +80,6 @@ async def get_count_message_room(room_id: int,
 
 
 @router.get("/message_id")
-
 async def fetch_message_by_id(message_id: int,
                               session: AsyncSession = Depends(get_async_session)):
     """
