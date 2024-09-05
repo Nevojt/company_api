@@ -1,5 +1,7 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from typing import Optional
+from datetime import datetime
 
         
         
@@ -20,7 +22,16 @@ class PrivateInfoRecipient(BaseModel):
     is_read: bool
 
 
-
+class PrivateReturnMessage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    created_at: datetime
+    receiver_id: Optional[int] = None
+    id: int
+    message: Optional[str] = None
+    fileUrl: Optional[str] = None
+    user_name: Optional[str] = "USER DELETE"
+    avatar: Optional[str] = "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp"
         
         
 
