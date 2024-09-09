@@ -1,8 +1,8 @@
 
 from fastapi import APIRouter, Response, status, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.async_db import get_async_session
-from sqlalchemy.future import select
+from sqlalchemy.orm import Session
+from app.database.database import get_db
+
 from app.auth import oauth2
 from app.models.user_model import User
 
@@ -16,7 +16,7 @@ credentials_exception = HTTPException(
 )
 
 @router.get('/ass')
-async def ass_endpoint(token: str, db: AsyncSession = Depends(get_async_session)):
+def ass_endpoint(token: str, session: Session = Depends(get_db)):
     """_summary_
 
     Args:
@@ -31,10 +31,8 @@ async def ass_endpoint(token: str, db: AsyncSession = Depends(get_async_session)
     """
     
     try:
-        user_data = await oauth2.verify_access_token(token, credentials_exception, db)
-        user_query = select(User).where(User.id == user_data.id)
-        result = await db.execute(user_query)
-        user = result.scalar_one_or_none()
+        user_data = oauth2.verify_access_token(token, credentials_exception)
+        user = session.query(User).filter(User.id == user_data.id).first()
         
         if user.blocked == True:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,

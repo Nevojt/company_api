@@ -1,5 +1,6 @@
 
 from datetime import timedelta
+from tkinter import CASCADE
 from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -27,13 +28,12 @@ class Rooms(Base):
     secret_room = Column(Boolean, default=False)
     block = Column(Boolean, nullable=False, server_default='false')
     delete_at = Column(TIMESTAMP(timezone=True), nullable=True)
-    company_id = Column(Integer, ForeignKey('companies.id', ondelete="CASCADE"), nullable=False)
+    company_id = Column(Integer, ForeignKey('companies.id', ondelete=CASCADE), nullable=False)
     description = Column(String(255), nullable=True)
     
-    # Relationships
     company = relationship("Company", back_populates="rooms")
     invitations = relationship("RoomInvitation", back_populates="room")
-    notifications = relationship("Notification", back_populates="room")
+    
     
 class RoomsManager(Base):
     __tablename__ = 'rooms_manager_secret'

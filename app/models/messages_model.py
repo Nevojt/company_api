@@ -1,9 +1,11 @@
-
-# from tkinter import CASCADE
-from sqlalchemy import JSON, Column, Integer, String, Boolean, ForeignKey
+from datetime import timedelta
+from tkinter import CASCADE
+from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
+
+from enum import Enum as PythonEnum
 from app.database.database import Base
 
 
@@ -20,11 +22,8 @@ class Socket(Base):
     id_return = Column(Integer)
     fileUrl = Column(String)
     edited = Column(Boolean, server_default='false') 
-    return_message = Column(JSON, server_default=None)
     
-    # Relationships
-    reports = relationship("Report", back_populates="message")
-    notifications = relationship("Notification", back_populates="message")
+    
     
 class PrivateMessage(Base):
     __tablename__ = 'private_messages'

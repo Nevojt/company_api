@@ -3,10 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 import pytz
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
 from app.models import user_model
-from app.schemas.reset import PasswordReset, PasswordResetRequest
+from app.schemas.reset import PasswordReset, PasswordResetRequest, PasswordResetMobile
 from app.auth import oauth2
 from app.config import utils
 from app.mail.send_mail import password_reset
@@ -24,7 +23,7 @@ router = APIRouter(
 
 
 @router.post("/request/", status_code=status.HTTP_202_ACCEPTED, response_description="Reset password")
-async def reset_password(request: PasswordResetRequest, db: AsyncSession = Depends(get_async_session)):
+async def reset_password(request: PasswordResetRequest, db: Session = Depends(get_db)):
     """
     Handles the password reset request. Validates the user's email and initiates the password reset process.
 
@@ -40,9 +39,7 @@ async def reset_password(request: PasswordResetRequest, db: AsyncSession = Depen
         dict: A message confirming that an email has been sent for password reset instructions.
     """
     # Func
-    user_q = select(user_model.User).where(user_model.User.email == request.email)
-    result = await db.execute(user_q)
-    user = result.scalar_one_or_none()
+    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     
     
     if not user:
@@ -53,9 +50,8 @@ async def reset_password(request: PasswordResetRequest, db: AsyncSession = Depen
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with email: {request.email} not verification")
     if user is not None:
-
-        token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
-        reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
+        token = await oauth2.create_access_token(data={"user_id": user.id})
+        reset_link = f"https://{settings.url_address_dns_company}/api/reset?token={token}"
         
         await password_reset("Password Reset", user.email,
             {

@@ -1,5 +1,6 @@
 
 import os
+from turtle import mode
 from typing import Optional
 
 from fastapi import HTTPException, status
@@ -64,7 +65,7 @@ def transcriptions(url: str):
         response.raise_for_status()  
         
         # Generate temporary audio file name
-        temporary_audio = "app/routers/AI/audio/" + generate_random_code() + ".mp3"
+        temporary_audio = "app/routers/AI/audio/" + generate_random_code() + ".ogg"
         
         # Create temporary audio file
         with open(temporary_audio, "wb") as audio_file:

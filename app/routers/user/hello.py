@@ -38,7 +38,7 @@ async def say_hello_system(receiver_id: int):
             await session.commit()
 
 
-async def system_notification_sayory(receiver_id: int, message: str):
+async def system_notification_change_owner(receiver_id: int, message: str):
 
         
     async with async_session_maker() as session:

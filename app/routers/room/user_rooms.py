@@ -7,7 +7,7 @@ from app.auth import oauth2
 from app.database.database import get_db
 from app.models import user_model, room_model, messages_model
 from app.schemas import room as room_schema
-from app.config.hello import system_notification_sayory
+from app.routers.user.hello import system_notification_change_owner
 
 router = APIRouter(
     prefix='/user_rooms',
@@ -164,6 +164,6 @@ async def change_room_owner(room_id: int,
     
     message = f"Room {room_query.name_room} is now owned by {user_query.user_name}"
     
-    await system_notification_sayory(new_owner_id, message)
+    await system_notification_change_owner(new_owner_id, message)
     
     return {"room_id": room_id, "new_owner_id": new_owner_id}
