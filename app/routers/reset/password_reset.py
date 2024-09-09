@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import user_model
-from app.schemas.reset import PasswordReset, PasswordResetRequest, PasswordResetMobile
+from app.schemas.reset import PasswordReset, PasswordResetRequest
 from app.auth import oauth2
 from app.config import utils
 from app.mail.send_mail import password_reset
@@ -50,7 +50,7 @@ async def reset_password(request: PasswordResetRequest, db: Session = Depends(ge
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with email: {request.email} not verification")
     if user is not None:
-        token = await oauth2.create_access_token(data={"user_id": user.id})
+        token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
         reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
         
         await password_reset("Password Reset", user.email,
