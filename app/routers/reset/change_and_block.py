@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from fastapi import status, HTTPException, Depends, APIRouter, Request
 from fastapi.templating import Jinja2Templates
 import pytz
@@ -8,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.mail import send_mail
 from ...config import utils
 from app.config.config import settings
+from app.config.hello import system_notification_sayory
 from ...auth import oauth2
 from ...database.async_db import get_async_session
 from app.models import user_model
@@ -75,7 +77,9 @@ async def reset(password: user.UserUpdatePassword,
                 "blocked_link": blocked_link
             }
         )
-
+    message_password = "Your password has been changed 🔐"
+    await system_notification_sayory(current_user.id, message_password)
+    
     return {"msg": "Password has been reset successfully."}
 
 templates = Jinja2Templates(directory="templates")

@@ -20,53 +20,45 @@ ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 
-async def create_access_token(data: dict):
-    """
-    Generate a JWT access token
-    Args:
-        data (dict): payload to include in the access token
-    Returns:
-        str: the access token
-    """
-    to_encode = data.copy()
+async def create_access_token(data: dict, db: AsyncSession):
+    user_id = data.get("user_id")
+    user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
+    user = user.scalar()
 
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    to_encode = data.copy()
+    to_encode.update({
+        "exp": expire,
+        "password_changed": str(user.password_changed)
+    })
 
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
     return encoded_jwt
 
 
-def verify_access_token(token: str, credentials_exception):
-    """
-    Verify an access token and retrieve the user's ID.
 
-    Args:
-        token (str): The access token to verify.
-        credentials_exception (HTTPException): The exception to raise if the credentials are invalid.
-
-    Returns:
-        TokenData: The user's ID.
-
-    Raises:
-        HTTPException: If the credentials are invalid.
-    """
-
+async def verify_access_token(token: str, credentials_exception, db: AsyncSession):
     try:
-
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get("user_id")
-        if id is None:
+        user_id: str = payload.get("user_id")
+        if user_id is None:
             raise credentials_exception
-        token_data = TokenData(id=id)
+
+        user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
+        user = user.scalar()
+
+        if user is None or str(user.password_changed) != payload['password_changed']:
+            raise credentials_exception 
+
+        token_data = TokenData(id=user_id)
     except JWTError:
-        
         raise credentials_exception
 
     return token_data
+
     
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(async_db.get_async_session)):
+async def get_current_user(token: str = Depends(oauth2_scheme),
+                           db: AsyncSession = Depends(async_db.get_async_session)):
     """
     Get the currently authenticated user.
 
@@ -86,7 +78,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         headers={"WWW-Authenticate": "Bearer"}
         )
     
-    token = verify_access_token(token, credentials_exception)
+    token = await verify_access_token(token, credentials_exception, db)
     
     
     user = await db.execute(select(user_model.User).filter(user_model.User.id == token.id))
@@ -95,8 +87,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     return user
 
 
-async def create_refresh_token(user_id: str):
-    expire = datetime.now(timezone.utc) + timedelta(days=100) 
-    to_encode = {"exp": expire, "user_id": user_id}
+async def create_refresh_token(user_id: str, db: AsyncSession):
+    # Отримання користувача з бази даних
+    user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
+    user = user.scalar()
+
+    if not user:
+        raise Exception("User not found")  # Помилка, якщо користувач не знайдений
+
+    expire = datetime.now(timezone.utc) + timedelta(days=100)
+    to_encode = {
+        "exp": expire,
+        "user_id": user_id,
+        "last_password_change": str(user.password_changed)
+    }
+
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

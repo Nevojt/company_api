@@ -1,11 +1,15 @@
 import logging
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from app.database.database import get_db
+from app.database.async_db import get_async_session
 from app.models import messages_model, user_model
 from app.schemas import private
-
+from app.config.crypto_encrypto import async_decrypt
+from app.auth import oauth2
 
 router = APIRouter(
     prefix="/direct",
@@ -73,3 +77,50 @@ async def get_private_recipient(user_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error creating {e}", exc_info=True)
     return result
+
+
+@router.get("/message_id/{message_id}")
+async def private_fetch_message_by_id(message_id: int,
+                                    session: AsyncSession = Depends(get_async_session),
+                                    current_user: user_model.User = Depends(oauth2.get_current_user)):
+
+    # Formulate the query
+    message_query = select(
+        messages_model.PrivateMessage, 
+        user_model.User
+    ).outerjoin(
+        user_model.User, messages_model.PrivateMessage.receiver_id == user_model.User.id
+
+    ).filter(
+        messages_model.PrivateMessage.id == message_id
+    ).group_by(
+        messages_model.PrivateMessage.id, user_model.User.id
+    )
+
+    # Execute the query
+    result = await session.execute(message_query)
+    message_data = result.first()
+    
+    if message_data:
+        message, user = message_data
+        
+        if not (message.sender_id == current_user.id or message.receiver_id == current_user.id):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This message not you!")
+
+        decrypted_message = await async_decrypt(message.message) if message.message else None
+
+        # Create a privateReturnMessage instance
+        return_message = private.PrivateReturnMessage(
+            created_at=message.created_at,
+            receiver_id=message.receiver_id,
+            id=message.id,
+            message=decrypted_message,
+            fileUrl=message.fileUrl,
+            user_name=user.user_name if user else "USER DELETE",
+            avatar=user.avatar if user else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp"
+        )
+
+        return return_message
+
+    else:
+        return None

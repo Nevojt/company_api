@@ -14,15 +14,21 @@ from .routers.messages import message, private_messages, vote
 from .routers.images import images, upload_file_google, upload_file_supabase, upload_and_return, upload_file_backblaze
 from .routers.room import rooms, count_users_messages, secret_rooms, tabs_rooms, user_rooms, ban_user, role_in_room
 from .routers.invitations import invitation_secret_room
+from .routers.following import following
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form
+
 from .superAdmin import company
+
+from .routers.company import company
+from .routers.reports import report_to_reason
+
 
 from .config.scheduler import setup_scheduler#, scheduler
 from .database.database import engine
 from app.database.async_db import async_session_maker, engine_asinc
-from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
+from app.models import following_model, user_model, room_model, image_model, password_model, company_model, messages_model, reports_model
 
 from app.admin import user as admin_user
 from app.admin import room as admin_room
@@ -38,7 +44,11 @@ async def init_db():
         await conn.run_sync(password_model.Base.metadata.create_all)
         await conn.run_sync(company_model.Base.metadata.create_all)
         await conn.run_sync(messages_model.Base.metadata.create_all)
-        
+        await conn.run_sync(following_model.Base.metadata.create_all)
+        await conn.run_sync(reports_model.Base.metadata.create_all)
+    
+    
+# Setup Scheduler    
 def startup_event():
     setup_scheduler(async_session_maker)
     
@@ -50,7 +60,7 @@ app = FastAPI(
     docs_url="/docs",
     title="Chat",
     description="Chat documentation",
-    version="0.1.3",
+    version="0.1.5",
     on_startup=[init_db, startup_event],
     # on_shutdown=[on_shutdown]
 )
@@ -65,12 +75,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Setup Scheduler
+
 
 
 
 
 app.include_router(message.router)
+
+app.include_router(report_to_reason.router)
 
 app.include_router(rooms.router)
 app.include_router(user_rooms.router)
@@ -79,6 +91,8 @@ app.include_router(invitation_secret_room.router)
 app.include_router(tabs_rooms.router)
 app.include_router(ban_user.router)
 app.include_router(role_in_room.router)
+
+app.include_router(following.router)
 
 app.include_router(user.router)
 app.include_router(auth.router)
