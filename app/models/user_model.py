@@ -32,7 +32,7 @@ class User(Base):
     refresh_token = Column(String, nullable=True)
     role = Column(Enum(UserRole), default=UserRole.user)
     blocked = Column(Boolean, nullable=False, server_default='false')
-    password_changed = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    password_changed = Column(TIMESTAMP(timezone=True), nullable=True)
     company_id = Column(Integer, ForeignKey('companies.id', ondelete="CASCADE"), nullable=False)
     active = Column(Boolean, nullable=False, server_default='True')
     description = Column(String)
