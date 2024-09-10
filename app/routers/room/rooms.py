@@ -26,7 +26,8 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[room_schema.RoomBase])
-async def get_rooms_info(db: Session = Depends(get_db)):
+async def get_rooms_info(db: Session = Depends(get_db),
+                        current_user: user_model.User = Depends(oauth2.get_current_user)):
     
     """
     Retrieves information about chat rooms, excluding a specific room ('Hell'), along with associated message and user counts.
@@ -52,7 +53,7 @@ async def get_rooms_info(db: Session = Depends(get_db)):
         room_model.Rooms.description,
         func.count(messages_model.Socket.id).label('count_messages')
     ).outerjoin(messages_model.Socket, room_model.Rooms.name_room == messages_model.Socket.rooms) \
-    .filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True) \
+    .filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True, room_model.Rooms.company_id == current_user.company_id) \
     .group_by(room_model.Rooms.id) \
     .order_by(desc('count_messages')) \
     .all()
