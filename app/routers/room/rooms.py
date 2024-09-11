@@ -29,18 +29,7 @@ router = APIRouter(
 async def get_rooms_info(db: Session = Depends(get_db),
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
     
-    """
-    Retrieves information about chat rooms, excluding a specific room ('Hell'), along with associated message and user counts.
-
-    Args:
-        db (Session, optional): Database session dependency. Defaults to Depends(get_db).
-
-    Returns:
-        List[schemas.RoomBase]: A list containing information about each room, such as room name, image, count of users, count of messages, and creation date.
-    """
     
-    # get info rooms and not room "Hell"
-    # rooms = db.query(room_model.Rooms).filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True).order_by(asc(room_model.Rooms.id)).all()
     rooms = db.query(
         room_model.Rooms.id,
         room_model.Rooms.owner,
