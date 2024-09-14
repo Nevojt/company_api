@@ -292,9 +292,17 @@ async def test_get_one_name(test_room, async_session):
         assert response.json()['name_room'] == test_room['name_room']
 
 @pytest.mark.asyncio
-async def test_get_all_room(async_session):
+async def test_get_all_room(test_user, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/rooms/")
+        login_res = await client.post("/login", data={"username": test_user['email'], "password": test_user['password']})
+        assert login_res.status_code == 200
+        login_data = login_res.json()
+        token = login_data['access_token']
+        
+        headers = {"Authorization": f"Bearer {token}"}
+        
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get("/rooms/", headers=headers)
         assert response.status_code == 200
 
 
