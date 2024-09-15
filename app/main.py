@@ -20,6 +20,7 @@ from .routers.mail import contact_form
 from .superAdmin import company
 
 from .config.scheduler import setup_scheduler#, scheduler
+from app.config.init_users import create_room
 from .database.database import engine
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
@@ -30,15 +31,31 @@ from app.admin import room as admin_room
 from app.routers.AI import sayory_router
 
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from app.database.async_db import get_async_session
+from .config import config, utils
+
+
+
 async def init_db():
     async with engine_asinc.begin() as conn:
-        await conn.run_sync(user_model.Base.metadata.create_all)
-        await conn.run_sync(room_model.Base.metadata.create_all)
-        await conn.run_sync(image_model.Base.metadata.create_all)
-        await conn.run_sync(password_model.Base.metadata.create_all)
-        await conn.run_sync(company_model.Base.metadata.create_all)
-        await conn.run_sync(messages_model.Base.metadata.create_all)
+        try:
+            await conn.run_sync(user_model.Base.metadata.create_all)
+            await conn.run_sync(room_model.Base.metadata.create_all)
+            await conn.run_sync(image_model.Base.metadata.create_all)
+            await conn.run_sync(password_model.Base.metadata.create_all)
+            await conn.run_sync(company_model.Base.metadata.create_all)
+            await conn.run_sync(messages_model.Base.metadata.create_all)
+            await conn.run_sync(following_model.Base.metadata.create_all)
+            await conn.run_sync(reports_model.Base.metadata.create_all)
+            print("All tables created successfully.")
+        except Exception as e:
+            print(f"Error during table creation: {e}")
+
+        await create_room(engine_asinc)
         
+
 def startup_event():
     setup_scheduler(async_session_maker)
     
