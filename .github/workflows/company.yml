@@ -53,7 +53,8 @@ jobs:
           echo "BUCKET_NAME_USER_AVATAR=${{ secrets.BUCKET_NAME_USER_AVATAR }}" >> $GITHUB_ENV
           echo "BUCKET_NAME_ROOM_IMAGE=${{ secrets.BUCKET_NAME_ROOM_IMAGE }}" >> $GITHUB_ENV
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-
+          echo "USERS_DATA_FILE=${{ secrets.USERS_DATA_FILE }}" >> $GITHUB_ENV
+          
     - name: Run Tests
       run: |
         pytest
