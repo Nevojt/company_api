@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+import json
 
 
 class Settings(BaseSettings):
@@ -31,11 +31,17 @@ class Settings(BaseSettings):
     bucket_name_user_avatar: str
     bucket_name_room_image: str
     openai_api_key: str
+    users_data_file: str
 
     
     model_config = SettingsConfigDict(env_file = ".env")
-   
+    
+    def load_users_data(self):
+        with open(self.users_data_file, 'r') as file:
+            users_data = json.load(file)
+        return users_data
 
 
 
 settings = Settings()
+users_data = settings.load_users_data()
