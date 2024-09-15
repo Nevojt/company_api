@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import json
-
+import os
 
 class Settings(BaseSettings):
     mail_username: str
@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file = ".env")
     
     def load_users_data(self):
+        if not os.path.exists(self.users_data_file):
+            print(f"Warning: File {self.users_data_file} not found. Loading default users data.")
+            return []  # Or return a default configuration if appropriate
         with open(self.users_data_file, 'r') as file:
             users_data = json.load(file)
         return users_data
