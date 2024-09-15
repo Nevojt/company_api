@@ -24,6 +24,7 @@ from app.config.init_users import create_room
 from .database.database import engine
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
+from app.models import following_model, reports_model
 
 from app.admin import user as admin_user
 from app.admin import room as admin_room
@@ -53,7 +54,7 @@ async def init_db():
         except Exception as e:
             print(f"Error during table creation: {e}")
 
-        await create_room(engine_asinc)
+        # await create_room(engine_asinc)
         
 
 def startup_event():

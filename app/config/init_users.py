@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from .config import users_data
+
 from fastapi import Depends
 from app.database.async_db import get_async_session
 from app.models import user_model, room_model

@@ -31,8 +31,10 @@ class Rooms(Base):
     company_id = Column(Integer, ForeignKey('companies.id', ondelete=CASCADE), nullable=False)
     description = Column(String(255), nullable=True)
     
+        # Relationships
     company = relationship("Company", back_populates="rooms")
     invitations = relationship("RoomInvitation", back_populates="room")
+    notifications = relationship("Notification", back_populates="room")
     
     
 class RoomsManager(Base):

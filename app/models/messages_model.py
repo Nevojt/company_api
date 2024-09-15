@@ -1,5 +1,5 @@
 from datetime import timedelta
-from tkinter import CASCADE
+
 from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -23,7 +23,9 @@ class Socket(Base):
     fileUrl = Column(String)
     edited = Column(Boolean, server_default='false') 
     
-    
+    # Relationships
+    reports = relationship("Report", back_populates="message")
+    notifications = relationship("Notification", back_populates="message")
     
 class PrivateMessage(Base):
     __tablename__ = 'private_messages'
@@ -38,6 +40,7 @@ class PrivateMessage(Base):
     edited = Column(Boolean, server_default='false')
     id_return = Column(Integer)
     
+
     
     
 class Vote(Base):
