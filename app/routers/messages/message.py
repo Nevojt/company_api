@@ -1,6 +1,7 @@
 
 from fastapi import status, HTTPException, Depends, APIRouter
 
+
 from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
@@ -121,7 +122,8 @@ async def fetch_message_by_id(message_id: int,
             message=decrypted_message,
             fileUrl=socket.fileUrl,
             user_name=user.user_name if user else "USER DELETE",
-            avatar=user.avatar if user else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp"
+            avatar=user.avatar if user else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp",
+            delete=socket.delete
         )
 
         return return_message

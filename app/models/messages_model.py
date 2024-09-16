@@ -21,6 +21,7 @@ class Socket(Base):
     fileUrl = Column(String)
     edited = Column(Boolean, server_default='false') 
     return_message = Column(JSON, server_default=None)
+    delete = Column(Boolean, server_default='false')
     
     # Relationships
     reports = relationship("Report", back_populates="message")

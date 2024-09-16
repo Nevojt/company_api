@@ -32,6 +32,7 @@ class SocketReturnMessage(BaseModel):
     fileUrl: Optional[str] = None
     user_name: Optional[str] = "USER DELETE"
     avatar: Optional[str] = "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp"
+    delete: bool
         
 class SocketUpdate(BaseModel):
     message: str
