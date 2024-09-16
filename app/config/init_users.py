@@ -28,7 +28,8 @@ async def create_initial_users(db: AsyncSession = Depends(get_async_session)):
             user_name=user_data["user_name"],
             email=user_data["email"],
             password=utils.hash(user_data["password"]),
-            avatar=user_data["avatar"]
+            avatar=user_data["avatar"],
+            company_id=1
         )
         db.add(user)
 

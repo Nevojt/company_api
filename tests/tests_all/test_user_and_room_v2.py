@@ -156,7 +156,7 @@ async def test_update_user(test_user_update_login, test_user_update, async_sessi
 
 @pytest.fixture
 def test_user_new_password():
-    return {"email":"test_user@gmail.com",
+    return {"email":"resetpassword@test.testing",
             "password":"NewPassword"}
 
 @pytest.fixture

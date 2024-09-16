@@ -32,12 +32,6 @@ from app.admin import room as admin_room
 from app.routers.AI import sayory_router
 
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from app.database.async_db import get_async_session
-from .config import config, utils
-
-
 
 async def init_db():
     async with engine_asinc.begin() as conn:
@@ -54,7 +48,7 @@ async def init_db():
         except Exception as e:
             print(f"Error during table creation: {e}")
 
-        # await create_room(engine_asinc)
+        await create_room(engine_asinc)
         
 
 def startup_event():
