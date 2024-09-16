@@ -5,7 +5,6 @@ from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
 
-from enum import Enum as PythonEnum
 from app.database.database import Base
 
 
@@ -21,7 +20,9 @@ class Socket(Base):
     rooms = Column(String, ForeignKey('rooms.name_room', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     id_return = Column(Integer)
     fileUrl = Column(String)
-    edited = Column(Boolean, server_default='false') 
+    edited = Column(Boolean, server_default='false')
+    return_message = Column(JSON, server_default=None)
+    delete = Column(Boolean, server_default='false')
     
     # Relationships
     reports = relationship("Report", back_populates="message")

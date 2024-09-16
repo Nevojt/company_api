@@ -21,7 +21,18 @@ class SocketModel(BaseModel):
     id_return: Optional[int] = None 
     edited: bool
 
-        
+class SocketReturnMessage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    created_at: datetime
+    receiver_id: Optional[int] = None
+    id: int
+    message: Optional[str] = None
+    fileUrl: Optional[str] = None
+    user_name: Optional[str] = "USER DELETE"
+    avatar: Optional[str] = "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp"
+    delete: bool
+      
 class SocketUpdate(BaseModel):
     message: str
     

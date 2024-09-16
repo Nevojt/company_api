@@ -1,5 +1,6 @@
 import time
 from fastapi import status, HTTPException, Depends, APIRouter
+from openai import models
 from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
@@ -98,7 +99,8 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
                 id=socket.id,
                 vote=votes,
                 id_return=socket.id_return,
-                edited=socket.edited
+                edited=socket.edited,
+                delete=socket.delete
             )
         )
     messages.reverse()
@@ -162,7 +164,61 @@ async def get_count_message_room(room_id: int,
     count_messages_after = result.scalar()
     return count_messages_after
 
-    
+
+@router.get("/message_id")
+async def fetch_message_by_id(message_id: int,
+                              session: AsyncSession = Depends(get_async_session),
+                              current_user: user_model.User = Depends(oauth2.get_current_user)):
+    """
+    Fetches a message by its ID along with user information and returns it as a SocketReturnMessage object.
+
+    Parameters:
+    session (AsyncSession): The database session to use for querying the database.
+    message_id (int): The ID of the message to fetch.
+
+    Returns:
+    Optional[SocketReturnMessage]: A SocketReturnMessage object representing the message, or None if no message is found.
+    """
+    # Formulate the query
+    message_query = select(
+        messages_model.Socket, 
+        user_model.User,
+        room_model.Rooms
+    ).join(
+        user_model.User, messages_model.Socket.receiver_id == user_model.User.id
+    ).join(
+        room_model.Rooms, room_model.Rooms.name_room == messages_model.Socket.rooms
+    ).where(
+        messages_model.Socket.id == message_id,
+        room_model.Rooms.company_id == current_user.company_id  # Ensure the room belongs to the same company as the user
+    )
+
+    # Execute the query
+    result = await session.execute(message_query)
+    message_data = result.first()
+
+    if message_data:
+        socket, user, room = message_data
+        
+        # Decrypt the message if it exists
+        decrypted_message = await async_decrypt(socket.message) if socket.message else None
+
+        # Create a SocketReturnMessage instance
+        return_message = message.SocketReturnMessage(
+            created_at=socket.created_at,
+            receiver_id=socket.receiver_id,
+            id=socket.id,
+            message=decrypted_message,
+            fileUrl=socket.fileUrl,
+            user_name=user.user_name if user else "USER DELETE",
+            avatar=user.avatar if user else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp",
+            delete=socket.delete
+        )
+
+        return return_message
+
+    else:
+        return None
 
 
 
