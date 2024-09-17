@@ -98,3 +98,15 @@ async def upload_to_backblaze(file: UploadFile = File(..., limit="25MB")):
     except Exception as e:
         # Raise a HTTPException with a 500 status code and the error message
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/list_files")
+async def list_files():
+    
+    bucket_name = "chatall"
+    
+    # Get the bucket by name
+    bucket = b2_api.get_bucket_by_name(bucket_name)
+    
+    # Get all files in the bucket
+    # files = bucket.get
+    
