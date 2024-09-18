@@ -1,5 +1,5 @@
 from datetime import timedelta
-from tkinter import CASCADE
+
 from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -34,7 +34,7 @@ class User(Base):
     role = Column(Enum(UserRole), default=UserRole.user)
     blocked = Column(Boolean, nullable=False, server_default='false')
     password_changed = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-    company_id = Column(Integer, ForeignKey('companies.id', ondelete=CASCADE), nullable=True)
+    company_id = Column(Integer, ForeignKey('companies.id', ondelete='CASCADE'), nullable=True)
     active = Column(Boolean, nullable=False, server_default='True')
     description = Column(String)
     
