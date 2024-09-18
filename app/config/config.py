@@ -52,3 +52,4 @@ class Settings(BaseSettings):
 
 settings = Settings()
 users_data = settings.load_users_data()
+#  test settings
