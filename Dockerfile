@@ -1,17 +1,13 @@
-# Виберіть базовий образ, який містить Python та інше необхідне ПЗ
-FROM python:3.10.11
+# Використовуємо офіційний Python базовий образ
+FROM python:3.10-slim
 
-# Встановлення робочого каталогу контейнера
+# Встановлюємо необхідні бібліотеки для роботи FastAPI
 WORKDIR /app
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Скопіюйте файли залежностей проекту (наприклад, requirements.txt) в контейнер
-COPY requirements.txt requirements.txt
+# Копіюємо весь код в робочу директорію контейнера
+COPY . /app
 
-# Встановлення залежностей
-RUN pip install -r requirements.txt
-
-# Копіювання всіх файлів вашого додатку в контейнер
-COPY . .
-
-# Вказати команду для запуску вашого додатку FastAPI
+# Вказуємо команду для запуску FastAPI через uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

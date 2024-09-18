@@ -10,11 +10,14 @@ class Settings(BaseSettings):
     mail_server: str
     mail_from_name: str
     mail_from_name_company: str
+    mail_from_name_test: str
     database_hostname_company: str
     database_hostname: str
+    database_hostname_test: str
     database_port: str
     database_password_company: str
     database_password: str
+    database_password_test: str
     database_name: str
     database_username: str
     secret_key: str
@@ -26,6 +29,7 @@ class Settings(BaseSettings):
     backblaze_key: str
     url_address_dns: str
     url_address_dns_company: str
+    url_address_dns_test: str
     key_crypto: str
     rout_image: str
     bucket_name_user_avatar: str
