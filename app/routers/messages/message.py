@@ -1,6 +1,6 @@
-import time
+
 from fastapi import status, HTTPException, Depends, APIRouter
-from openai import models
+
 from sqlalchemy import desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
