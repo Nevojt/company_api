@@ -279,40 +279,39 @@ async def update_user(update: user.UserUpdate,
     
 @router.put('/v2/avatar')
 async def update_user_v2(file: UploadFile = File(...), 
-                        db: Session = Depends(get_db), 
+                        db: AsyncSession = Depends(get_async_session),
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
 
-        
     if not current_user.verified or current_user.blocked:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User not verification or blocked."
         )
         
-    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
-    user_data = user_query.first()
+    user_query = select(user_model.User).where(user_model.User.id == current_user.id)
+    user_data = await db.execute(user_query)
+    user_data = user_data.scalar_one_or_none()
     
-    if user_data is None:
+    if not user_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with ID: {current_user.id} not found"
         )
     
-    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
-    user_status = user_status_query.first()
+    user_status_query = select(user_model.User_Status).where(user_model.User_Status.user_id == current_user.id)
+    user_status_result = await db.execute(user_status_query)
+    user_status = user_status_result.scalar_one_or_none()
     
-    if user_status is None:
+    if not user_status:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User status for ID: {current_user.id} not found"
         )
-    avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
-    
-    update = user.UserUpdateAvatar(avatar=avatar)
-    update_data = update.model_dump()
+    avatar_url = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
 
-    user_query.update(update_data, synchronize_session=False)
-    db.commit()
+
+    user_data.avatar = avatar_url
+    await db.commit()
     return "updated avatar"
 
 @router.put('/v2/description')

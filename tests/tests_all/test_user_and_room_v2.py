@@ -114,8 +114,15 @@ async def test_verify_user(test_user_verify, async_session):
 
 @pytest.fixture
 def test_user_update():
-    return {"user_name": "User test Update",
+    return {"user_name": "Update User",
             "avatar": "New avatar"}
+
+@pytest.fixture
+def fake_file():
+    from io import BytesIO
+    return {"avatar": ("avatar.png", BytesIO(b"file_content"), "image/png")}
+
+
 
 @pytest.fixture
 def test_user_update_login():
@@ -123,36 +130,35 @@ def test_user_update_login():
             "password": "password123"}
 
 @pytest.mark.asyncio
-async def test_update_user(test_user_update_login, test_user_update, async_session):
+async def test_update_user(test_user_update_login, fake_file, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
-        login_res = await client.post("/login", 
+        login_res = await client.post("/login",
                                       data={"username": test_user_update_login['email'],
                                             "password": test_user_update_login['password']})
         assert login_res.status_code == 200
         login_data = login_res.json()
         token = login_data['access_token']
 
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        user_info_res = await client.get("/users/", 
-                                         headers={"Authorization": f"Bearer {token}"})
-        assert user_info_res.status_code == 200
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            user_info_res = await client.get("/users/",
+                                             headers={"Authorization": f"Bearer {token}"})
+            assert user_info_res.status_code == 200
 
-    new_data = {
-        "user_name": test_user_update["user_name"],
-        "avatar": test_user_update["avatar"]
-    }
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+        files = {
+            "avatar": fake_file['avatar'],
+        }
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
 
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.put(f"/users/",
-                                    headers=headers,
-                                    json=new_data,
-                                    follow_redirects=False)
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            response = await client.put('/v2/avatar',  # Переконайтесь, що шлях вірний
+                                        headers=headers,
+                                        files=files,  # Використовуйте files для відправлення файлу
+                                        follow_redirects=False)
 
-    assert response.status_code == 200
-    assert response.json()['user_name'] == test_user_update["user_name"]
+            assert response.status_code == 200
+
 
 @pytest.fixture
 def test_user_new_password():

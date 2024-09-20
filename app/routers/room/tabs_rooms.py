@@ -49,7 +49,7 @@ async def create_user_tab(tab: room_schema.RoomTabsCreate,
                                 detail="Maximum tab limit reached. You can only have 10 tabs.")
         
         # Create a new tab
-        new_tab = room_model.RoomTabsInfo(owner_id=current_user.id, **tab.dict())
+        new_tab = room_model.RoomTabsInfo(owner_id=current_user.id, **tab.model_dump())
         db.add(new_tab)
         await db.commit()
         await db.refresh(new_tab)

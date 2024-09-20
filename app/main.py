@@ -20,8 +20,8 @@ from .routers.mail import contact_form
 from .superAdmin import company
 
 from .config.scheduler import setup_scheduler#, scheduler
-from app.config.init_users import create_room
-from .database.database import engine
+from app.config.init_users import create_room, create_company
+from app.database.database import engine
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
 from app.models import following_model, reports_model
@@ -30,7 +30,7 @@ from app.admin import user as admin_user
 from app.admin import room as admin_room
 
 from app.routers.AI import sayory_router
-
+# from app.models.room_model import  Base
 
 
 async def init_db():
@@ -47,8 +47,11 @@ async def init_db():
             print("All tables created successfully.")
         except Exception as e:
             print(f"Error during table creation: {e}")
-
-        await create_room(engine_asinc)
+        try:
+            await create_company(engine_asinc)
+            await  create_room(engine_asinc)
+        except Exception as e:
+            print(f"Error during database initialization: {e}")
         
 
 def startup_event():
@@ -101,7 +104,7 @@ app.include_router(vote.router)
 app.include_router(images.router)
 app.include_router(upload_file_backblaze.router)
 app.include_router(upload_file_supabase.router)
-app.include_router(upload_file_google.router)
+# app.include_router(upload_file_google.router)
 app.include_router(upload_and_return.router)
 
 app.include_router(private_messages.router)
@@ -170,6 +173,6 @@ def get_company_from_subdomain(request: Request):
     return subdomain
 
 @app.get("/company")
-async def get_company(company: str = Depends(get_company_from_subdomain)):
-    return {"company": company}
+async def get_company(company_name: str = Depends(get_company_from_subdomain)):
+    return {"company": company_name}
 

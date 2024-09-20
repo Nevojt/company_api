@@ -1,7 +1,6 @@
 
-from datetime import timedelta
 
-from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
@@ -24,7 +23,7 @@ class Rooms(Base):
     name_room = Column(String, nullable=False, unique=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     image_room = Column(String, nullable=False)
-    owner = Column(Integer, (ForeignKey("users.id", ondelete='SET NULL')), nullable=False)
+    owner = Column(Integer, (ForeignKey("users.id", ondelete='SET NULL')), nullable=True)
     secret_room = Column(Boolean, default=False)
     block = Column(Boolean, nullable=False, server_default='false')
     delete_at = Column(TIMESTAMP(timezone=True), nullable=True)
