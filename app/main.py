@@ -11,7 +11,7 @@ from .mail import send_mail
 
 from .routers.user import auth, finds, user, verify_user, user_status, company_user
 from .routers.messages import message, private_messages, vote
-from .routers.images import images, upload_file_google, upload_file_supabase, upload_and_return, upload_file_backblaze
+from .routers.images import images, upload_file_supabase, upload_and_return, upload_file_backblaze
 from .routers.room import rooms, count_users_messages, secret_rooms, tabs_rooms, user_rooms, ban_user, role_in_room
 from .routers.invitations import invitation_secret_room
 from .routers.token_test import ass
@@ -21,7 +21,6 @@ from .superAdmin import company
 
 from .config.scheduler import setup_scheduler#, scheduler
 from app.config.init_users import create_room, create_company
-from app.database.database import engine
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
 from app.models import following_model, reports_model

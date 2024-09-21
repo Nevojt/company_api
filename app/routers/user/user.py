@@ -41,19 +41,21 @@ async def created_user_v2(subdomain: str = Form(...),
     """
     This function creates a new user in the database.
 
-    Args:
-        email (str): The email of the user.
-        user_name (str): The user name of the user.
-        password (str): The password of the user.
-        file (UploadFile): The avatar file of the user.
-        bucket_name (str): The name of the Backblaze B2 bucket to upload the file to.
-        db (AsyncSession): The database session to use.
+    Parameters:
+    - subdomain (str): The subdomain of the company.
+    - email (str): The email of the user.
+    - user_name (str): The username of the user.
+    - password (str): The password of the user.
+    - file (UploadFile): The avatar file of the user.
+    - description (str): The description of the user.
+    - db (AsyncSession): The database session to use.
 
     Returns:
-        schemas.UserOut: The newly created user.
+    - user.UserOut: The newly created user.
 
     Raises:
-        HTTPException: If a user with the given email already exists.
+    - HTTPException: If a user with the given email or user_name already exists.
+    - HTTPException: If the company with the given subdomain does not exist.
     """
     
     company = select(company_model.Company.id).where(company_model.Company.subdomain == subdomain)
@@ -64,8 +66,9 @@ async def created_user_v2(subdomain: str = Form(...),
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Company with subdomain {subdomain} does not exist.")
     
-    existing_deactivated_user = select(user_model.UserDeactivation).where((user_model.UserDeactivation.email == email) |
-        (user_model.UserDeactivation.user_name == user_name))
+    existing_deactivated_user = (select(user_model.UserDeactivation)
+                                 .where((user_model.UserDeactivation.email == email) |
+                                (user_model.UserDeactivation.user_name == user_name)))
     
     deactivated_result = await db.execute(existing_deactivated_user)
     existing_deactivated_user = deactivated_result.scalar_one_or_none()
@@ -119,12 +122,15 @@ async def created_user_v2(subdomain: str = Form(...),
     await db.refresh(new_user)
     
     # Create a User_Status entry for the new user
-    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+    post = user_model.User_Status(user_id=new_user.id,
+                                  user_name=new_user.user_name,
+                                  name_room="Hell",
+                                  room_id=1)
     db.add(post)
     await db.commit()
     await db.refresh(post)
     
-    registration_link = f"http://{settings.url_address_dns_company}/api/success_registration?token={new_user.token_verify}"
+    registration_link = f"https://{settings.url_address_dns_company}/api/success_registration?token={new_user.token_verify}"
     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
                                            {
                                             "title": "Registration",

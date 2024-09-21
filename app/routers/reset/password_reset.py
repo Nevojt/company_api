@@ -23,13 +23,13 @@ router = APIRouter(
 
 
 @router.post("/request/", status_code=status.HTTP_202_ACCEPTED, response_description="Reset password")
-async def reset_password(request: PasswordResetRequest,
+async def reset_password(request_password: PasswordResetRequest,
                          db: AsyncSession = Depends(get_async_session)):
     """
     Handles the password reset request. Validates the user's email and initiates the password reset process.
 
     Args:
-        request (PasswordResetRequest): The request payload containing the user's email.
+        request_password (PasswordResetRequest): The request payload containing the user's email.
         db (Session, optional): Database session dependency. Defaults to Depends(get_db).
 
     Raises:
@@ -40,18 +40,18 @@ async def reset_password(request: PasswordResetRequest,
         dict: A message confirming that an email has been sent for password reset instructions.
     """
     # Func
-    user = select(user_model.User).where(user_model.User.email == request.email)
+    user = select(user_model.User).where(user_model.User.email == request_password.email)
     user = await db.execute(user)
     user = user.scalar_one_or_none()
     
     
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with email: {request.email} not found")
+                            detail=f"User with email: {request_password.email} not found")
     
     if user.verified is False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with email: {request.email} not verification")
+                            detail=f"User with email: {request_password.email} not verification")
     if user is not None:
         token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
         reset_link = f"https://{settings.url_address_dns_company}/api/reset?token={token}"
