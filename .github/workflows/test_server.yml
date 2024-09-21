@@ -154,6 +154,6 @@ jobs:
         docker run -d --name api_test_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="512m" nevojt/api_test:latest;
         docker run -d --name api_test_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="512m" nevojt/api_test:latest
         "
-
+# Update data
     
 
