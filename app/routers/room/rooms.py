@@ -77,63 +77,6 @@ async def get_rooms_info(db: Session = Depends(get_db),
 
     return rooms_info
 
- 
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_room(room: room_schema.RoomCreate, 
-                      db: AsyncSession = Depends(get_async_session), 
-                      current_user: user_model.User = Depends(oauth2.get_current_user)):
-    """
-    Create a new room.
-
-    Args:
-        room (schemas.RoomCreate): Room creation data.
-        db (AsyncSession): Database session.
-        current_user (str): Currently authenticated user.
-
-    Raises:
-        HTTPException: If the room already exists.
-
-    Returns:
-        room_model.Rooms: The newly created room.
-    """
-    
-    
-    if current_user.blocked == True or current_user.verified == False:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with ID {current_user.id} is blocked or not verified")
-        
-    room_get = select(room_model.Rooms).where(room_model.Rooms.name_room == room.name_room)
-    result = await db.execute(room_get)
-    existing_room = result.scalar_one_or_none()
-    
-    if existing_room:
-        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
-                            detail=f"Room {room.name_room} already exists")
-    
-    
-    new_room = room_model.Rooms(owner=current_user.id, **room.model_dump())
-    db.add(new_room)
-    await db.commit()
-    await db.refresh(new_room)
-    
-    role_in_room = room_model.RoleInRoom(user_id=current_user.id, room_id=new_room.id, role="owner")
-    db.add(role_in_room)
-    await db.commit()
-    await db.refresh(role_in_room)
-    
-    add_room_to_my_room = room_model.RoomsManagerMyRooms(user_id=current_user.id, room_id=new_room.id)
-    db.add(add_room_to_my_room)
-    await db.commit()
-    await db.refresh(add_room_to_my_room)
-    
-    if  room.secret_room == True:
-        manager_room = room_model.RoomsManager(user_id=current_user.id, room_id=new_room.id)
-        db.add(manager_room)
-        await db.commit()
-        await db.refresh(manager_room)
-    
-    return new_room
 
 
 @router.post("/v2", status_code=status.HTTP_201_CREATED)
@@ -458,3 +401,61 @@ async def get_rooms_info_company(current_user: user_model.User = Depends(oauth2.
         rooms_info.append(room_schema.RoomBase(**room_info))
 
     return rooms_info
+
+
+# Old versions
+# @router.post("/", status_code=status.HTTP_201_CREATED)
+# async def create_room(room: room_schema.RoomCreate,
+#                       db: AsyncSession = Depends(get_async_session),
+#                       current_user: user_model.User = Depends(oauth2.get_current_user)):
+#     """
+#     Create a new room.
+#
+#     Args:
+#         room (schemas.RoomCreate): Room creation data.
+#         db (AsyncSession): Database session.
+#         current_user (str): Currently authenticated user.
+#
+#     Raises:
+#         HTTPException: If the room already exists.
+#
+#     Returns:
+#         room_model.Rooms: The newly created room.
+#     """
+#
+#
+#     if current_user.blocked == True or current_user.verified == False:
+#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+#                             detail=f"User with ID {current_user.id} is blocked or not verified")
+#
+#     room_get = select(room_model.Rooms).where(room_model.Rooms.name_room == room.name_room)
+#     result = await db.execute(room_get)
+#     existing_room = result.scalar_one_or_none()
+#
+#     if existing_room:
+#         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+#                             detail=f"Room {room.name_room} already exists")
+#
+#
+#     new_room = room_model.Rooms(owner=current_user.id, **room.model_dump())
+#     db.add(new_room)
+#     await db.commit()
+#     await db.refresh(new_room)
+#
+#     role_in_room = room_model.RoleInRoom(user_id=current_user.id, room_id=new_room.id, role="owner")
+#     db.add(role_in_room)
+#     await db.commit()
+#     await db.refresh(role_in_room)
+#
+#     add_room_to_my_room = room_model.RoomsManagerMyRooms(user_id=current_user.id, room_id=new_room.id)
+#     db.add(add_room_to_my_room)
+#     await db.commit()
+#     await db.refresh(add_room_to_my_room)
+#
+#     if  room.secret_room == True:
+#         manager_room = room_model.RoomsManager(user_id=current_user.id, room_id=new_room.id)
+#         db.add(manager_room)
+#         await db.commit()
+#         await db.refresh(manager_room)
+#
+#     return new_room
