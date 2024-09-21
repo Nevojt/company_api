@@ -1,4 +1,4 @@
-aiosmtplib>=2.0,<3.0
+aiosmtplib==2.0.2
 annotated-types==0.7.0
 anyio==4.4.0
 APScheduler==3.10.4
@@ -24,6 +24,7 @@ email_validator==2.2.0
 enumb==0.1.5
 exceptiongroup==1.2.2
 expo==0.1.2
+Faker==29.0.0
 fastapi==0.111.1
 fastapi-cli==0.0.4
 fastapi-mail==1.4.1
@@ -36,6 +37,7 @@ google-resumable-media==2.7.1
 googleapis-common-protos==1.63.2
 gotrue==2.5.5
 greenlet==3.0.3
+gTTS==2.5.3
 gunicorn==22.0.0
 h11==0.14.0
 h2==4.1.0
@@ -78,6 +80,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-jose==3.3.0
 python-multipart==0.0.9
+pyttsx3==2.91
 pytz==2024.1
 PyYAML==6.0.1
 realtime==1.0.6

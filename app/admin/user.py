@@ -103,7 +103,7 @@ async def created_user_admin(email: str = Form(...),
                             detail=f"User with user_name {existing_username_user.user_name} already exists")
     
     # Hash the user's password
-    hashed_password = utils.hash(user_data.password)
+    hashed_password = utils.hash_password(user_data.password)
     user_data.password = hashed_password
     
     verification_token = utils.generate_unique_token(user_data.email)

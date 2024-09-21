@@ -10,8 +10,10 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.schemas import user, token
 from .utils import random_email, random_lower_string
+from faker import Faker
 
 client = TestClient(app)
+faker = Faker()
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -28,28 +30,33 @@ async def async_session():
 
 @pytest.fixture
 def test_user_create():
-    return {"email": random_email(),
-            "password": "password123",
-            "subdomain": "sayorama"}
+    return {"subdomain": "test.sayorama",
+            "user_name": faker.user_name(),
+            "email": faker.email(),
+            "password": faker.password(),
+            "description": faker.text()
+            }
 
 @pytest.mark.asyncio
 async def test_create_user_v2(test_user_create, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
-        user_name = random_lower_string()
+        user_name = test_user_create["user_name"]
         email = test_user_create["email"]
         password = test_user_create["password"]
         subdomain = test_user_create["subdomain"]
+        description = test_user_create["description"]
 
-        response = await client.post(
-            "/users/v2",
-            data={
-                "email": email,
-                "user_name": user_name,
-                "password": password,
-                "subdomain": subdomain
-            },
-            files={"file": (None, "", "application/octet-stream")}
-        )
+        response = await client.post("/users/v2",
+                                    data={
+                                        "subdomain": subdomain,
+                                        "email": email,
+                                        "user_name": user_name,
+                                        "password": password,
+                                        "description": description
+
+                                    },
+                                    files={"avatar": (None, "", "application/octet-stream")}
+                                    )
 
         assert response.status_code == 201
         new_user = user.UserOut(**response.json())
@@ -64,9 +71,10 @@ def test_login_user_fixture():
 async def test_login_user_login(test_login_user_fixture, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
         res = await client.post(
-            "/login", data={"username": test_login_user_fixture['email'], "password": test_login_user_fixture['password']}
+            "/login", data={"username": test_login_user_fixture['email'],
+                            "password": test_login_user_fixture['password']}
         )
-        
+
         assert res.status_code == 200
         login_res = token.Token(**res.json())
         payload = jwt.decode(login_res.access_token, settings.secret_key, algorithms=[settings.algorithm])
@@ -82,7 +90,7 @@ def test_user_verify():
 async def test_verify_user(test_user_verify, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
         # Authenticate the user
-        login_res = await client.post("/login", 
+        login_res = await client.post("/login",
                                       data={"username": test_user_verify['email'],
                                             "password": test_user_verify['password']})
         assert login_res.status_code == 200
@@ -91,7 +99,7 @@ async def test_verify_user(test_user_verify, async_session):
 
     async with AsyncClient(app=app, base_url="http://test") as client:
         # Get user's information to find the user ID
-        user_info_res = await client.get("/users/", 
+        user_info_res = await client.get("/users/",
                                          headers={"Authorization": f"Bearer {token}"})
         assert user_info_res.status_code == 200
         users = user_info_res.json()
@@ -117,12 +125,21 @@ def test_user_update():
     return {"user_name": "Update User",
             "avatar": "New avatar"}
 
+import io
+
+# Створюємо фейковий файл зображення
+def create_fake_image():
+    image = io.BytesIO()
+    # Використовуємо PIL для створення зображення
+    from PIL import Image
+    with Image.new('RGB', (100, 100), color = 'red') as img:
+        img.save(image, format='PNG')
+    image.seek(0)  # Важливо повернути курсор на початок файлу після запису
+    return image
+
 @pytest.fixture
 def fake_file():
-    from io import BytesIO
-    return {"avatar": ("avatar.png", BytesIO(b"file_content"), "image/png")}
-
-
+    return create_fake_image()
 
 @pytest.fixture
 def test_user_update_login():
@@ -130,7 +147,7 @@ def test_user_update_login():
             "password": "password123"}
 
 @pytest.mark.asyncio
-async def test_update_user(test_user_update_login, fake_file, async_session):
+async def test_update_user_avatar(test_user_update_login, fake_file, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
         login_res = await client.post("/login",
                                       data={"username": test_user_update_login['email'],
@@ -143,21 +160,20 @@ async def test_update_user(test_user_update_login, fake_file, async_session):
             user_info_res = await client.get("/users/",
                                              headers={"Authorization": f"Bearer {token}"})
             assert user_info_res.status_code == 200
-
-        files = {
-            "avatar": fake_file['avatar'],
-        }
+        files = {'file': (f'{faker.random_letter()}.png', fake_file, 'image/png')}
         headers = {
-            "Authorization": f"Bearer {token}"
+            'Authorization': f'Bearer {token}',
+            'accept': 'application/json',
+            # 'Content-Type': 'multipart/form-data'
         }
 
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.put('/v2/avatar',  # Переконайтесь, що шлях вірний
+            user_res = await client.put("/users/v2/avatar",
+                                        files=files,
                                         headers=headers,
-                                        files=files,  # Використовуйте files для відправлення файлу
                                         follow_redirects=False)
-
-            assert response.status_code == 200
+            print(user_res.text)
+            assert user_res.status_code == 200
 
 
 @pytest.fixture
@@ -192,7 +208,7 @@ async def test_change_user_password(test_user_update_password, test_user_new_pas
         res_password = await client.put("/manipulation/password",
                                         headers={"Authorization": f"Bearer {token}"},
                                         json=change_password)
-        
+
         assert res_password.status_code == 200
 
 @pytest.fixture
@@ -209,7 +225,7 @@ def test_user_delete_login():
 @pytest.mark.asyncio
 async def test_create_user_v2_del(test_user_delete_login, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
-        
+
         response = await client.post(
             "/users/test",
             json={
@@ -263,10 +279,10 @@ def test_room():
     return {"name_room": "Test Room Created",
             "image_room": "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/Content%20Home%20page/Desktop/Danger%20in%20nature.jpg",
             "secret_room": True}
-    
 
 
-    
+
+
 @pytest.mark.asyncio
 async def test_created_rooms(test_user, test_room, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
@@ -274,13 +290,12 @@ async def test_created_rooms(test_user, test_room, async_session):
         assert login_res.status_code == 200
         login_data = login_res.json()
         token = login_data['access_token']
-        
+
         headers = {"Authorization": f"Bearer {token}"}
-        
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.post("/rooms/v2",
-                            headers=headers, 
+                            headers=headers,
                             data={
                                 "name_room": test_room['name_room'],
                                 "image_room": test_room['image_room'],
@@ -288,7 +303,7 @@ async def test_created_rooms(test_user, test_room, async_session):
                             files={"file": (None, "", "application/octet-stream")})
         assert response.status_code == 201
 
-    
+
 @pytest.mark.asyncio
 async def test_get_one_name(test_room, async_session):
     room = test_room['name_room']
@@ -304,9 +319,9 @@ async def test_get_all_room(test_user, async_session):
         assert login_res.status_code == 200
         login_data = login_res.json()
         token = login_data['access_token']
-        
+
         headers = {"Authorization": f"Bearer {token}"}
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/rooms/", headers=headers)
         assert response.status_code == 200
@@ -317,7 +332,7 @@ def test_update_room():
     return {"name_room": "Test Room Update",
             "image_room": "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/Content%20Home%20page/Desktop/Winter%20fun.jp",
             "secret_room": True}
-     
+
 @pytest.mark.asyncio
 async def test_update_rooms(test_user, test_room, test_update_room, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
@@ -325,9 +340,9 @@ async def test_update_rooms(test_user, test_room, test_update_room, async_sessio
         assert login_res.status_code == 200
         login_data = login_res.json()
         token = login_data['access_token']
-        
+
         headers = {"Authorization": f"Bearer {token}"}
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         room = test_room['name_room']
         response = await client.get(f"rooms/{room}")
@@ -335,10 +350,10 @@ async def test_update_rooms(test_user, test_room, test_update_room, async_sessio
         room_data = response.json()
         id_room = room_data['id']
 
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.put(f"/rooms/{id_room}",
-                            headers=headers, 
+                            headers=headers,
                             json=test_update_room,
                             follow_redirects=False)
         assert response.status_code == 200
@@ -353,9 +368,9 @@ async def test_delete_rooms(test_user, test_update_room, async_session):
         assert login_res.status_code == 200
         login_data = login_res.json()
         token = login_data['access_token']
-        
+
         headers = {"Authorization": f"Bearer {token}"}
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         room = test_update_room['name_room']
         response = await client.get(f"rooms/{room}")
@@ -363,7 +378,7 @@ async def test_delete_rooms(test_user, test_update_room, async_session):
         room_data = response.json()
         id_room = room_data['id']
 
-        
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.delete(f"/rooms/{id_room}",
                             headers=headers,

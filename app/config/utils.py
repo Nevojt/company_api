@@ -19,7 +19,7 @@ b2_api.authorize_account("production", settings.backblaze_id, settings.backblaze
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def hash(password: str):
+def hash_password(password: str):
     """
     Hash a password using the CryptContext from passlib.context.
 

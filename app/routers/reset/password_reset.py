@@ -93,7 +93,7 @@ async def reset(token: str, new_password: PasswordReset, db: AsyncSession = Depe
 
     current_time_utc = datetime.now(pytz.UTC)
     # hashed new password
-    hashed_password = utils.hash(new_password.password)
+    hashed_password = utils.hash_password(new_password.password)
 
     # Update password to database
     user.password = hashed_password

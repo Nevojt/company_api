@@ -2,14 +2,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from fastapi import Depends
-from app.database.async_db import get_async_session, engine_asinc
+from app.database.async_db import get_async_session
 from app.models import user_model, room_model, company_model
 from app.config import utils, config
 
 
-async def create_company(engine_asinc):
-    async with AsyncSession(engine_asinc) as session:
-        # Перевірка на існування компанії з даним субдоменом або email
+async def create_company(engine_asinc_db):
+    async with AsyncSession(engine_asinc_db) as session:
+
         existing_company = await session.execute(
             select(company_model.Company).where(
                 (company_model.Company.subdomain == "test.sayorama") |
@@ -57,19 +57,26 @@ async def create_initial_users(db: AsyncSession = Depends(get_async_session)):
         user = user_model.User(
             user_name=user_data["user_name"],
             email=user_data["email"],
-            password=utils.hash(user_data["password"]),
+            password=utils.hash_password(user_data["password"]),
             avatar=user_data["avatar"],
             company_id=1
         )
         db.add(user)
+        await  db.flush()
+
+        user_status = user_model.User_Status(user_id=user.id,
+                                             user_name=user.user_name,
+                                             name_room="Hell",
+                                             room_id=1)
+        db.add(user_status)
 
     await db.commit()
     
     
     
-async def create_room(engine_asinc):
-    # await  create_company(engine_asinc)
-    async with AsyncSession(engine_asinc) as session:
+async def create_room(engine_asinc_db):
+
+    async with AsyncSession(engine_asinc_db) as session:
     # Check if the room already exists
         existing_room = await session.execute(select(room_model.Rooms).filter_by(name_room='Hell'))
         existing_room = existing_room.scalars().first()

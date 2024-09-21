@@ -97,7 +97,7 @@ async def created_user_v2(subdomain: str = Form(...),
                             detail=f"User with user_name {existing_username_user.user_name} already exists")
     
     # Hash the user's password
-    hashed_password = utils.hash(user_data.password)
+    hashed_password = utils.hash_password(user_data.password)
     user_data.password = hashed_password
     
     verification_token = utils.generate_unique_token(user_data.email)
@@ -511,7 +511,7 @@ async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends
     10. Returns the new user object.
     """
     # Hash the user's password
-    hashed_password = utils.hash(user.password)
+    hashed_password = utils.hash_password(user.password)
     user.password = hashed_password
 
     # Create a new user and add it to the database
