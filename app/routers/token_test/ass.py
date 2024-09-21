@@ -1,10 +1,9 @@
 
 from fastapi import APIRouter, Response, status, HTTPException, Depends
-from sqlalchemy.orm import Session
-from app.database.database import get_db
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.async_db import get_async_session
 from app.auth import oauth2
-from app.models.user_model import User
+
 
 
 router = APIRouter(tags=['ASS'])
@@ -16,12 +15,13 @@ credentials_exception = HTTPException(
 )
 
 @router.get('/ass')
-def ass_endpoint(token: str, session: Session = Depends(get_db)):
+async def ass_endpoint(token: str,
+                        db: AsyncSession = Depends(get_async_session)):
     """_summary_
 
     Args:
         token (str): token verification
-        session (Session, optional): session database. Defaults to Depends(get_db).
+        db (Session, optional): session database. Defaults to Depends(get_db).
 
     Raises:
         HTTPException:: Token not validation
@@ -29,16 +29,25 @@ def ass_endpoint(token: str, session: Session = Depends(get_db)):
     Returns:
         Response: return server
     """
-    
-    try:
-        user_data = oauth2.verify_access_token(token, credentials_exception)
-        user = session.query(User).filter(User.id == user_data.id).first()
-        
-        if user.blocked == True:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail=f"User with ID {user.id} is blocked")
 
-            
+    try:
+        user_data = await oauth2.verify_access_token(token=token,
+                                               credentials_exception=credentials_exception,
+                                               db=db)
+
+        if not user_data:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        check_user = await oauth2.get_current_user(token=token,
+                                             db=db)
+        if not check_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if check_user.blocked:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail=f"User with ID {check_user.id} is blocked")
+
+
         return Response(status_code=status.HTTP_200_OK)
     except HTTPException as ex_error:
         raise ex_error

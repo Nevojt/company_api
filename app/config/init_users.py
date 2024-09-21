@@ -30,7 +30,7 @@ async def create_company(engine_asinc_db):
             contact_phone="1234567890",
             address="123 Example St",
             description="Just an example company",
-            logo_url="http://example.com/logo.png"
+            logo_url="https://example.com/logo.png"
         )
         session.add(new_company)
         await session.commit()

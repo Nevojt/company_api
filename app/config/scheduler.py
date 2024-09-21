@@ -34,7 +34,7 @@ async def delete_old_rooms(db_session_factory):
 async def delete_test_users(db_session_factory):
     async with db_session_factory() as db:
         
-        email_pattern = '%.testuser'
+        email_pattern = '%@example.com'
         
         query = select(user_model.User).where(user_model.User.email.like(email_pattern))
         result = await db.execute(query)
