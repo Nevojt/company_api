@@ -87,18 +87,15 @@ async def create_room_v2(name_room: str =Form(...),
                         db: AsyncSession = Depends(get_async_session), 
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
     """
-    Create a new room.
-
-    Args:
-        room (schemas.RoomCreate): Room creation data.
-        db (AsyncSession): Database session.
-        current_user (str): Currently authenticated user.
-
-    Raises:
-        HTTPException: If the room already exists.
-
-    Returns:
-        room_model.Rooms: The newly created room.
+    1. A brief description of the function's purpose: This function creates a new room with the provided parameters.
+    2. Detailed descriptions of each parameter:
+    name_room: The name of the room.
+    description: The description of the room.
+    file: The file containing the image for the room.
+    secret: A boolean indicating whether the room should be secret.
+    db: The asynchronous database session.
+    current_user: The currently authenticated user.
+    3. The return value and its meaning: The function returns the newly created room.
     """
     default_image = ["https://f003.backblazeb2.com/file/imagesapp/DALLE_1+.webp",
                      "https://f003.backblazeb2.com/file/imagesapp/DALLE_4.webp",
@@ -141,7 +138,7 @@ async def create_room_v2(name_room: str =Form(...),
     await db.commit()
     await db.refresh(add_room_to_my_room)
     
-    if  room_data.secret_room == True:
+    if  room_data.secret_room:
         manager_room = room_model.RoomsManager(user_id=current_user.id, room_id=new_room.id)
         db.add(manager_room)
         await db.commit()
@@ -186,7 +183,7 @@ def delete_room(room_id: int, db: Session = Depends(get_db),
     Returns:
         Response: An empty response with status code 204 No Content.
     """
-    if current_user.blocked == True or current_user.verified == False:
+    if current_user.blocked or current_user.verified == False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} is blocked or not verified")
     
@@ -214,14 +211,22 @@ def delete_room(room_id: int, db: Session = Depends(get_db),
 
 
 @router.put("/{room_id}", response_model=room_schema.RoomUpdate)  # Assuming you're using room_id
-async def update_room(room_id: int, 
-                      update_room: room_schema.RoomCreate, 
+async def update_room_func(room_id: int,
+                      update_room: room_schema.RoomCreate,
                       db: AsyncSession = Depends(get_async_session), 
                       current_user: user_model.User = Depends(oauth2.get_current_user)):
-    """
-    Update a room by ID.
-    """
-    if current_user.blocked or not current_user.verified:
+    """1.
+    A brief description of the function's purpose: This function updates a room with new data provided by update_room.
+    2.
+    Detailed descriptions of each parameter:
+    room_id: The ID of the room to update.
+    update_room: An instance of room_schema.RoomCreate containing the new data for the room.
+    db: An asynchronous database session provided by FastAPI's dependency injection system.
+    current_user: An instance of user_model.User representing the currently authenticated user.
+    3.
+    The return value and its meaning: The function returns an instance of room_schema.RoomUpdate representing the updated room."""
+
+    if current_user.blocked or current_user.verified == False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Access denied for user {current_user.id}")
 
@@ -257,7 +262,7 @@ async def update_room(room_id: int,
             await db.commit()
             await db.refresh(manager)
 
-    elif update_room.secret_room == False:
+    else:
         if manager is not None:
             await db.delete(manager)
             await db.commit()
