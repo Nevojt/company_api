@@ -19,8 +19,8 @@ SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
-logging.basicConfig(filename='_log/authentication.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+# logging.basicConfig(filename='_log/authentication.log', format='%(asctime)s - %(levelname)s - %(message)s')
+# logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=['Authentication'])
 
@@ -56,10 +56,10 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
         
-        if user.blocked == True:
+        if user.blocked:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is blocked")
-        if user.active == False:
+        if user.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is not active")
         
@@ -79,12 +79,12 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
             "token_type": "bearer"}
         
     except HTTPException as ex_error:
-        logger.error(f"Error processing Authentication {ex_error}", exc_info=True)
+        # logger.error(f"Error processing Authentication {ex_error}", exc_info=True)
         # Re-raise HTTPExceptions without modification
         raise
     except Exception as e:
         # Log the exception or handle it as you see fit
-        logger.error(f"An error occurred: Authentication {e}", exc_info=True)
+        # logger.error(f"An error occurred: Authentication {e}", exc_info=True)
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while processing the request.")
 
