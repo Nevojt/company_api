@@ -1,6 +1,6 @@
 
-from datetime import timedelta
-from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
+
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship

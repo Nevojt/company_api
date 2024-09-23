@@ -27,7 +27,7 @@ share/python-wheels/
 MANIFEST
 .env*
 sinuous-grove-405612-a7d9d516c960.json
-_log
+#app/_log
 users_data.json
 
 # PyInstaller
@@ -130,7 +130,7 @@ celerybeat.pid
 
 # Environments
 .env.mail
-.env*
+.env
 .venv
 /venv*
 env/

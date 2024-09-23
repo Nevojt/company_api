@@ -87,7 +87,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     return user
 
 
-async def create_refresh_token(user_id: str, db: AsyncSession):
+async def create_refresh_token(user_id: int, db: AsyncSession):
     # Отримання користувача з бази даних
     user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
     user = user.scalar()

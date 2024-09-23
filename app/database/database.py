@@ -7,8 +7,7 @@ import time
 from app.config.config import settings
 
 
-SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg2://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
-
+SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg2://{settings.database_name}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_username}'
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
@@ -40,6 +39,6 @@ while True:
         break
 
     except Exception as error:
-            print('Conection to database failed')
+            print('Connection to database failed')
             print("Error:",  error)
             time.sleep(2)

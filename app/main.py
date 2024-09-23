@@ -55,7 +55,7 @@ async def init_db():
         except Exception as e:
             print(f"Error during table creation: {e}")
 
-        await create_room(engine_asinc)
+        # await create_room(engine_asinc)
         
     
     
