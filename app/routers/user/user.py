@@ -296,9 +296,9 @@ async def update_user(update: user.UserUpdate,
         )
         
     user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
-    user = user_query.first()
+    user_result = user_query.first()
     
-    if user is None:
+    if user_result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with ID: {current_user.id} not found"
