@@ -75,8 +75,8 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t nevojt/public_api:latest .
-        docker push nevojt/public_api:latest
+        docker build -t nevojt/public_api:${{ github.sha }} .
+        docker push nevojt/public_api:${{ github.sha }}
 
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
