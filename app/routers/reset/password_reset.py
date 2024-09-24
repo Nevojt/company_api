@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import pytz
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -10,7 +10,7 @@ from app.schemas.reset import PasswordReset, PasswordResetRequest
 from app.auth import oauth2
 from app.config import utils
 from app.mail.send_mail import password_reset
-from app.database.database import get_db
+# from app.database.database import get_db
 from app.database.async_db import get_async_session
 from app.config.config import settings
 
