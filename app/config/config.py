@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     mail_from: str
     mail_port: int
     mail_server: str
+
     mail_from_name: str
     mail_from_name_company: str
 
@@ -47,8 +48,8 @@ class Settings(BaseSettings):
             print(f"Warning: File {self.users_data_file} not found. Loading default users data.")
             return []  # Or return a default configuration if appropriate
         with open(self.users_data_file, 'r') as file:
-            users_data = json.load(file)
-        return users_data
+            users_data_json = json.load(file)
+        return users_data_json
 
 
 
