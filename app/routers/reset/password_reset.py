@@ -24,7 +24,8 @@ router = APIRouter(
 
 
 @router.post("/request/", status_code=status.HTTP_202_ACCEPTED, response_description="Reset password")
-async def reset_password(request: PasswordResetRequest, db: AsyncSession = Depends(get_async_session)):
+async def reset_password(request: PasswordResetRequest,
+                         db: AsyncSession = Depends(get_async_session)):
     """
     Handles the password reset request. Validates the user's email and initiates the password reset process.
 
@@ -56,13 +57,15 @@ async def reset_password(request: PasswordResetRequest, db: AsyncSession = Depen
         token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
         reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
         
-        await password_reset("Password Reset", user.email,
-            {
-                "title": "Password Reset",
-                "name": user.user_name,
-                "reset_link": reset_link
-            }
-        )
+        await password_reset(subject="Password Reset",
+                             email_to=user.email,
+                             body={
+                                "title": "Password Reset",
+                                "name": user.user_name,
+                                "reset_link": reset_link
+                            }
+                        )
+
         return {"msg": "Email has been sent with instructions to reset your password."}
         
     else:

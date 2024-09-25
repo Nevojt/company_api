@@ -14,8 +14,8 @@ conf = ConnectionConfig(
     MAIL_PORT=settings.mail_port,
     MAIL_SERVER=settings.mail_server,
     MAIL_FROM_NAME=settings.mail_from_name,
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,  
+    MAIL_STARTTLS=False,
+    MAIL_SSL_TLS=True,
 )
 
 
@@ -85,7 +85,7 @@ async def password_reset_mobile(subject: str, email_to: str, body: dict):
 
     return {"message": "Email has been sent."}
 
-templare_mail_regostration = env.get_template('email.html')
+template_mail_registration = env.get_template('email.html')
 
 async def send_registration_mail(subject: str, email_to: str, body: dict):
     """
@@ -103,7 +103,7 @@ async def send_registration_mail(subject: str, email_to: str, body: dict):
         Exception: An exception is raised if there is an error sending the email.
     """
     
-    html_content = templare_mail_regostration.render(body)
+    html_content = template_mail_registration.render(body)
     message = MessageSchema(
         subject=subject,
         recipients=[email_to],
