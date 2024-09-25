@@ -12,7 +12,7 @@ class Report(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     message_id = Column(Integer, ForeignKey('socket.id'), nullable=False)
-    reported_by_user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    reported_by_user_id = Column(Integer, nullable=False)
     reason = Column(String, nullable=False)
     additional_info = Column(Text, nullable=True)
     status = Column(String, nullable=False, default="Pending")
