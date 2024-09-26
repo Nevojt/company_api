@@ -37,6 +37,6 @@ class Notification(Base):
     report_id = Column(Integer, ForeignKey("reports.id"), nullable=False)
 
     # Relationships
-    room = relationship("Rooms", back_populates="notifications")
+    rooms = relationship("Rooms", back_populates="notifications")
     message = relationship("Socket", back_populates="notifications")
     moderator = relationship("User", back_populates="notifications")

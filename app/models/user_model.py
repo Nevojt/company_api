@@ -38,7 +38,7 @@ class User(Base):
     description = Column(String)
     
     company = relationship("Company", back_populates="users")
-    bans = relationship("Ban", back_populates="user")
+    bans = relationship("Ban", back_populates="users")
     # Relationships
     reports = relationship("Report", back_populates="reported_by_user")
     notifications = relationship("Notification", back_populates="moderator")

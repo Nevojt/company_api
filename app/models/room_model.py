@@ -27,13 +27,13 @@ class Rooms(Base):
     secret_room = Column(Boolean, default=False)
     block = Column(Boolean, nullable=False, server_default='false')
     delete_at = Column(TIMESTAMP(timezone=True), nullable=True)
-    company_id = Column(Integer, ForeignKey('companies.id', ondelete="CASCADE"), nullable=False)
+    company_id = Column(Integer, ForeignKey('companies.id', ondelete="CASCADE"), nullable=True)
     description = Column(String(255), nullable=True)
     
     # Relationships
     company = relationship("Company", back_populates="rooms")
-    invitations = relationship("RoomInvitation", back_populates="room")
-    notifications = relationship("Notification", back_populates="room")
+    invitations = relationship("RoomInvitation", back_populates="rooms")
+    notifications = relationship("Notification", back_populates="rooms")
     
 class RoomsManager(Base):
     __tablename__ = 'rooms_manager_secret'
@@ -85,7 +85,7 @@ class RoomInvitation(Base):
     status = Column(Enum('pending', 'accepted', 'declined', name='invitation_status'), default='pending')
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
-    room = relationship("Rooms", back_populates="invitations")
+    rooms = relationship("Rooms", back_populates="invitations")
     sender = relationship("User", foreign_keys=[sender_id])
     recipient = relationship("User", foreign_keys=[recipient_id])
     
@@ -109,4 +109,4 @@ class Ban(Base):
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     
-    user = relationship("User", back_populates="bans")
+    users = relationship("User", back_populates="bans")
