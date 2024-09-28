@@ -68,7 +68,7 @@ app = FastAPI(
     docs_url="/docs",
     title="Chat Public",
     description="Chat documentation Public",
-    version="0.1.5",
+    version="0.1.5.1",
     on_startup=[init_db, startup_event],
     # on_shutdown=[on_shutdown]
 )
