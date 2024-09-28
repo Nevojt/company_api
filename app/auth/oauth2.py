@@ -1,4 +1,3 @@
-
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 
@@ -13,7 +12,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
@@ -36,7 +34,6 @@ async def create_access_token(data: dict, db: AsyncSession):
     return encoded_jwt
 
 
-
 async def verify_access_token(token: str, credentials_exception, db: AsyncSession):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -48,7 +45,7 @@ async def verify_access_token(token: str, credentials_exception, db: AsyncSessio
         user = user.scalar()
 
         if user is None or str(user.password_changed) != payload['password_changed']:
-            raise credentials_exception 
+            raise credentials_exception
 
         token_data = TokenData(id=user_id)
     except JWTError:
@@ -56,7 +53,7 @@ async def verify_access_token(token: str, credentials_exception, db: AsyncSessio
 
     return token_data
 
-    
+
 async def get_current_user(token: str = Depends(oauth2_scheme),
                            db: AsyncSession = Depends(async_db.get_async_session)):
     """
@@ -73,21 +70,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
         HTTPException: If the credentials are invalid.
     """
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, 
-        detail="Could not validate credentials", 
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
-        )
-    
+    )
+
     token = await verify_access_token(token, credentials_exception, db)
-    
-    
+
     user = await db.execute(select(user_model.User).filter(user_model.User.id == token.id))
     user = user.scalar()
-    
+
     return user
 
 
-async def create_refresh_token(user_id: int, db: AsyncSession):
+async def create_refresh_token(user_id: str, db: AsyncSession):
     # Отримання користувача з бази даних
     user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
     user = user.scalar()

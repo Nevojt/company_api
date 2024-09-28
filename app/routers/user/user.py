@@ -141,7 +141,7 @@ async def created_user_v2(email: str = Form(...),
 async def delete_user(
     password: user.UserDelete,
     db: AsyncSession = Depends(get_async_session), 
-    current_user: int = Depends(oauth2.get_current_user)
+    current_user: user_model.User = Depends(oauth2.get_current_user)
 ):
     """
     Asynchronously deletes a user from the database.
@@ -409,7 +409,8 @@ async def update_user_v2(user_name: str = Form(...),
 
 
 @router.get('/{email}', response_model=user.UserInfo)
-def get_user_mail(email: str, db: Session = Depends(get_db)):
+def get_user_mail(email: str,
+                  db: Session = Depends(get_db)):
     """
     Get a user by their email.
 
@@ -435,7 +436,8 @@ def get_user_mail(email: str, db: Session = Depends(get_db)):
     return user
 
 @router.get('/audit/{user_name}', response_model=user.UserInfo)
-def get_user_name(user_name: str, db: Session = Depends(get_db)):
+def get_user_name(user_name: str,
+                  db: Session = Depends(get_db)):
     """
     Get a user by their use_name.
 
@@ -486,7 +488,8 @@ async def read_users(db: AsyncSession = Depends(get_async_session)):
 
 
 @router.post("/test", status_code=status.HTTP_201_CREATED, response_model=user.UserOut, include_in_schema=False)
-async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends(get_async_session)):
+async def created_user_test(user: user.UserCreateDel,
+                            db: AsyncSession = Depends(get_async_session)):
     """
     This function creates a new user in the database. It takes a UserCreateDel object as input, which contains the user's details.
 
