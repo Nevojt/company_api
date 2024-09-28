@@ -23,7 +23,7 @@ async def create_company(engine_asinc_db):
 
         new_company = company_model.Company(
             name="Sayorama Company",
-            subdomain="test.sayorama",
+            subdomain="sayorama",
             contact_email="test@sayorama.eu",
             contact_phone="1234567890",
             address="123 Example St",

@@ -66,7 +66,7 @@ async def on_shutdown():
 app = FastAPI(
     root_path="/api",
     docs_url="/docs",
-    title="Chat",
+    title="Chat Public",
     description="Chat documentation Public",
     version="0.1.5",
     on_startup=[init_db, startup_event],
