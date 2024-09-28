@@ -64,7 +64,7 @@ async def on_shutdown():
     scheduler.shutdown()
 
 app = FastAPI(
-    root_path="/public/api",
+    root_path="/api",
     docs_url="/docs",
     title="Chat",
     description="Chat documentation Public",
