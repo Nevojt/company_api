@@ -1,29 +1,23 @@
 from datetime import datetime
 from typing import List
-from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
 
 import pytz
-from sqlalchemy.orm import Session
-from sqlalchemy.future import select
+from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import Session
 
-from app.mail import send_mail
-
-from ...config import utils
 from app.config.config import settings
 from app.config.hello import say_hello_system, system_notification_sayory
-
-from .created_image import generate_image_with_letter
-from ...auth import oauth2
-from ...database.async_db import get_async_session
-from ...database.database import get_db
+from app.mail import send_mail
 from app.models import user_model, room_model
 from app.schemas import user
-
-
-
-
-
+from .created_image import generate_image_with_letter
+from ...auth import oauth2
+from ...config import utils
+from ...database.async_db import get_async_session
+from ...database.database import get_db
 
 router = APIRouter(
     prefix="/users",
@@ -31,9 +25,9 @@ router = APIRouter(
 )
 
 
-
 @router.post("/v2", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
-async def created_user_v2(email: str = Form(...),
+async def created_user_v2(background_tasks: BackgroundTasks,
+                          email: str = Form(...),
                           user_name: str = Form(...),
                           password: str = Form(...),
                           file: UploadFile = File(None),
@@ -44,10 +38,11 @@ async def created_user_v2(email: str = Form(...),
 
     Args:
         email (str): The email of the user.
-        user_name (str): The user name of the user.
+        user_name (str): The user_name of the user.
         password (str): The password of the user.
         file (UploadFile): The avatar file of the user.
-        bucket_name (str): The name of the Backblaze B2 bucket to upload the file to.
+
+        description: The description of the user.
         db (AsyncSession): The database session to use.
 
     Returns:
@@ -56,7 +51,7 @@ async def created_user_v2(email: str = Form(...),
     Raises:
         HTTPException: If a user with the given email already exists.
     """
-    
+    start = datetime.now()
     company = 1
     
     existing_deactivated_user = select(user_model.UserDeactivation).where((user_model.UserDeactivation.email == email) |
@@ -118,16 +113,18 @@ async def created_user_v2(email: str = Form(...),
     db.add(post)
     await db.commit()
     await db.refresh(post)
-    
+
+    # Offload email sending and system notification to BackgroundTasks
     registration_link = f"https://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
-    await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
-                                           {
-                                            "title": "Registration",
-                                            "name": user_data.user_name,
-                                            "registration_link": registration_link
-                                            })
-    await say_hello_system(new_user.id)
-    
+    background_tasks.add_task(send_mail.send_registration_mail, "Thank you for registration!", new_user.email,
+                              {
+                                  "title": "Registration",
+                                  "name": user_data.user_name,
+                                  "registration_link": registration_link
+                              })
+    background_tasks.add_task(say_hello_system, new_user.id)
+    finish = datetime.now() - start
+    print(f"Create User Time: {finish}")
     return new_user
 
 
