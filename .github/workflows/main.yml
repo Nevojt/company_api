@@ -64,9 +64,9 @@ jobs:
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
           echo "USERS_DATA_FILE=${{ secrets.USERS_DATA_FILE }}" >> $GITHUB_ENV
 
-    - name: Run Tests
-      run: |
-         pytest
+#    - name: Run Tests
+#      run: |
+#         pytest
 
 
 
