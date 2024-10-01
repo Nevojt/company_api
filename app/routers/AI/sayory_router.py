@@ -1,7 +1,9 @@
+import os
 from typing import Optional
 from fastapi import File, UploadFile, status, HTTPException, Depends, APIRouter
 from .ai_functions import ask_to_gpt, transcriptions
 from .ai_spech_function import speech_engine
+from app.config import utils
 
 
 
@@ -62,6 +64,35 @@ async def transcribe_audio_from_url(url: str):
     """
     return transcriptions(url)
 
+
 @router.post("/speech")
 async def speaker_in_text(text: str):
-  return await speech_engine(text)
+    """
+    This function converts a given text into speech using a pre-trained text-to-speech model.
+    The generated audio is then uploaded to a storage service and the URL of the uploaded audio is returned.
+
+    Parameters:
+    - text (str): The text to be converted into speech. The text must be a valid string.
+
+    Returns:
+    - dict: A dictionary containing the URL of the uploaded audio. The dictionary has a single key-value pair:
+      {"audio_url": audio_url}, where "audio_url" is the URL of the uploaded audio file.
+
+    Raises:
+    - Exception: If an error occurs during the audio upload process, an exception is raised with an error message.
+    """
+    audio = await speech_engine(text)
+    print(audio)
+    try:
+        with open(audio, "rb") as audio_file:
+            file = UploadFile(audio_file, filename=audio.name)
+            audio_url = await utils.upload_to_backblaze(file, "audio-speech")
+
+            if audio.exists():
+                os.remove(audio)
+
+        return audio_url
+    except Exception as e:
+        print(f"Error uploading audio: {e}")
+
+

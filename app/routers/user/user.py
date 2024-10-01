@@ -37,6 +37,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
     This function creates a new user in the database.
 
     Args:
+        background_tasks: List of BackgroundTasks
         email (str): The email of the user.
         user_name (str): The user_name of the user.
         password (str): The password of the user.
@@ -54,7 +55,8 @@ async def created_user_v2(background_tasks: BackgroundTasks,
     start = datetime.now()
     company = 1
     
-    existing_deactivated_user = select(user_model.UserDeactivation).where((user_model.UserDeactivation.email == email) |
+    existing_deactivated_user = select(user_model.UserDeactivation).where(
+        (user_model.UserDeactivation.email == email) |
         (user_model.UserDeactivation.user_name == user_name))
     
     deactivated_result = await db.execute(existing_deactivated_user)

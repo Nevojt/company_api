@@ -28,7 +28,7 @@ async def say_hello_system(receiver_id: int):
     Say hello to a user.
 
     Args:
-        recipient_id (int): The ID of the recipient."""
+        receiver_id (int): The ID of the recipient."""
         
     async with async_session_maker() as session:
         for message in messages:
