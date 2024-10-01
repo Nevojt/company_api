@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     mail_server: str
 
     mail_from_name: str
-    mail_from_name_company: str
+    # mail_from_name_company: str
 
     database_name: str
     database_username: str
