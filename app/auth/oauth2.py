@@ -37,7 +37,7 @@ async def create_access_token(data: dict, db: AsyncSession):
 async def verify_access_token(token: str, credentials_exception, db: AsyncSession):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("user_id")
+        user_id: int = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
 
@@ -83,7 +83,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     return user
 
 
-async def create_refresh_token(user_id: str, db: AsyncSession):
+async def create_refresh_token(user_id: int, db: AsyncSession):
     # Отримання користувача з бази даних
     user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
     user = user.scalar()

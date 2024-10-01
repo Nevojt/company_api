@@ -22,8 +22,8 @@ from .routers.company import company
 from .routers.reports import report_to_reason
 
 from .config.scheduler import setup_scheduler#, scheduler
-from app.config.init_users import create_room, create_company, create_initial_users
-from .database.database import engine
+from app.config.init_users import create_room, create_company
+
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import following_model, user_model, room_model, image_model, password_model, company_model, messages_model, reports_model
 
@@ -73,7 +73,7 @@ app = FastAPI(
     # on_shutdown=[on_shutdown]
 )
 
-origins = ["*"]
+origins = ["31.220.75.30:8000"]
 
 app.add_middleware(
     CORSMiddleware,

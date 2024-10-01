@@ -1,6 +1,6 @@
 
 
-from typing import List
+from typing import List, Optional
 from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
 
 from sqlalchemy.future import select
@@ -178,7 +178,7 @@ async def activated_deactivated_user(user_id: int,
 async def deactivation_user(
     user_id: int,
     db: AsyncSession = Depends(get_async_session), 
-    current_user: int = Depends(oauth2.get_current_user)
+    current_user: user_model.User = Depends(oauth2.get_current_user)
 ):
     """
     Asynchronously deletes a user from the database.
@@ -235,7 +235,7 @@ async def deactivation_user(
                 id=existing_user.id,
                 email=existing_user.email,
                 user_name=existing_user.user_name,
-                reason=None,
+                reason=Optional[str] | None,
                 roles=None,
                 company_id=existing_user.company_id
             )

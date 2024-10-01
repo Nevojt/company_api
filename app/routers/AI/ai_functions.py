@@ -1,6 +1,6 @@
 
 import os
-from typing import Optional
+from typing import Optional, List, Any
 
 from fastapi import HTTPException, status
 import requests
@@ -17,7 +17,7 @@ client = AsyncOpenAI(
 
 async def ask_to_gpt(ask_to_chat: str,
                      temperature: Optional[float],
-                     num: int) -> str:
+                     num: int) -> list[Any] | str:
     try:
         chat_completion = await client.chat.completions.create(
             model="gpt-4o-mini",

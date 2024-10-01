@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from jinja2 import Environment, FileSystemLoader
 from app.config.config import settings
 from app.schemas import mail
@@ -45,7 +45,7 @@ async def password_reset(subject: str, email_to: str, body: dict):
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -77,7 +77,7 @@ async def password_reset_mobile(subject: str, email_to: str, body: dict):
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -108,7 +108,7 @@ async def send_registration_mail(subject: str, email_to: str, body: dict):
         subject=subject,
         recipients=[email_to],
         template_body=html_content,
-        subtype='html',
+        subtype=MessageType.html,
     )
     
     fm = FastMail(conf)
@@ -123,7 +123,7 @@ async def send_mail_for_change_password(subject: str, email_to: str, body: dict)
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -150,7 +150,7 @@ async def send_mail_for_contact_form(contact: mail.ContactForm):
         subject=f"New Contact Message from {contact.name}",
         recipients=[support_email],
         body=html_content,
-        subtype="html"
+        subtype=MessageType.html
     )
 
     fm = FastMail(conf)

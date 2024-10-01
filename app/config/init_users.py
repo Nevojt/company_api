@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -11,8 +12,8 @@ async def create_company(engine_asinc_db):
     async with AsyncSession(engine_asinc_db) as session:
         existing_company = await session.execute(
             select(company_model.Company).where(
-                (company_model.Company.subdomain == "test.sayorama") |
-                (company_model.Company.contact_email == "test@sayorama.eu")
+                (company_model.Company.subdomain == "sayorama") |
+                (company_model.Company.contact_email == "pablic@sayorama.eu")
             )
         )
         existing_company = existing_company.scalars().first()
@@ -22,9 +23,9 @@ async def create_company(engine_asinc_db):
             return existing_company
 
         new_company = company_model.Company(
-            name="Sayorama Company",
+            name="Sayorama Pablic",
             subdomain="sayorama",
-            contact_email="test@sayorama.eu",
+            contact_email="pablic@sayorama.eu",
             contact_phone="1234567890",
             address="123 Example St",
             description="Just an example company",
@@ -79,7 +80,7 @@ async def create_room(engine_asinc_db):
         if existing_room is None:
             new_room = room_model.Rooms(name_room='Hell',
                                         image_room='Hell',
-                                        owner=None,
+                                        owner=Optional[str] | None,
                                         secret_room=True,
                                         company_id=1)
             session.add(new_room)
