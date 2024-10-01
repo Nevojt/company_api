@@ -37,14 +37,7 @@ jobs:
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> $GITHUB_ENV
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $GITHUB_ENV
-#          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
-
-#          echo "DATABASE_HOSTNAME_COMPANY=${{ secrets.DATABASE_HOSTNAME_COMPANY }}" >> $GITHUB_ENV
-#          echo "DATABASE_HOSTNAME_TEST=${{ secrets.DATABASE_HOSTNAME_TEST }}" >> $GITHUB_ENV
-
-#          echo "DATABASE_PASSWORD_COMPANY=${{ secrets.DATABASE_PASSWORD_COMPANY }}" >> $GITHUB_ENV
-#          echo "DATABASE_PASSWORD_TEST=${{ secrets.DATABASE_PASSWORD_TEST }}" >> $GITHUB_ENV
-
+          
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> $GITHUB_ENV
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> $GITHUB_ENV
@@ -54,19 +47,32 @@ jobs:
           echo "BACKBLAZE_KEY=${{ secrets.BACKBLAZE_KEY }}" >> $GITHUB_ENV
           echo "URL_ADDRESS_DNS=${{ secrets.URL_ADDRESS_DNS }}" >> $GITHUB_ENV
              
-#          echo "URL_ADDRESS_DNS_COMPANY=${{ secrets.URL_ADDRESS_DNS_COMPANY }}" >> $GITHUB_ENV
-#          echo "URL_ADDRESS_DNS_TEST=${{ secrets.URL_ADDRESS_DNS_TEST }}" >> $GITHUB_ENV
-             
           echo "KEY_CRYPTO=${{ secrets.KEY_CRYPTO }}" >> $GITHUB_ENV
           echo "ROUT_IMAGE=${{ secrets.ROUT_IMAGE }}" >> $GITHUB_ENV
           echo "BUCKET_NAME_USER_AVATAR=${{ secrets.BUCKET_NAME_USER_AVATAR }}" >> $GITHUB_ENV
           echo "BUCKET_NAME_ROOM_IMAGE=${{ secrets.BUCKET_NAME_ROOM_IMAGE }}" >> $GITHUB_ENV
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
           echo "USERS_DATA_FILE=${{ secrets.USERS_DATA_FILE }}" >> $GITHUB_ENV
+             
 
-#    - name: Run Tests
-#      run: |
-#         pytest
+#          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
+
+#          echo "DATABASE_HOSTNAME_COMPANY=${{ secrets.DATABASE_HOSTNAME_COMPANY }}" >> $GITHUB_ENV
+#          echo "DATABASE_HOSTNAME_TEST=${{ secrets.DATABASE_HOSTNAME_TEST }}" >> $GITHUB_ENV
+
+#          echo "DATABASE_PASSWORD_COMPANY=${{ secrets.DATABASE_PASSWORD_COMPANY }}" >> $GITHUB_ENV
+#          echo "DATABASE_PASSWORD_TEST=${{ secrets.DATABASE_PASSWORD_TEST }}" >> $GITHUB_ENV
+
+
+             
+#          echo "URL_ADDRESS_DNS_COMPANY=${{ secrets.URL_ADDRESS_DNS_COMPANY }}" >> $GITHUB_ENV
+#          echo "URL_ADDRESS_DNS_TEST=${{ secrets.URL_ADDRESS_DNS_TEST }}" >> $GITHUB_ENV
+             
+
+
+    - name: Run Tests
+      run: |
+         pytest
 
 
 
