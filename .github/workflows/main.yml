@@ -8,6 +8,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env:
+          - { SSH_HOST: 'SSH_HOST_PABLIC_1', SSH_USER: 'SSH_USER_PABLIC_1', SSH_PASSWORD: 'SSH_PASSWORD_PABLIC_1', CONTAINER_PATH: '/home/pablic/api/.env' }
+          - { SSH_HOST: 'SSH_HOST_PABLIC_2', SSH_USER: 'SSH_USER_PABLIC_2', SSH_PASSWORD: 'SSH_PASSWORD_PABLIC_2', CONTAINER_PATH: '/home/pablic/api/.env' }
 
     steps:
     - name: Checkout code
@@ -23,53 +28,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set Environment Variables
-      run: |
-          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
-          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> $GITHUB_ENV
-          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_ENV
-          echo "MAIL_SERVER=${{ secrets.MAIL_SERVER }}" >> $GITHUB_ENV
-          echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> $GITHUB_ENV
-             
-          echo "DATABASE_HOSTNAME=${{ secrets.DATABASE_HOSTNAME }}" >> $GITHUB_ENV
-          echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
-          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
-          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> $GITHUB_ENV
-          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $GITHUB_ENV
-#          echo "MAIL_FROM_NAME_COMPANY=${{ secrets.MAIL_FROM_NAME_COMPANY }}" >> $GITHUB_ENV
-
-#          echo "DATABASE_HOSTNAME_COMPANY=${{ secrets.DATABASE_HOSTNAME_COMPANY }}" >> $GITHUB_ENV
-#          echo "DATABASE_HOSTNAME_TEST=${{ secrets.DATABASE_HOSTNAME_TEST }}" >> $GITHUB_ENV
-
-#          echo "DATABASE_PASSWORD_COMPANY=${{ secrets.DATABASE_PASSWORD_COMPANY }}" >> $GITHUB_ENV
-#          echo "DATABASE_PASSWORD_TEST=${{ secrets.DATABASE_PASSWORD_TEST }}" >> $GITHUB_ENV
-
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> $GITHUB_ENV
-          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> $GITHUB_ENV
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> $GITHUB_ENV
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> $GITHUB_ENV
-          echo "BACKBLAZE_ID=${{ secrets.BACKBLAZE_ID }}" >> $GITHUB_ENV
-          echo "BACKBLAZE_KEY=${{ secrets.BACKBLAZE_KEY }}" >> $GITHUB_ENV
-          echo "URL_ADDRESS_DNS=${{ secrets.URL_ADDRESS_DNS }}" >> $GITHUB_ENV
-             
-#          echo "URL_ADDRESS_DNS_COMPANY=${{ secrets.URL_ADDRESS_DNS_COMPANY }}" >> $GITHUB_ENV
-#          echo "URL_ADDRESS_DNS_TEST=${{ secrets.URL_ADDRESS_DNS_TEST }}" >> $GITHUB_ENV
-             
-          echo "KEY_CRYPTO=${{ secrets.KEY_CRYPTO }}" >> $GITHUB_ENV
-          echo "ROUT_IMAGE=${{ secrets.ROUT_IMAGE }}" >> $GITHUB_ENV
-          echo "BUCKET_NAME_USER_AVATAR=${{ secrets.BUCKET_NAME_USER_AVATAR }}" >> $GITHUB_ENV
-          echo "BUCKET_NAME_ROOM_IMAGE=${{ secrets.BUCKET_NAME_ROOM_IMAGE }}" >> $GITHUB_ENV
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-          echo "USERS_DATA_FILE=${{ secrets.USERS_DATA_FILE }}" >> $GITHUB_ENV
-
-    - name: Run Tests
-      run: |
-         pytest
-
-
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -84,45 +42,16 @@ jobs:
         docker build -t nevojt/public_api:${{ github.sha }} -t nevojt/public_api:latest .
         docker push nevojt/public_api:${{ github.sha }}
         docker push nevojt/public_api:latest
-    
 
-    - name: Install sshpass
-      run: sudo apt-get install -y sshpass
-
-#    - name: Deploy to Server Nginx
-#      env:
-#        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD_TEST }}
-#        SSH_HOST: ${{ secrets.SSH_HOST_TEST }}
-#        SSH_USER: ${{ secrets.SSH_USER_TEST }}
-#      run: |
-#        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-#        docker pull nevojt/public_api:latest;
-#
-#
-#        docker stop public_api_1 || true;
-#        docker rm public_api_1 || true;
-#        docker stop public_api_2 || true;
-#        docker rm public_api_2 || true;
-#        docker stop public_api_3 || true;
-#        docker rm public_api_3 || true;
-#        docker stop public_api_4 || true;
-#        docker rm public_api_4 || true;
-#
-#        docker run -d --name public_api_1 --env-file /home/test/api/.env -p 8000:8000 --cpus="1" --memory="512m" nevojt/public_api:latest;
-#        docker run -d --name public_api_2 --env-file /home/test/api/.env -p 8001:8000 --cpus="1" --memory="512m" nevojt/public_api:latest;
-#        docker run -d --name public_api_3 --env-file /home/test/api/.env -p 8002:8000 --cpus="1" --memory="512m" nevojt/public_api:latest;
-#        docker run -d --name public_api_4 --env-file /home/test/api/.env -p 8003:8000 --cpus="1" --memory="512m" nevojt/public_api:latest
-#        "
-    - name: Deploy to Server pablic 1
+    - name: Deploy to Server
       env:
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD_PABLIC_1 }}
-        SSH_HOST: ${{ secrets.SSH_HOST_PABLIC_1 }}
-        SSH_USER: ${{ secrets.SSH_USER_PABLIC_1 }}
+        SSH_PASSWORD: ${{ matrix.env.SSH_PASSWORD }}
+        SSH_HOST: ${{ matrix.env.SSH_HOST }}
+        SSH_USER: ${{ matrix.env.SSH_USER }}
       run: |
         sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
         docker pull nevojt/public_api:latest;
         
-
         docker stop public_api_1 || true;
         docker rm public_api_1 || true;
         docker stop public_api_2 || true;
@@ -132,33 +61,8 @@ jobs:
         docker stop public_api_4 || true;
         docker rm public_api_4 || true;
         
-        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
-        "
-
-    - name: Deploy to Server pablic 2
-      env:
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD_PABLIC_2 }}
-        SSH_HOST: ${{ secrets.SSH_HOST_PABLIC_2 }}
-        SSH_USER: ${{ secrets.SSH_USER_PABLIC_2 }}
-      run: |
-        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
-        docker pull nevojt/public_api:latest;
-        
-
-        docker stop public_api_1 || true;
-        docker rm public_api_1 || true;
-        docker stop public_api_2 || true;
-        docker rm public_api_2 || true;
-        docker stop public_api_3 || true;
-        docker rm public_api_3 || true;
-        docker stop public_api_4 || true;
-        docker rm public_api_4 || true;
-        
-        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
+        docker run -d --name public_api_1 --env-file ${{ matrix.env.CONTAINER_PATH }} -p 8000:8000 --cpus='1' --memory='1024m' nevojt/public_api:latest;
+        docker run -d --name public_api_2 --env-file ${{ matrix.env.CONTAINER_PATH }} -p 8001:8000 --cpus='1' --memory='1024m' nevojt/public_api:latest;
+        docker run -d --name public_api_3 --env-file ${{ matrix.env.CONTAINER_PATH }} -p 8002:8000 --cpus='1' --memory='1024m' nevojt/public_api:latest;
+        docker run -d --name public_api_4 --env-file ${{ matrix.env.CONTAINER_PATH }} -p 8003:8000 --cpus='1' --memory='1024m' nevojt/public_api:latest
         "
