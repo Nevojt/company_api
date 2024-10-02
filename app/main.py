@@ -73,7 +73,9 @@ app = FastAPI(
     # on_shutdown=[on_shutdown]
 )
 
-origins = ["31.220.75.30:8000"]
+# origins = ["31.220.75.30:8000"]
+
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
