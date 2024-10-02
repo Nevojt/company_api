@@ -24,6 +24,7 @@ email_validator==2.2.0
 enumb==0.1.5
 exceptiongroup==1.2.2
 expo==0.1.2
+faker==30.1.0
 fastapi==0.111.1
 fastapi-cli==0.0.4
 fastapi-mail==1.4.1
