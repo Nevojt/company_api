@@ -10,6 +10,7 @@ from app.auth import oauth2
 from app.database.async_db import get_async_session
 from app.models import user_model, room_model, messages_model
 from app.schemas import message
+from app.schemas.message import wrap_message
 from sqlalchemy.future import select
 from typing import List
 
@@ -134,7 +135,7 @@ async def fetch_message_by_id(message_id: int,
 
 
 
-@router.get("/{room_id}", response_model=List[message.SocketModel])
+@router.get("/{room_id}")
 async def get_messages_room(room_id: int, 
                             session: AsyncSession = Depends(get_async_session), 
                             limit: int = 50, skip: int = 0):
@@ -142,7 +143,7 @@ async def get_messages_room(room_id: int,
     Retrieves a list of socket messages with associated user details, paginated by a limit and offset.
 
     Args:
-        rooms (str): The rooms of the message.
+        room_id (str): The rooms of the message.
         session (AsyncSession, optional): Asynchronous database session. Defaults to Depends(get_async_session).
         limit (int, optional): Maximum number of messages to retrieve. Defaults to 50.
         skip (int, optional): Number of messages to skip for pagination. Defaults to 0.
@@ -175,33 +176,34 @@ async def get_messages_room(room_id: int,
         messages_model.Socket.id, user_model.User.id
     ).order_by(
         desc(messages_model.Socket.created_at)
-    )
+    ).limit(limit)
 
     result = await session.execute(query)
     raw_messages = result.all()
 
     # Convert raw messages to SocketModel
-    messages = []
+
+    wrapped_messages = []
     for socket, user, votes in raw_messages:
         decrypted_message = await async_decrypt(socket.message)
-        messages.append(
-            message.SocketModel(
-                created_at=socket.created_at,
-                receiver_id=socket.receiver_id,
-                message=decrypted_message,
-                fileUrl=socket.fileUrl,
-                user_name=user.user_name if user is not None else "Unknown user",
-                avatar=user.avatar if user is not None else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/photo_2024-06-14_19-20-40.jpg",
-                verified=user.verified if user is not None else None,
-                id=socket.id,
-                vote=votes,
-                id_return=socket.id_return,
-                edited=socket.edited,
-                return_message=socket.return_message
-            )
+        socket_model = message.SocketModel(
+            created_at=socket.created_at,
+            receiver_id=socket.receiver_id,
+            message=decrypted_message,
+            fileUrl=socket.fileUrl,
+            user_name=user.user_name if user is not None else "Unknown user",
+            avatar=user.avatar if user is not None else "https://media.giphy.com/media/9Y01tydkHUVvhxNVKR/giphy.gif?cid=ecf05e47xvp40pbs2k84kiq9qyo4h7c37yuixsylgd9l8c0h&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+            verified=user.verified if user is not None else None,
+            id=socket.id,
+            vote=votes,
+            id_return=socket.id_return,
+            edited=socket.edited,
+            delete=socket.delete
         )
-    messages.reverse()
-    return messages
+        wrapped_message = await wrap_message(socket_model)
+        wrapped_messages.append(wrapped_message)
+
+    return wrapped_messages
 
 
 
