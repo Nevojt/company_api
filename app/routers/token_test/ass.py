@@ -21,7 +21,7 @@ async def ass_endpoint(token: str, db: AsyncSession = Depends(get_async_session)
 
     Args:
         token (str): token verification
-        session (Session, optional): session database. Defaults to Depends(get_db).
+        db (Session, optional): session database. Defaults to Depends(get_db).
 
     Raises:
         HTTPException:: Token not validation
@@ -36,7 +36,7 @@ async def ass_endpoint(token: str, db: AsyncSession = Depends(get_async_session)
         result = await db.execute(user_query)
         user = result.scalar_one_or_none()
         
-        if user.blocked == True:
+        if user.blocked:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is blocked")
 

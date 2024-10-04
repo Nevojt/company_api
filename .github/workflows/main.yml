@@ -138,10 +138,10 @@ jobs:
         docker stop public_api_4 || true;
         docker rm public_api_4 || true;
         
-#        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
+        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
         "
 
     - name: Deploy to Server pablic 2
@@ -163,8 +163,8 @@ jobs:
         docker stop public_api_4 || true;
         docker rm public_api_4 || true;
         
-#        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
-#        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
+        docker run -d --name public_api_1 --env-file /home/pablic/api/.env -p 8000:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_2 --env-file /home/pablic/api/.env -p 8001:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_3 --env-file /home/pablic/api/.env -p 8002:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest;
+        docker run -d --name public_api_4 --env-file /home/pablic/api/.env -p 8003:8000 --cpus="1" --memory="1024m" nevojt/public_api:latest
         "
