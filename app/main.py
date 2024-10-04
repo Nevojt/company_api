@@ -17,7 +17,7 @@ from .routers.invitations import invitation_secret_room
 from .routers.following import following
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
-from .routers.mail import contact_form
+from .routers.mail import contact_form, update_mail
 from .routers.company import company
 from .routers.reports import report_to_reason
 
@@ -126,6 +126,7 @@ app.include_router(change_and_block.router)
 
 app.include_router(send_mail.router)
 app.include_router(contact_form.router)
+app.include_router(update_mail.router)
 
 app.include_router(verify_user.router)
 

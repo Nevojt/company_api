@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="https://f003.backblazeb2.com/file/imagesapp/Group+96+(1).png" type="image/png">
+<title>Update email!</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    background-color: #fff;
+    width: 80%;
+    max-width: 600px;
+    padding: 2em;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+  }
+  h1{
+    text-align: center;
+    color: black ;
+  }
+
+  .header-logo img {
+    margin-right: 15px; /* Adjust the spacing between the logo and the title */
+  }
+  .welcome-message {
+    margin: 20px 0;
+  }
+  .code {
+    background-color: #0084ff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 24px; /* Larger font size for better readability */
+    margin: 20px auto;
+    display: inline-block;
+  }
+  .verification-button {
+    background-color: #0084ff;
+    /* color: #fff; */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 50%;
+    text-decoration: none;
+    display: inline-block;
+    margin: 20px auto;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header-logo"></div>
+    <img src="https://f003.backblazeb2.com/file/imagesapp/Group+96+(1).png" alt="Sayorama Logo" />
+
+    <h1>Changing your account email!</h1>
+
+  <div class="welcome-message">
+    <p>Dear {{ name }}!</p>
+    <p>We have received a request to change your email address. To confirm this action, you can:</p>
+    <p>1. Click the button below:.</p>
+      <a href="{{ update_link }}" target="_blank" class="verification-button" style="color: #fff;">Update Email</a>
+
+    <p>2. Or enter this confirmation code on our website:</p>
+      <div class="code">{{ reset_code }}</div>
+    <p>Go to confirmation</p>
+    <p>If you have not made this request, please contact our support team immediately or ignore this email.</p>
+    <p>Best regards</p>
+    <p>Sayorama Support team</p>
+
+  </div>
+
+</div>
+</body>
+</html>

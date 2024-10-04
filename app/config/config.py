@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     mail_server: str
 
     mail_from_name: str
-    # mail_from_name_company: str
+    mail_from_name_company: str
 
     database_name: str
     database_username: str
@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     database_port: str
     database_password: str
 
-    # database_hostname_company: str
-    # database_password_company: str
+    database_hostname_company: str
+    database_password_company: str
 
     secret_key: str
     algorithm: str
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     backblaze_key: str
 
     url_address_dns: str
-    # url_address_dns_company: str
+    url_address_dns_company: str
 
     key_crypto: str
     rout_image: str
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     users_data_file: str
 
     
-    model_config = SettingsConfigDict(env_file = ".env")
+    model_config = SettingsConfigDict(env_file = ".env", extra="ignore")
     
     def load_users_data(self):
         if not os.path.exists(self.users_data_file):

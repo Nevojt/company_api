@@ -155,3 +155,18 @@ async def send_mail_for_contact_form(contact: mail.ContactForm):
 
     fm = FastMail(conf)
     await fm.send_message(message)
+
+
+mail_change_email = env.get_template('email_update.html')
+async def send_mail_for_change_email(subject: str, email_to: str, body: dict):
+    html_content = mail_change_email.render(body)
+
+    message = MessageSchema(
+        subject=subject,
+        recipients=[email_to],
+        body=html_content,
+        subtype=MessageType.html,
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message, template_name='mail_change_password.html')
