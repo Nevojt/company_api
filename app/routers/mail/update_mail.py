@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import EmailStr
 from sqlalchemy.future import select
+from  datetime import datetime, timezone
 
 
 
@@ -42,6 +43,7 @@ async def update_email(email: EmailStr = Form(...),
     if current_user.blocked:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User is blocked!")
+
     if not current_user.verified:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User is not verified!")
@@ -53,22 +55,25 @@ async def update_email(email: EmailStr = Form(...),
         )
 
     token = utils.generate_access_code()
+    update_code = utils.generate_reset_code()
     new_update_request = password_model.MailUpdateModel(
         user_id=current_user.id,
         new_email=email,
         update_token=token,
-        update_code=utils.generate_random_code(),  # Реалізуйте функцію для генерації коду
+        update_code=update_code,
         is_active=True
     )
     db.add(new_update_request)
     await db.commit()
 
-    update_linc = f"https://127.0.0.1:8000/api/update-mail/success_update?token={token}"
+    update_linc = f"https://{settings.url_address_dns}/api/update-mail/success_update_linc?token={token}"
+    # update_linc = f"http://127.0.0.1:8000/api/update-mail/success_update_linc?token={token}"
     await send_mail_for_change_email("Changing your account email", current_user.email,
                                                   {
                                                       "title": "Changing your account email.",
                                                       "name": current_user.user_name,
                                                       "update_link": update_linc,
+                                                      "reset_code": update_code
                                                   }
                                                   )
 
@@ -79,7 +84,7 @@ async def update_email(email: EmailStr = Form(...),
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/success_update")
+@router.get("/success_update_linc")
 async def update_email_link(
                     request: Request,
                     token: str = Query(...),
@@ -100,7 +105,6 @@ async def update_email_link(
     Returns:
         dict: A message confirming email verification.
         @param db:
-        @param email:
         @param token:
         @param request:
     """
@@ -109,7 +113,7 @@ async def update_email_link(
     # Отримати запис з таблиці MailUpdateModel за токеном
     query = select(password_model.MailUpdateModel).where(
         password_model.MailUpdateModel.update_token == token,
-        password_model.MailUpdateModel.is_active == True  # Переконайтеся, що запит активний
+        password_model.MailUpdateModel.is_active == True
     )
     result = await db.execute(query)
     mail_update_record = result.scalar_one_or_none()
@@ -117,104 +121,62 @@ async def update_email_link(
     if not mail_update_record:
         return templates.TemplateResponse("error_page.html", {"request": request})
 
+    if mail_update_record.expires_at < datetime.now(timezone.utc):
+        return templates.TemplateResponse("error_page.html", {"request": request})
+
     # Отримати користувача за user_id
-    user_query = select(user_model.User).where(user_model.User.id == mail_update_record.user_id)
+    await get_and_update_user_email(user_id=mail_update_record.user_id,
+                                    new_email=mail_update_record.new_email,
+                                    db=db)
+
+    # Деактивувати запис у MailUpdateModel
+    mail_update_record.is_active = False
+    await db.commit()
+
+
+    return templates.TemplateResponse("success_registration.html", {"request": request})
+
+
+@router.put("/success_update_code", response_description="Update Email Code")
+async def update_email_code(code: str,
+                            db: AsyncSession = Depends(get_async_session)
+                           ):
+    query = select(password_model.MailUpdateModel).where(
+        password_model.MailUpdateModel.update_code == code,
+        password_model.MailUpdateModel.is_active == True
+    )
+    result = await db.execute(query)
+    mail_update_record = result.scalar_one_or_none()
+
+    if not mail_update_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Update code not found.")
+
+    if mail_update_record.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Update code expired.")
+
+    await get_and_update_user_email(user_id=mail_update_record.user_id,
+                                    new_email=mail_update_record.new_email,
+                                    db=db)
+    # Деактивувати запис у MailUpdateModel
+    mail_update_record.is_active = False
+    await db.commit()
+
+
+
+
+
+async def get_and_update_user_email(user_id: int,
+                                    new_email: str,
+                                    db: AsyncSession = Depends(get_async_session)):
+    user_query = select(user_model.User).where(user_model.User.id == user_id)
     result = await db.execute(user_query)
     user = result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
 
-    # Оновити електронну адресу користувача
-    user.email = mail_update_record.new_email
+    user.email = new_email
     await db.commit()
 
-    # Деактивувати запис у MailUpdateModel
-    mail_update_record.is_active = False
-    await db.commit()
-
-    return templates.TemplateResponse("success_registration.html", {"request": request})
-
-# @router.post("/request/", status_code=status.HTTP_202_ACCEPTED, response_description="Update Email")
-# async def reset_password(request: EmailStr = Form(...),
-#                          db: AsyncSession = Depends(get_async_session)):
-#     """
-#     Handles the password reset request. Validates the user's email and initiates the password reset process.
-#
-#     Args:
-#         request (PasswordResetRequest): The request payload containing the user's email.
-#         db (Session, optional): Database session dependency. Defaults to Depends(get_db).
-#
-#     Raises:
-#         HTTPException: Raises a 404 error if no user is found with the provided email.
-#         HTTPException: Raises a 404 error if the user's details are not found or the email address is invalid.
-#
-#     Returns:
-#         dict: A message confirming that an email has been sent for password reset instructions.
-#     """
-#     # Func
-#     user_q = select(user_model.User).where(user_model.User.email == request.email)
-#     result = await db.execute(user_q)
-#     user = result.scalar_one_or_none()
-#
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-#                             detail=f"User with email: {request.email} not found")
-#
-#     if user.verified is False:
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-#                             detail=f"User with email: {request.email} not verification")
-#     if user is not None:
-#         token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
-#         reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
-#
-#         await password_reset(subject="Password Reset",
-#                              email_to=user.email,
-#                              body={
-#                                  "title": "Password Reset",
-#                                  "name": user.user_name,
-#                                  "reset_link": reset_link
-#                              }
-#                              )
-#
-#         return {"msg": "Email has been sent with instructions to reset your password."}
-#
-#     else:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="Your details not found, invalid email address"
-#         )
 
 
-# @router.put("/reset", response_description="Reset password")
-# async def reset(token: str, new_password: PasswordReset, db: AsyncSession = Depends(get_async_session)):
-#     """
-#     Handles the actual password reset using a provided token. Validates the token and updates the user's password.
-#
-#     Args:
-#         token (str): The token for user verification, used to ensure the password reset request is valid.
-#         new_password (PasswordReset): The payload containing the new password.
-#         db (AsyncSession, optional): Asynchronous database session. Defaults to Depends(get_async_session).
-#
-#     Raises:
-#         HTTPException: Raises a 404 error if no user is found associated with the provided token.
-#
-#     Returns:
-#         dict: A message confirming that the password has been successfully reset.
-#     """
-#
-#     user = await oauth2.get_current_user(token, db)
-#
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-#
-#     current_time_utc = datetime.now(pytz.UTC)
-#     # hashed new password
-#     hashed_password = utils.hash_password(new_password.password)
-#
-#     # Update password to database
-#     user.password = hashed_password
-#     user.blocked = False
-#     user.password_changed = current_time_utc
-#     db.add(user)
-#     await db.commit()

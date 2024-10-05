@@ -26,6 +26,6 @@ class MailUpdateModel(Base):
     update_code = Column(String)
     update_token = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-    expires_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc) + timedelta(hours=1))
+    expires_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc) + timedelta(minutes=15))
     is_active = Column(Boolean, default=True)
     
