@@ -52,25 +52,21 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
         query = select(user_model.User).where(user_model.User.email == user_credentials.username)
         result = await db.execute(query)
         user = result.scalar_one_or_none()
-        print(f"user id: {user.id}")
-        print(user_credentials.username)
-        print(user_credentials.password)
 
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-        print("1")
+
         
         if user.blocked:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is blocked")
-        print("2")
+
         if not user.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is not active")
         
         if not utils.verify(user_credentials.password, user.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-        print("3")
 
         access_token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
         

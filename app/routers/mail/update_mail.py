@@ -1,6 +1,6 @@
 
 
-from fastapi import APIRouter, HTTPException, Form, Depends, status, Request, Query
+from fastapi import APIRouter, HTTPException, Form, Depends, status, Request, Query, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import EmailStr
@@ -9,8 +9,8 @@ from  datetime import datetime, timezone
 
 
 
-from app.mail.send_mail import send_mail_for_change_email
-from app.schemas import mail
+from app.mail.send_mail import send_mail_for_change_email, send_registration_mail
+
 from app.database.async_db import get_async_session
 
 from ...auth import oauth2
@@ -78,18 +78,18 @@ async def update_email(email: EmailStr = Form(...),
                                                   )
 
     print(password)
-    return "Update test"
+    return "Send email confirmation"
 
 
 templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/success_update_linc")
-async def update_email_link(
-                    request: Request,
-                    token: str = Query(...),
-                    db: AsyncSession = Depends(get_async_session)
-                ):
+async def update_email_link(background_tasks: BackgroundTasks,
+                            request: Request,
+                            token: str = Query(...),
+                            db: AsyncSession = Depends(get_async_session)
+                        ):
     """
     Verifies the user's email address using the provided token.
 
@@ -104,6 +104,7 @@ async def update_email_link(
 
     Returns:
         dict: A message confirming email verification.
+        @param background_tasks:
         @param db:
         @param token:
         @param request:
@@ -125,9 +126,12 @@ async def update_email_link(
         return templates.TemplateResponse("error_page.html", {"request": request})
 
     # Отримати користувача за user_id
-    await get_and_update_user_email(user_id=mail_update_record.user_id,
-                                    new_email=mail_update_record.new_email,
-                                    db=db)
+    # await get_and_update_user_email(user_id=mail_update_record.user_id,
+    #                                 new_email=mail_update_record.new_email,
+    #                                 db=db)
+    background_tasks.add_task(get_and_update_user_email, user_id=mail_update_record.user_id,
+                              new_email=mail_update_record.new_email,
+                              db=db)
 
     # Деактивувати запис у MailUpdateModel
     mail_update_record.is_active = False
@@ -138,7 +142,8 @@ async def update_email_link(
 
 
 @router.put("/success_update_code", response_description="Update Email Code")
-async def update_email_code(code: str,
+async def update_email_code(background_tasks: BackgroundTasks,
+                            code: str,
                             db: AsyncSession = Depends(get_async_session)
                            ):
     query = select(password_model.MailUpdateModel).where(
@@ -154,10 +159,13 @@ async def update_email_code(code: str,
     if mail_update_record.expires_at < datetime.now(timezone.utc):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Update code expired.")
 
-    await get_and_update_user_email(user_id=mail_update_record.user_id,
+    background_tasks.add_task(get_and_update_user_email, user_id=mail_update_record.user_id,
                                     new_email=mail_update_record.new_email,
                                     db=db)
-    # Деактивувати запис у MailUpdateModel
+    # await get_and_update_user_email(user_id=mail_update_record.user_id,
+    #                                 new_email=mail_update_record.new_email,
+    #                                 db=db)
+
     mail_update_record.is_active = False
     await db.commit()
 
@@ -175,7 +183,20 @@ async def get_and_update_user_email(user_id: int,
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
 
+    token_verify = utils.generate_unique_token(new_email)
+
     user.email = new_email
+    user.verified = False
+    user.token_verify = token_verify
+
+    verification_link = f"https://{settings.url_address_dns}/api/success_registration?token={token_verify}"
+    await send_registration_mail( "Please verify your email!", new_email,
+                              {
+                                  "title": "Registration",
+                                  "name": user.user_name,
+                                  "registration_link": verification_link
+                              })
+
     await db.commit()
 
 
