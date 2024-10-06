@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from sqlalchemy import JSON, Column, Integer, Interval, String, Boolean, ForeignKey, Enum, DateTime
+
+from sqlalchemy import JSON, Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
@@ -20,10 +21,10 @@ class Socket(Base):
     rooms = Column(String, ForeignKey('rooms.name_room', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     id_return = Column(Integer)
     fileUrl = Column(String)
-    edited = Column(Boolean, server_default='false')
+    edited = Column(Boolean, server_default='false') 
     return_message = Column(JSON, server_default=None)
     delete = Column(Boolean, server_default='false')
-    
+
     # Relationships
     reports = relationship("Report", back_populates="message")
     notifications = relationship("Notification", back_populates="message")
@@ -41,7 +42,6 @@ class PrivateMessage(Base):
     edited = Column(Boolean, server_default='false')
     id_return = Column(Integer)
     
-
     
     
 class Vote(Base):

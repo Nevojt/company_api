@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from jinja2 import Environment, FileSystemLoader
 from app.config.config import settings
 from app.schemas import mail
@@ -13,9 +13,9 @@ conf = ConnectionConfig(
     MAIL_FROM=settings.mail_from,
     MAIL_PORT=settings.mail_port,
     MAIL_SERVER=settings.mail_server,
-    MAIL_FROM_NAME=settings.mail_from_name_company,
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,  
+    MAIL_FROM_NAME=settings.mail_from_name,
+    MAIL_STARTTLS=False,
+    MAIL_SSL_TLS=True,
 )
 
 
@@ -45,7 +45,7 @@ async def password_reset(subject: str, email_to: str, body: dict):
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -77,7 +77,7 @@ async def password_reset_mobile(subject: str, email_to: str, body: dict):
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -85,7 +85,7 @@ async def password_reset_mobile(subject: str, email_to: str, body: dict):
 
     return {"message": "Email has been sent."}
 
-templare_mail_regostration = env.get_template('email.html')
+template_mail_registration = env.get_template('email.html')
 
 async def send_registration_mail(subject: str, email_to: str, body: dict):
     """
@@ -103,12 +103,12 @@ async def send_registration_mail(subject: str, email_to: str, body: dict):
         Exception: An exception is raised if there is an error sending the email.
     """
     
-    html_content = templare_mail_regostration.render(body)
+    html_content = template_mail_registration.render(body)
     message = MessageSchema(
         subject=subject,
         recipients=[email_to],
         template_body=html_content,
-        subtype='html',
+        subtype=MessageType.html,
     )
     
     fm = FastMail(conf)
@@ -123,7 +123,7 @@ async def send_mail_for_change_password(subject: str, email_to: str, body: dict)
         subject=subject,
         recipients=[email_to],
         body=html_content,
-        subtype="html",
+        subtype=MessageType.html,
     )
 
     fm = FastMail(conf)
@@ -150,8 +150,23 @@ async def send_mail_for_contact_form(contact: mail.ContactForm):
         subject=f"New Contact Message from {contact.name}",
         recipients=[support_email],
         body=html_content,
-        subtype="html"
+        subtype=MessageType.html
     )
 
     fm = FastMail(conf)
     await fm.send_message(message)
+
+
+mail_change_email = env.get_template('email_update.html')
+async def send_mail_for_change_email(subject: str, email_to: str, body: dict):
+    html_content = mail_change_email.render(body)
+
+    message = MessageSchema(
+        subject=subject,
+        recipients=[email_to],
+        body=html_content,
+        subtype=MessageType.html,
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message, template_name='mail_change_password.html')

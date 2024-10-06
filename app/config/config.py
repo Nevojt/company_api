@@ -8,28 +8,38 @@ class Settings(BaseSettings):
     mail_from: str
     mail_port: int
     mail_server: str
+
     mail_from_name: str
     mail_from_name_company: str
     mail_from_name_test: str
     database_hostname_company: str
+
+    database_name: str
+    database_username: str
     database_hostname: str
     database_hostname_test: str
     database_port: str
-    database_password_company: str
     database_password: str
     database_password_test: str
     database_name: str
     database_username: str
+
+    database_hostname_company: str
+    database_password_company: str
+
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
+
     supabase_url: str
     supabase_key: str
     backblaze_id: str
     backblaze_key: str
+
     url_address_dns: str
     url_address_dns_company: str
     url_address_dns_test: str
+
     key_crypto: str
     rout_image: str
     bucket_name_user_avatar: str
@@ -38,15 +48,15 @@ class Settings(BaseSettings):
     users_data_file: str
 
     
-    model_config = SettingsConfigDict(env_file = ".env")
+    model_config = SettingsConfigDict(env_file = ".env", extra="ignore")
     
     def load_users_data(self):
         if not os.path.exists(self.users_data_file):
             print(f"Warning: File {self.users_data_file} not found. Loading default users data.")
             return []  # Or return a default configuration if appropriate
         with open(self.users_data_file, 'r') as file:
-            users_data = json.load(file)
-        return users_data
+            users_data_json = json.load(file)
+        return users_data_json
 
 
 

@@ -16,10 +16,15 @@ from .routers.room import rooms, count_users_messages, secret_rooms, tabs_rooms,
 from .routers.invitations import invitation_secret_room
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
+from .routers.mail import contact_form, update_mail
+from .routers.company import company
+from .routers.reports import report_to_reason
 from .routers.mail import contact_form
 from .superAdmin import company
 
 from .config.scheduler import setup_scheduler#, scheduler
+from app.config.init_users import create_room, create_company
+
 from app.config.init_users import create_room, create_company
 from app.database.async_db import async_session_maker, engine_asinc
 from app.models import user_model, room_model, image_model, password_model, company_model, messages_model
@@ -29,7 +34,6 @@ from app.admin import user as admin_user
 from app.admin import room as admin_room
 
 from app.routers.AI import sayory_router
-# from app.models.room_model import  Base
 
 
 async def init_db():
@@ -48,9 +52,10 @@ async def init_db():
             print(f"Error during table creation: {e}")
         try:
             await create_company(engine_asinc)
-            await  create_room(engine_asinc)
+            await create_room(engine_asinc)
+
         except Exception as e:
-            print(f"Error during database initialization: {e}")
+            print(f"Error during table creation: {e}")
         
 
 def startup_event():
@@ -62,12 +67,15 @@ async def on_shutdown():
 app = FastAPI(
     root_path="/api",
     docs_url="/docs",
-    title="Test API",
-    description="Chat documentation TEST API",
-    version="0.1.4",
+    redoc_url="/new-redoc-url",
+    title="Chat Public",
+    description="Chat documentation Public",
+    version="0.1.5.1",
     on_startup=[init_db, startup_event],
     # on_shutdown=[on_shutdown]
 )
+
+# origins = ["31.220.75.30:8000"]
 
 origins = ["*"]
 
@@ -86,6 +94,8 @@ app.add_middleware(
 
 app.include_router(message.router)
 
+app.include_router(report_to_reason.router)
+
 app.include_router(rooms.router)
 app.include_router(user_rooms.router)
 app.include_router(secret_rooms.router)
@@ -93,6 +103,8 @@ app.include_router(invitation_secret_room.router)
 app.include_router(tabs_rooms.router)
 app.include_router(ban_user.router)
 app.include_router(role_in_room.router)
+
+app.include_router(following.router)
 
 app.include_router(user.router)
 app.include_router(auth.router)
@@ -115,6 +127,7 @@ app.include_router(change_and_block.router)
 
 app.include_router(send_mail.router)
 app.include_router(contact_form.router)
+app.include_router(update_mail.router)
 
 app.include_router(verify_user.router)
 

@@ -225,7 +225,7 @@ async def add_rooms_to_tab(tab_id: int, room_ids: List[int],
     Raises:
         HTTPException: If the tab does not exist, any room does not exist, or if any room is already in the specified tab.
     """
-    if current_user.blocked == True:
+    if current_user.blocked:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} is blocked")
 
@@ -250,7 +250,8 @@ async def add_rooms_to_tab(tab_id: int, room_ids: List[int],
         db.query(room_model.RoomsTabs).filter(room_model.RoomsTabs.room_id == room_id).delete()
 
         # Add the room to the tab
-        new_room_tab = room_model.RoomsTabs(room_id=room_id, tab_id=tab_id, user_id=current_user.id, tab_name=tab.name_tab)
+        new_room_tab = room_model.RoomsTabs(room_id=room_id, tab_id=tab_id,
+                                            user_id=current_user.id, tab_name=tab.name_tab)
         db.add(new_room_tab)
 
     db.commit()

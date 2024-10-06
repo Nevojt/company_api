@@ -1,37 +1,32 @@
 from datetime import datetime
 from typing import List
-from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
 
 import pytz
-from sqlalchemy.orm import Session
-from sqlalchemy.future import select
+from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import Session
 
-from app.mail import send_mail
-
-from ...config import utils
 from app.config.config import settings
-
-from .hello import say_hello_system, system_notification_change_owner
+from app.config.hello import say_hello_system, system_notification_sayory
+from app.mail import send_mail
+from app.models import user_model, room_model
+from app.schemas import user
 from .created_image import generate_image_with_letter
 from ...auth import oauth2
+from ...config import utils
 from ...database.async_db import get_async_session
 from ...database.database import get_db
-from app.models import user_model, room_model, company_model
-from app.schemas import user
-
-
-
-
-
 
 router = APIRouter(
     prefix="/users",
     tags=['Users'],
 )
 
+
 @router.post("/v2", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
-async def created_user_v2(subdomain: str = Form(...),
+async def created_user_v2(background_tasks: BackgroundTasks,
                           email: str = Form(...),
                           user_name: str = Form(...),
                           password: str = Form(...),
@@ -41,34 +36,28 @@ async def created_user_v2(subdomain: str = Form(...),
     """
     This function creates a new user in the database.
 
-    Parameters:
-    - subdomain (str): The subdomain of the company.
-    - email (str): The email of the user.
-    - user_name (str): The username of the user.
-    - password (str): The password of the user.
-    - file (UploadFile): The avatar file of the user.
-    - description (str): The description of the user.
-    - db (AsyncSession): The database session to use.
+    Args:
+        background_tasks: List of BackgroundTasks
+        email (str): The email of the user.
+        user_name (str): The user_name of the user.
+        password (str): The password of the user.
+        file (UploadFile): The avatar file of the user.
+
+        description: The description of the user.
+        db (AsyncSession): The database session to use.
 
     Returns:
-    - user.UserOut: The newly created user.
+        schemas.UserOut: The newly created user.
 
     Raises:
-    - HTTPException: If a user with the given email or user_name already exists.
-    - HTTPException: If the company with the given subdomain does not exist.
+        HTTPException: If a user with the given email already exists.
     """
+    start = datetime.now()
+    company = 1
     
-    company = select(company_model.Company.id).where(company_model.Company.subdomain == subdomain)
-    company_id = await db.execute(company)
-    company_id = company_id.scalar_one_or_none()
-
-    if company_id is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Company with subdomain {subdomain} does not exist.")
-    
-    existing_deactivated_user = (select(user_model.UserDeactivation)
-                                 .where((user_model.UserDeactivation.email == email) |
-                                (user_model.UserDeactivation.user_name == user_name)))
+    existing_deactivated_user = select(user_model.UserDeactivation).where(
+        (user_model.UserDeactivation.email == email) |
+        (user_model.UserDeactivation.user_name == user_name))
     
     deactivated_result = await db.execute(existing_deactivated_user)
     existing_deactivated_user = deactivated_result.scalar_one_or_none()
@@ -79,7 +68,7 @@ async def created_user_v2(subdomain: str = Form(...),
                             detail=f"User with email {email} or user_name {user_name} is deactivated")
 
     
-    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password, company_id=company_id)
+    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password)
 
 # Check if a user with the given email already exists
     email_query = select(user_model.User).where(user_model.User.email == user_data.email)
@@ -115,30 +104,29 @@ async def created_user_v2(subdomain: str = Form(...),
     new_user = user_model.User(**user_data.model_dump(),
                            avatar=avatar,
                            description=description,
-                        #    company_id=company, # Default company id
+                           company_id=company, # Default company id
                            token_verify=verification_token)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
     
     # Create a User_Status entry for the new user
-    post = user_model.User_Status(user_id=new_user.id,
-                                  user_name=new_user.user_name,
-                                  name_room="Hell",
-                                  room_id=1)
+    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
     db.add(post)
     await db.commit()
     await db.refresh(post)
-    
-    registration_link = f"https://{settings.url_address_dns_test}/api/success_registration?token={new_user.token_verify}"
-    await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
-                                           {
-                                            "title": "Registration",
-                                            "name": user_data.user_name,
-                                            "registration_link": registration_link
-                                            })
-    await say_hello_system(new_user.id)
-    
+
+    # Offload email sending and system notification to BackgroundTasks
+    registration_link = f"https://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    background_tasks.add_task(send_mail.send_registration_mail, "Thank you for registration!", new_user.email,
+                              {
+                                  "title": "Registration",
+                                  "name": user_data.user_name,
+                                  "registration_link": registration_link
+                              })
+    background_tasks.add_task(say_hello_system, new_user.id)
+    finish = datetime.now() - start
+    print(f"Create User Time: {finish}")
     return new_user
 
 
@@ -152,7 +140,7 @@ async def created_user_v2(subdomain: str = Form(...),
 async def delete_user(
     password: user.UserDelete,
     db: AsyncSession = Depends(get_async_session), 
-    current_user: int = Depends(oauth2.get_current_user)
+    current_user: user_model.User = Depends(oauth2.get_current_user)
 ):
     """
     Asynchronously deletes a user from the database.
@@ -206,7 +194,7 @@ async def delete_user(
         if moderator:
             room.owner = moderator.user_id
             moderator.role = 'owner'
-            await system_notification_change_owner(moderator.user_id, message)
+            await system_notification_sayory(moderator.user_id, message)
         else:
             room.owner = 0
         room.delete_at = datetime.now(pytz.utc)
@@ -253,9 +241,9 @@ async def update_user(update: user.UserUpdate,
         )
         
     user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
-    user = user_query.first()
+    user_result = user_query.first()
     
-    if user is None:
+    if user_result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with ID: {current_user.id} not found"
@@ -285,39 +273,40 @@ async def update_user(update: user.UserUpdate,
     
 @router.put('/v2/avatar')
 async def update_user_v2(file: UploadFile = File(...), 
-                        db: AsyncSession = Depends(get_async_session),
+                        db: Session = Depends(get_db), 
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
 
+        
     if not current_user.verified or current_user.blocked:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User not verification or blocked."
         )
         
-    user_query = select(user_model.User).where(user_model.User.id == current_user.id)
-    user_data = await db.execute(user_query)
-    user_data = user_data.scalar_one_or_none()
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_data = user_query.first()
     
-    if not user_data:
+    if user_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with ID: {current_user.id} not found"
         )
     
-    user_status_query = select(user_model.User_Status).where(user_model.User_Status.user_id == current_user.id)
-    user_status_result = await db.execute(user_status_query)
-    user_status = user_status_result.scalar_one_or_none()
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
     
-    if not user_status:
+    if user_status is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User status for ID: {current_user.id} not found"
         )
-    avatar_url = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
+    avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
+    
+    update = user.UserUpdateAvatar(avatar=avatar)
+    update_data = update.model_dump()
 
-
-    user_data.avatar = avatar_url
-    await db.commit()
+    user_query.update(update_data, synchronize_session=False)
+    db.commit()
     return "updated avatar"
 
 @router.put('/v2/description')
@@ -419,7 +408,8 @@ async def update_user_v2(user_name: str = Form(...),
 
 
 @router.get('/{email}', response_model=user.UserInfo)
-def get_user_mail(email: str, db: Session = Depends(get_db)):
+def get_user_mail(email: str,
+                  db: Session = Depends(get_db)):
     """
     Get a user by their email.
 
@@ -445,7 +435,8 @@ def get_user_mail(email: str, db: Session = Depends(get_db)):
     return user
 
 @router.get('/audit/{user_name}', response_model=user.UserInfo)
-def get_user_name(user_name: str, db: Session = Depends(get_db)):
+def get_user_name(user_name: str,
+                  db: Session = Depends(get_db)):
     """
     Get a user by their use_name.
 
@@ -496,7 +487,8 @@ async def read_users(db: AsyncSession = Depends(get_async_session)):
 
 
 @router.post("/test", status_code=status.HTTP_201_CREATED, response_model=user.UserOut, include_in_schema=False)
-async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends(get_async_session)):
+async def created_user_test(user: user.UserCreateDel,
+                            db: AsyncSession = Depends(get_async_session)):
     """
     This function creates a new user in the database. It takes a UserCreateDel object as input, which contains the user's details.
 
@@ -543,57 +535,58 @@ async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends
 
 #  OLD CODE
 
+
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
 # async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_async_session)):
 #     """
 #     This function creates a new user in the database.
-
+#
 #     Args:
 #         user (schemas.UserCreate): The user data to create.
 #         db (AsyncSession): The database session to use.
-
+#
 #     Returns:
 #         schemas.UserOut: The newly created user.
-
+#
 #     Raises:
 #         HTTPException: If a user with the given email already exists.
 #     """
-    
+#
 #     # Check if a user with the given email already exists
 #     query = select(user_model.User).where(user_model.User.email == user.email)
 #     result = await db.execute(query)
 #     existing_user = result.scalar_one_or_none()
-
+#
 #     if existing_user:
 #         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
 #                             detail=f"User {existing_user.email} already exists")
-    
+#
 #     # Hash the user's password
-#     hashed_password = utils.hash(user.password)
+#     hashed_password = utils.hash_password(user.password)
 #     user.password = hashed_password
-    
+#
 #     verification_token = utils.generate_unique_token(user.email)
-    
+#
 #     # Create a new user and add it to the database
 #     new_user = user_model.User(**user.model_dump(),
-#                            token_verify=verification_token)
+#                                token_verify=verification_token)
 #     db.add(new_user)
 #     await db.commit()
 #     await db.refresh(new_user)
-    
+#
 #     # Create a User_Status entry for the new user
 #     post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
 #     db.add(post)
 #     await db.commit()
 #     await db.refresh(post)
-    
+#
 #     registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
 #     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
 #                                            {
-#                                             "title": "Registration",
-#                                             "name": user.user_name,
-#                                             "registration_link": registration_link
-#                                             })
+#                                                "title": "Registration",
+#                                                "name": user.user_name,
+#                                                "registration_link": registration_link
+#                                            })
 #     await say_hello_system(new_user.id)
-    
+#
 #     return new_user

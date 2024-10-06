@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -71,18 +72,19 @@ async def create_initial_users(db: AsyncSession = Depends(get_async_session)):
         db.add(user_status)
 
     await db.commit()
-    
-    
-    
-async def create_room(engine_asinc_db):
 
+
+async def create_room(engine_asinc_db):
     async with AsyncSession(engine_asinc_db) as session:
-    # Check if the room already exists
+        # Check if the room already exists
         existing_room = await session.execute(select(room_model.Rooms).filter_by(name_room='Hell'))
         existing_room = existing_room.scalars().first()
         if existing_room is None:
-            new_room = room_model.Rooms(name_room='Hell', image_room='Hell',
-                                        owner=None, secret_room=True, company_id=1)
+            new_room = room_model.Rooms(name_room='Hell',
+                                        image_room='Hell',
+                                        owner=Optional[str] | None,
+                                        secret_room=True,
+                                        company_id=1)
             session.add(new_room)
             await session.commit()
         else:

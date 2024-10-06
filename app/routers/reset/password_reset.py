@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import pytz
+
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +10,7 @@ from app.schemas.reset import PasswordReset, PasswordResetRequest
 from app.auth import oauth2
 from app.config import utils
 from app.mail.send_mail import password_reset
+# from app.database.database import get_db
 
 from app.database.async_db import get_async_session
 from app.config.config import settings
@@ -23,13 +25,13 @@ router = APIRouter(
 
 
 @router.post("/request/", status_code=status.HTTP_202_ACCEPTED, response_description="Reset password")
-async def reset_password(request_password: PasswordResetRequest,
+async def reset_password(request: PasswordResetRequest,
                          db: AsyncSession = Depends(get_async_session)):
     """
     Handles the password reset request. Validates the user's email and initiates the password reset process.
 
     Args:
-        request_password (PasswordResetRequest): The request payload containing the user's email.
+        request (PasswordResetRequest): The request payload containing the user's email.
         db (Session, optional): Database session dependency. Defaults to Depends(get_db).
 
     Raises:
@@ -40,29 +42,31 @@ async def reset_password(request_password: PasswordResetRequest,
         dict: A message confirming that an email has been sent for password reset instructions.
     """
     # Func
-    user = select(user_model.User).where(user_model.User.email == request_password.email)
-    user = await db.execute(user)
-    user = user.scalar_one_or_none()
+    user_q = select(user_model.User).where(user_model.User.email == request.email)
+    result = await db.execute(user_q)
+    user = result.scalar_one_or_none()
     
     
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with email: {request_password.email} not found")
+                            detail=f"User with email: {request.email} not found")
     
     if user.verified is False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with email: {request_password.email} not verification")
+                            detail=f"User with email: {request.email} not verification")
     if user is not None:
         token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
-        reset_link = f"https://{settings.url_address_dns_company}/api/reset?token={token}"
+        reset_link = f"https://{settings.url_address_dns}/api/reset?token={token}"
         
-        await password_reset("Password Reset", user.email,
-            {
-                "title": "Password Reset",
-                "name": user.user_name,
-                "reset_link": reset_link
-            }
-        )
+        await password_reset(subject="Password Reset",
+                             email_to=user.email,
+                             body={
+                                "title": "Password Reset",
+                                "name": user.user_name,
+                                "reset_link": reset_link
+                            }
+                        )
+
         return {"msg": "Email has been sent with instructions to reset your password."}
         
     else:

@@ -1,91 +1,5 @@
-2024-07-15 20:18:41,993 - ERROR - Job "generate_code_verification (trigger: interval[0:01:00], next run at: 2024-07-15 20:19:41 CEST)" raised an exception
 Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/venv/lib/python3.12/site-packages/apscheduler/executors/base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/project/project_chat/app/config/scheduler.py", line 62, in generate_code_verification
-    return ''.join(secrets.choice(characters) for _ in range(length))
-                                                       ^^^^^^^^^^^^^
-TypeError: 'sessionmaker' object cannot be interpreted as an integer
-2024-07-15 20:20:16,101 - ERROR - Job "generate_code_verification (trigger: interval[0:01:00], next run at: 2024-07-15 20:21:16 CEST)" raised an exception
 Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/venv/lib/python3.12/site-packages/apscheduler/executors/base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/project/project_chat/app/config/scheduler.py", line 62, in generate_code_verification
-    return ''.join(secrets.choice(characters) for _ in range(length))
-                                                       ^^^^^^^^^^^^^
-TypeError: 'sessionmaker' object cannot be interpreted as an integer
-2024-07-15 20:21:16,101 - ERROR - Job "generate_code_verification (trigger: interval[0:01:00], next run at: 2024-07-15 20:22:16 CEST)" raised an exception
-Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/venv/lib/python3.12/site-packages/apscheduler/executors/base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/project/project_chat/app/config/scheduler.py", line 62, in generate_code_verification
-    return ''.join(secrets.choice(characters) for _ in range(length))
-                                                       ^^^^^^^^^^^^^
-TypeError: 'sessionmaker' object cannot be interpreted as an integer
-2024-07-15 20:26:14,412 - ERROR - Job "generate_code_verification (trigger: interval[0:01:00], next run at: 2024-07-15 20:27:14 CEST)" raised an exception
-Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/venv/lib/python3.12/site-packages/apscheduler/executors/base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/project/project_chat/app/config/scheduler.py", line 64, in generate_code_verification
-    return ''.join(secrets.choice(characters) for _ in range(length))
-                                                       ^^^^^^^^^^^^^
-TypeError: 'sessionmaker' object cannot be interpreted as an integer
-2024-07-20 11:37:07,855 - ERROR - Error processing Authentication 403: User with ID 253 is not active
-Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/app/routers/user/auth.py", line 63, in login
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-fastapi.exceptions.HTTPException: 403: User with ID 253 is not active
-2024-07-20 11:37:14,887 - ERROR - Error processing Authentication 403: User with ID 253 is not active
-Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/app/routers/user/auth.py", line 63, in login
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-fastapi.exceptions.HTTPException: 403: User with ID 253 is not active
-2024-07-20 11:37:17,253 - ERROR - Error processing Authentication 403: User with ID 253 is not active
-Traceback (most recent call last):
-  File "/home/dmytro/project/project_chat/app/routers/user/auth.py", line 63, in login
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-fastapi.exceptions.HTTPException: 403: User with ID 253 is not active
-2024-08-30 19:44:53,885 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-08-30 20:01:13,479 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-08-30 20:01:24,834 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-08-30 20:02:04,671 - ERROR - An error occurred: Authentication create_refresh_token() missing 1 required positional argument: 'db'
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 71, in login
-    refresh_token = await oauth2.create_refresh_token(user.id)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: create_refresh_token() missing 1 required positional argument: 'db'
-2024-08-31 10:08:06,761 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-08-31 10:08:17,267 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-08-31 11:10:31,235 - ERROR - An error occurred: Authentication Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2509, in get_property
-    return self._props[key]
-           ~~~~~~~~~~~^^^^^
-KeyError: 'reports'
 
 The above exception was the direct cause of the following exception:
 
@@ -96,9 +10,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,139 +25,10 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1578, in _add_reverse_property
-    other = self.mapper.get_property(key, _configure_mappers=False)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2511, in get_property
-    raise sa_exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-08-31 11:11:07,229 - ERROR - An error occurred: Authentication One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Report(reports)]'. Original exception was: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 53, in login
-    result = await db.execute(query)
-             ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
-    result = await greenlet_spawn(
-             ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
-    return self._execute_internal(
-           ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2236, in _execute_internal
-    result: Result[Any] = compile_state_cls.orm_execute_statement(
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
-    result = conn.execute(
-             ^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
-    return meth(
-           ^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
-    return connection._execute_clauseelement(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
-                                                ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4241, in _do_configure_registries
-    raise e
-sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Report(reports)]'. Original exception was: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-08-31 11:12:21,454 - ERROR - An error occurred: Authentication Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2509, in get_property
-    return self._props[key]
-           ~~~~~~~~~~~^^^^^
-KeyError: 'reports'
 
 The above exception was the direct cause of the following exception:
 
@@ -257,9 +39,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -275,69 +54,9 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1578, in _add_reverse_property
-    other = self.mapper.get_property(key, _configure_mappers=False)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2511, in get_property
-    raise sa_exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-08-31 11:13:01,676 - ERROR - An error occurred: Authentication Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2509, in get_property
-    return self._props[key]
-           ~~~~~~~~~~~^^^^^
-KeyError: 'reports'
 
 The above exception was the direct cause of the following exception:
 
@@ -348,9 +67,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -366,69 +82,9 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1578, in _add_reverse_property
-    other = self.mapper.get_property(key, _configure_mappers=False)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2511, in get_property
-    raise sa_exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-08-31 11:15:30,143 - ERROR - An error occurred: Authentication Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2509, in get_property
-    return self._props[key]
-           ~~~~~~~~~~~^^^^^
-KeyError: 'reports'
 
 The above exception was the direct cause of the following exception:
 
@@ -439,9 +95,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -457,75 +110,9 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1578, in _add_reverse_property
-    other = self.mapper.get_property(key, _configure_mappers=False)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2511, in get_property
-    raise sa_exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[Socket(socket)]' has no property 'reports'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-08-31 11:18:54,175 - ERROR - An error occurred: Authentication When initializing mapper Mapper[Notification(notifications)], expression 'Room' failed to locate a name ('Room'). If this is a class name, consider adding this relationship() to the <class 'app.models.reports_model.Notification'> class after both dependent classes have been defined.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 515, in _resolve_name
-    rval = d[token]
-           ~^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_collections.py", line 345, in __missing__
-    self[key] = val = self.creator(key)
-                      ^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 483, in _access_cls
-    return self.fallback[key]
-           ~~~~~~~~~~~~~^^^^^
-KeyError: 'Room'
 
 The above exception was the direct cause of the following exception:
 
@@ -536,9 +123,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -554,75 +138,9 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1642, in do_init
-    self._setup_entity()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1854, in _setup_entity
-    self._clsregistry_resolve_name(argument)(),
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 519, in _resolve_name
-    self._raise_for_name(name, err)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 500, in _raise_for_name
-    raise exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[Notification(notifications)], expression 'Room' failed to locate a name ('Room'). If this is a class name, consider adding this relationship() to the <class 'app.models.reports_model.Notification'> class after both dependent classes have been defined.
-2024-08-31 11:19:47,136 - ERROR - An error occurred: Authentication When initializing mapper Mapper[Notification(notifications)], expression 'Room' failed to locate a name ('Room'). If this is a class name, consider adding this relationship() to the <class 'app.models.reports_model.Notification'> class after both dependent classes have been defined.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 515, in _resolve_name
-    rval = d[token]
-           ~^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_collections.py", line 345, in __missing__
-    self[key] = val = self.creator(key)
-                      ^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 483, in _access_cls
-    return self.fallback[key]
-           ~~~~~~~~~~~~~^^^^^
-KeyError: 'Room'
 
 The above exception was the direct cause of the following exception:
 
@@ -633,9 +151,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -651,73 +166,9 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1599, in _add_reverse_property
-    other._setup_entity()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1854, in _setup_entity
-    self._clsregistry_resolve_name(argument)(),
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 519, in _resolve_name
-    self._raise_for_name(name, err)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/clsregistry.py", line 500, in _raise_for_name
-    raise exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[Notification(notifications)], expression 'Room' failed to locate a name ('Room'). If this is a class name, consider adding this relationship() to the <class 'app.models.reports_model.Notification'> class after both dependent classes have been defined.
-2024-08-31 11:22:39,933 - ERROR - An error occurred: Authentication Mapper 'Mapper[RoomInvitation(room_invitations)]' has no property 'rooms'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 Traceback (most recent call last):
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2509, in get_property
-    return self._props[key]
-           ~~~~~~~~~~~^^^^^
-KeyError: 'rooms'
 
 The above exception was the direct cause of the following exception:
 
@@ -728,9 +179,6 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 461, in execute
     result = await greenlet_spawn(
              ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
-    result = context.switch(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
     return self._execute_internal(
            ^^^^^^^^^^^^^^^^^^^^^^^
@@ -746,77 +194,4 @@ Traceback (most recent call last):
   File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
     return connection._execute_clauseelement(
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1632, in _execute_clauseelement
-    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
                                                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 703, in _compile_w_cache
-    compiled_sql = self._compiler(
-                   ^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 316, in _compiler
-    return dialect.statement_compiler(dialect, self, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
-    Compiled.__init__(self, dialect, statement, **kwargs)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
-    self.string = self.process(self.statement, **compile_kwargs)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
-    return obj._compiler_dispatch(self, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
-    return meth(self, **kw)  # type: ignore  # noqa: E501
-           ^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/compiler.py", line 4679, in visit_select
-    compile_state = select_stmt._compile_state_factory(
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
-    return klass.create_for_statement(statement, compiler, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 1097, in create_for_statement
-    _QueryEntity.to_compile_state(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2552, in to_compile_state
-    _MapperEntity(
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 2632, in __init__
-    entity._post_inspect
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
-    obj.__dict__[self.__name__] = result = self.fget(obj)
-                                           ^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2711, in _post_inspect
-    self._check_configure()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2388, in _check_configure
-    _configure_registries({self.registry}, cascade=True)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4204, in _configure_registries
-    _do_configure_registries(registries, cascade)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4245, in _do_configure_registries
-    mapper._post_configure_properties()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2405, in _post_configure_properties
-    prop.init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 584, in init
-    self.do_init()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1647, in do_init
-    self._generate_backref()
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2133, in _generate_backref
-    self._add_reverse_property(self.back_populates)
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1578, in _add_reverse_property
-    other = self.mapper.get_property(key, _configure_mappers=False)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/dmytro/company/api/venv/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2511, in get_property
-    raise sa_exc.InvalidRequestError(
-sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[RoomInvitation(room_invitations)]' has no property 'rooms'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
-2024-09-01 16:17:09,014 - ERROR - Error processing Authentication 401: Invalid Credentials
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 67, in login
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-fastapi.exceptions.HTTPException: 401: Invalid Credentials
-2024-09-14 11:18:09,826 - ERROR - An error occurred: Authentication create_access_token() missing 1 required positional argument: 'db'
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 69, in login
-    access_token = await oauth2.create_access_token(data={"user_id": user.id})
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: create_access_token() missing 1 required positional argument: 'db'
-2024-09-14 11:18:34,126 - ERROR - An error occurred: Authentication create_access_token() missing 1 required positional argument: 'db'
-Traceback (most recent call last):
-  File "/home/dmytro/company/api/app/routers/user/auth.py", line 69, in login
-    access_token = await oauth2.create_access_token(data={"user_id": user.id})
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: create_access_token() missing 1 required positional argument: 'db'
