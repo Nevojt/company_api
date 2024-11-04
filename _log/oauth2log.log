@@ -1,0 +1,18 @@
+2024-11-03 19:47:56,099 - ERROR - Error fetching user tabs: cannot unpack non-iterable Rooms object
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 112, in get_user_all_rooms_in_all_tabs
+    for room, tab in rooms_and_tabs:
+        ^^^^^^^^^
+TypeError: cannot unpack non-iterable Rooms object
+2024-11-03 19:48:34,775 - ERROR - Error fetching rooms in tab: cannot unpack non-iterable Rooms object
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 189, in get_rooms_in_one_tab
+    for room, tab_info in rooms_and_tabs:
+        ^^^^^^^^^^^^^^
+TypeError: cannot unpack non-iterable Rooms object
+2024-11-03 19:54:57,826 - ERROR - Error fetching user tabs: cannot unpack non-iterable Rooms object
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 112, in get_user_all_rooms_in_all_tabs
+    for room, tab in rooms_and_tabs:
+        ^^^^^^^^^
+TypeError: cannot unpack non-iterable Rooms object
