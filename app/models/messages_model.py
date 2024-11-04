@@ -10,10 +10,10 @@ from app.database.database import Base
 
 
 
-class Socket(Base):
-    __tablename__ = 'socket'
+class ChatMessages(Base):
+    __tablename__ = 'chat_messages'
     
-    id = Column(Integer, primary_key=True, nullable=False, index=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     message = Column(String)
     fileUrl = Column(String)
@@ -35,7 +35,7 @@ class Socket(Base):
 class PrivateMessage(Base):
     __tablename__ = 'private_messages'
     
-    id = Column(Integer, primary_key=True, nullable=False, index=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'), nullable=False)
     sender_id = Column(UUID, ForeignKey('users.id', ondelete="CASCADE"), nullable=False, index=True)
     receiver_id = Column(UUID, ForeignKey('users.id', ondelete="CASCADE"), nullable=False, index=True)
     message = Column(String)
