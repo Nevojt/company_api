@@ -47,9 +47,9 @@ async def get_rooms_info(db: AsyncSession = Depends(get_async_session)):
                 room_model.Rooms.block,
                 room_model.Rooms.delete_at,
                 room_model.Rooms.description,
-                func.count(messages_model.Socket.id).label('count_messages')
+                func.count(messages_model.ChatMessages.id).label('count_messages')
             )
-            .outerjoin(messages_model.Socket, room_model.Rooms.name_room == messages_model.Socket.rooms)
+            .outerjoin(messages_model.ChatMessages, room_model.Rooms.name_room == messages_model.ChatMessages.rooms)
             .where(room_model.Rooms.name_room != hell, room_model.Rooms.secret_room != True)
             .group_by(room_model.Rooms.id)
             .order_by(desc('count_messages'))
@@ -507,9 +507,9 @@ async def get_rooms_info_company(current_user: user_model.User = Depends(oauth2.
                 room_model.Rooms.block,
                 room_model.Rooms.delete_at,
                 room_model.Rooms.description,
-                func.count(messages_model.Socket.id).label('count_messages')
+                func.count(messages_model.ChatMessages.id).label('count_messages')
             )
-            .outerjoin(messages_model.Socket, room_model.Rooms.name_room == messages_model.Socket.rooms)
+            .outerjoin(messages_model.ChatMessages, room_model.Rooms.name_room == messages_model.ChatMessages.rooms)
             .where(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True, room_model.Rooms.company_id == current_user.company_id)
             .group_by(room_model.Rooms.id)
             .order_by(desc('count_messages'))

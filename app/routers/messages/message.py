@@ -2,9 +2,9 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from uuid import UUID
 
-from sqlalchemy import desc, func, and_
+from sqlalchemy import desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import NoResultFound
+
 
 from app.auth import oauth2
 from app.database.async_db import get_async_session
@@ -15,6 +15,7 @@ from sqlalchemy.future import select
 from typing import List
 
 from app.config.crypto_encrypto import async_decrypt
+from app.settings.get_info import get_room_by_id
 
 router = APIRouter(
     prefix="/messages",
@@ -22,19 +23,10 @@ router = APIRouter(
 )
 
 
-async def check_room_blocked(room_id: UUID,
-                             session: AsyncSession):
-    query = select(room_model.Rooms).where(room_model.Rooms.id == room_id, room_model.Rooms.block.is_(True))
-    try:
-        result = await session.execute(query)
-        room_record = result.scalar_one()
-        return True
-    except NoResultFound:
-        return False
 
 @router.get("/{room_id}/{message_id}")
 async def get_count_message_room(room_id: UUID,
-                                 message_id: int, 
+                                 message_id: UUID,
                                  session: AsyncSession = Depends(get_async_session)):
     """
     Retrieves the count of messages in a specific room that have an ID greater than a given message ID.
@@ -47,43 +39,27 @@ async def get_count_message_room(room_id: UUID,
     Returns:
         int: The count of messages in the room that have an ID greater than the given message ID.
     """
-    get_room_and_message = (
-        select(room_model.Rooms.name_room, messages_model.Socket.id)
-        .join(messages_model.Socket, 
-              and_(
-                  room_model.Rooms.name_room == messages_model.Socket.rooms,
-                  messages_model.Socket.id == message_id
-              ), isouter=True)
-        .where(room_model.Rooms.id == room_id)
+    message_date = await session.execute(select(messages_model.ChatMessages.created_at)
+        .where(messages_model.ChatMessages.id == message_id, messages_model.ChatMessages.room_id == room_id)
     )
-    result = await session.execute(get_room_and_message)
-    room_message_data = result.first()
-    
-    if room_message_data is None or room_message_data[0] is None:
-        raise HTTPException(status_code=404, detail="Room not found")
-    
-    name_room, message_id_check = room_message_data
+    message_date = message_date.scalar_one_or_none()
 
-    if message_id_check is None:
+    # Якщо повідомлення не знайдено, повертаємо 0
+    if message_date is None:
         return 0
 
-    count_query = (
+    # Запит на підрахунок кількості повідомлень після вказаного повідомлення за датою
+    count_messages_after = await session.execute(
         select(func.count())
-        .select_from(messages_model.Socket)
-        .where(
-            and_(
-                messages_model.Socket.rooms == name_room,
-                messages_model.Socket.id > message_id
-            )
-        )
+        .where(messages_model.ChatMessages.room_id == room_id,
+               messages_model.ChatMessages.created_at > message_date)
     )
-    result = await session.execute(count_query)
-    count_messages_after = result.scalar()
-    return count_messages_after
+    count = count_messages_after.scalar()
+    return count
 
 
 @router.get("/message_id")
-async def fetch_message_by_id(message_id: int,
+async def fetch_message_by_id(message_id: UUID,
                               session: AsyncSession = Depends(get_async_session)):
     """
     Fetches a message by its ID along with user information and returns it as a SocketReturnMessage object.
@@ -97,15 +73,15 @@ async def fetch_message_by_id(message_id: int,
     """
     # Formulate the query
     message_query = select(
-        messages_model.Socket, 
+        messages_model.ChatMessages,
         user_model.User
     ).outerjoin(
-        user_model.User, messages_model.Socket.receiver_id == user_model.User.id
+        user_model.User, messages_model.ChatMessages.receiver_id == user_model.User.id
 
     ).filter(
-        messages_model.Socket.id == message_id
+        messages_model.ChatMessages.id == message_id
     ).group_by(
-        messages_model.Socket.id, user_model.User.id
+        messages_model.ChatMessages.id, user_model.User.id
     )
 
     # Execute the query
@@ -113,20 +89,22 @@ async def fetch_message_by_id(message_id: int,
     message_data = result.first()
 
     if message_data:
-        socket, user = message_data
-        decrypted_message = await async_decrypt(socket.message) if socket.message else None
+        messages, user = message_data
+        decrypted_message = await async_decrypt(messages.message) if messages.message else None
 
         # Create a SocketReturnMessage instance
-        return_message = message.SocketReturnMessage(
-            created_at=socket.created_at,
-            receiver_id=socket.receiver_id,
-            id=socket.id,
+        return_message = message.ChatReturnMessage(
+            created_at=messages.created_at,
+            receiver_id=messages.receiver_id,
+            id=messages.id,
             message=decrypted_message,
-            fileUrl=socket.fileUrl,
-            user_name=user.user_name if user else "USER DELETE",
-            avatar=user.avatar if user else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/boy_1.webp",
-            deleted=socket.deleted,
-            room_id=socket.room_id
+            fileUrl=messages.fileUrl,
+            voiceUrl=messages.voiceUrl,
+            videoUrl=messages.videoUrl,
+            user_name=user.user_name if user else "Unknown user",
+            avatar=user.avatar if user else "https://media.giphy.com/media/9Y01tydkHUVvhxNVKR/giphy.gif?cid=ecf05e47xvp40pbs2k84kiq9qyo4h7c37yuixsylgd9l8c0h&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+            deleted=messages.deleted,
+            room_id=messages.room_id
         )
 
         return return_message
@@ -153,55 +131,54 @@ async def get_messages_room(room_id: UUID,
     Returns:
         List[schemas.SocketModel]: A list of socket messages along with user details, structured as per SocketModel schema.
     """
-    room_blocked = await check_room_blocked(room_id, session)  
-    if room_blocked:
-        raise HTTPException(status_code=403, detail="Room is blocked")
-    
-    room = select(room_model.Rooms).where(room_model.Rooms.id == room_id)
-    result = await session.execute(room)
-    existing_room = result.scalar_one_or_none()
+    existing_room = await get_room_by_id(session, room_id)
     if existing_room is None:
         raise HTTPException(status_code=404, detail="Room not found")
+
+    if existing_room.block:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Room is blocked")
+
     
-    
-    query = select(
-    messages_model.Socket, 
-    user_model.User, 
-    func.coalesce(func.sum(messages_model.Vote.dir), 0).label('votes')
+    query = await session.execute(select(
+    messages_model.ChatMessages,
+    user_model.User,
+    func.coalesce(func.sum(messages_model.ChatMessageVote.dir), 0).label('votes')
     ).outerjoin(
-        messages_model.Vote, messages_model.Socket.id == messages_model.Vote.message_id
-    ).outerjoin( 
-        user_model.User, messages_model.Socket.receiver_id == user_model.User.id
+        messages_model.ChatMessageVote, messages_model.ChatMessages.id == messages_model.ChatMessageVote.message_id
+    ).outerjoin(
+        user_model.User, messages_model.ChatMessages.receiver_id == user_model.User.id
     ).filter(
-        messages_model.Socket.rooms == existing_room.name_room
+        messages_model.ChatMessages.room_id == existing_room.id  # Використовуємо ID, якщо `room_id` це UUID
     ).group_by(
-        messages_model.Socket.id, user_model.User.id
+        messages_model.ChatMessages.id, user_model.User.id
     ).order_by(
-        desc(messages_model.Socket.created_at)
-    ).limit(limit)
+        desc(messages_model.ChatMessages.created_at)
+    ).limit(limit))
 
-    result = await session.execute(query)
-    raw_messages = result.all()
+    raw_messages = query.all()
 
-    # Convert raw messages to SocketModel
+    # Convert raw messages to ChatMessagesSchema
 
     wrapped_messages = []
-    for socket, user, votes in raw_messages:
-        decrypted_message = await async_decrypt(socket.message)
-        socket_model = message.SocketModel(
-            created_at=socket.created_at,
-            receiver_id=socket.receiver_id,
+    for messages, user, votes in raw_messages:
+        decrypted_message = await async_decrypt(messages.message)
+        socket_model = message.ChatMessagesSchema(
+            created_at=messages.created_at,
+            receiver_id=messages.receiver_id,
             message=decrypted_message,
-            fileUrl=socket.fileUrl,
+            fileUrl=messages.fileUrl,
+            voiceUrl=messages.voiceUrl,
+            videoUrl=messages.voiceUrl,
             user_name=user.user_name if user is not None else "Unknown user",
             avatar=user.avatar if user is not None else "https://media.giphy.com/media/9Y01tydkHUVvhxNVKR/giphy.gif?cid=ecf05e47xvp40pbs2k84kiq9qyo4h7c37yuixsylgd9l8c0h&ep=v1_gifs_search&rid=giphy.gif&ct=g",
-            verified=user.verified if user is not None else None,
-            id=socket.id,
+            verified=user.verified,
+            id=messages.id,
             vote=votes,
-            id_return=socket.id_return,
-            edited=socket.edited,
-            deleted=socket.deleted,
-            room_id=socket.room_id
+            id_return=messages.id_return,
+            edited=messages.edited,
+            deleted=messages.deleted,
+            room_id=messages.room_id
         )
         wrapped_message = await wrap_message(socket_model)
         wrapped_messages.append(wrapped_message)
@@ -212,20 +189,19 @@ async def get_messages_room(room_id: UUID,
 
 
 @router.put("/{id}", include_in_schema=False)
-async def change_message(id_message: int, message_update: message.SocketUpdate,
+async def change_message(id_message: UUID, message_update: message.ChatUpdateMessage,
                          current_user: user_model.User = Depends(oauth2.get_current_user), 
                          session: AsyncSession = Depends(get_async_session)):
     
     
-    query = select(messages_model.Socket).where(messages_model.Socket.id == id_message,
-                                                messages_model.Socket.receiver_id == current_user.id)
-    result = await session.execute(query)
-    message = result.scalar()
+    message_query = await session.execute(select(messages_model.ChatMessages).where(messages_model.ChatMessages.id == id_message,
+                                                messages_model.ChatMessages.receiver_id == current_user.id))
+    messages = message_query.scalar_one_or_none()
 
-    if message is None:
+    if messages is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found or you don't have permission to edit this message")
 
-    message.message = message_update.message
+    messages.message = message_update.message
     session.add(message)
     await session.commit()
 
@@ -235,7 +211,7 @@ async def change_message(id_message: int, message_update: message.SocketUpdate,
 
 # Old functions
 
-@router.get("/", response_model=List[message.SocketModel], include_in_schema=False)
+@router.get("/", response_model=List[message.ChatMessagesSchema], include_in_schema=False)
 async def get_posts(session: AsyncSession = Depends(get_async_session), 
                     limit: int = 50, skip: int = 0):
     
@@ -252,17 +228,17 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
     """
 
     query = select(
-        messages_model.Socket, 
+        messages_model.ChatMessages,
         user_model.User, 
-        func.coalesce(func.sum(messages_model.Vote.dir), 0).label('votes')
+        func.coalesce(func.sum(messages_model.ChatMessageVote.dir), 0).label('votes')
     ).outerjoin(
-        messages_model.Vote, messages_model.Socket.id == messages_model.Vote.message_id
+        messages_model.ChatMessageVote, messages_model.ChatMessages.id == messages_model.ChatMessageVote.message_id
     ).join(
-        user_model.User, messages_model.Socket.receiver_id == user_model.User.id
+        user_model.User, messages_model.ChatMessages.receiver_id == user_model.User.id
     ).group_by(
-        messages_model.Socket.id, user_model.User.id
+        messages_model.ChatMessages.id, user_model.User.id
     ).order_by(
-        desc(messages_model.Socket.created_at)
+        desc(messages_model.ChatMessages.created_at)
     ).limit(50)
 
     result = await session.execute(query)
@@ -273,23 +249,23 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
 
     # Convert raw messages to SocketModel
     messages = []
-    for socket, user, votes in raw_messages:
-        decrypted_message = await async_decrypt(socket.message)
+    for messages, user, votes in raw_messages:
+        decrypted_message = await async_decrypt(messages.message)
         messages.append(
-            message.SocketModel(
-                created_at=socket.created_at,
-                receiver_id=socket.receiver_id,
+            messages.ChatMessagesSchema(
+                created_at=messages.created_at,
+                receiver_id=messages.receiver_id,
                 message=decrypted_message,
-                fileUrl=socket.fileUrl,
+                fileUrl=messages.fileUrl,
                 user_name=user.user_name if user is not None else "Unknown user",
                 avatar=user.avatar if user is not None else "https://tygjaceleczftbswxxei.supabase.co/storage/v1/object/public/image_bucket/inne/image/photo_2024-06-14_19-20-40.jpg",
                 verified=user.verified if user is not None else None,
-                id=socket.id,
+                id=messages.id,
                 vote=votes,
-                id_return=socket.id_return,
-                edited=socket.edited,
-                deleted=socket.deleted,
-                room_id=socket.room_id
+                id_return=messages.id_return,
+                edited=messages.edited,
+                deleted=messages.deleted,
+                room_id=messages.room_id
             )
         )
     messages.reverse()

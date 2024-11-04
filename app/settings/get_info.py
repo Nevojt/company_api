@@ -1,7 +1,6 @@
 import logging
 from uuid import UUID
 from fastapi import HTTPException, status
-from requests.utils import extract_zipped_paths
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func
@@ -120,11 +119,11 @@ async def get_count_messages(db: AsyncSession):
     try:
         messages_count = await db.execute(
             select(
-                messages_model.Socket.rooms,
-                func.count(messages_model.Socket.id).label('count')
+                messages_model.ChatMessages.rooms,
+                func.count(messages_model.ChatMessages.id).label('count')
             )
-            .group_by(messages_model.Socket.rooms)
-            .where(messages_model.Socket.rooms != hell)
+            .group_by(messages_model.ChatMessages.rooms)
+            .where(messages_model.ChatMessages.rooms != hell)
         )
         messages_count = messages_count.all()
         return messages_count

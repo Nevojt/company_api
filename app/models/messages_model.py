@@ -52,11 +52,11 @@ class PrivateMessage(Base):
 
     
     
-class Vote(Base):
-    __tablename__ = 'votes'
+class ChatMessageVote(Base):
+    __tablename__ = 'chat_message_votes'
     
     user_id = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    message_id = Column(Integer, ForeignKey("socket.id", ondelete="CASCADE"), primary_key=True)
+    message_id = Column(UUID, ForeignKey("chat_messages.id", ondelete="CASCADE"), primary_key=True)
     dir = Column(Integer)
     
     
@@ -64,5 +64,5 @@ class PrivateMessageVote(Base):
     __tablename__ = 'private_message_votes'
     
     user_id = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    message_id = Column(Integer, ForeignKey("private_messages.id", ondelete="CASCADE"), primary_key=True)
+    message_id = Column(UUID, ForeignKey("private_messages.id", ondelete="CASCADE"), primary_key=True)
     dir = Column(Integer) 

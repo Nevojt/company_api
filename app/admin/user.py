@@ -1,7 +1,8 @@
 
-
+from uuid import UUID
 from typing import List, Optional
 from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
+from pydantic import EmailStr
 
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +18,7 @@ from app.config.created_image import generate_image_with_letter
 from app.auth import oauth2
 from app.database.async_db import get_async_session
 
-from app.models import models, user_model, room_model
+from app.models import user_model, room_model
 from app.schemas import user
 
 
@@ -30,7 +31,7 @@ router = APIRouter(
 
 @router.get("/company", response_model=List[user.UserInfoLights])
 async def read_company_users(db: AsyncSession = Depends(get_async_session),
-                             current_user: user.UserOut = Depends(oauth2.get_current_user)):
+                             current_user: user_model.User = Depends(oauth2.get_current_user)):
     
     if current_user.role != 'admin':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
@@ -44,18 +45,18 @@ async def read_company_users(db: AsyncSession = Depends(get_async_session),
     return users
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
-async def created_user_admin(email: str = Form(...),
+async def created_user_admin(email: EmailStr = Form(...),
                           user_name: str = Form(...),
                           password: str = Form(...),
                           file: UploadFile = File(None),
                           db: AsyncSession = Depends(get_async_session),
-                          current_user: int = Depends(oauth2.get_current_user)):
+                          current_user: user_model.User = Depends(oauth2.get_current_user)):
     """
     This function creates a new user in the database.
 
     Args:
         email (str): The email of the user.
-        user_name (str): The user name of the user.
+        user_name (str): The username of the user.
         password (str): The password of the user.
         file (UploadFile): The avatar file of the user.
         bucket_name (str): The name of the Backblaze B2 bucket to upload the file to.
@@ -137,7 +138,7 @@ async def created_user_admin(email: str = Form(...),
     await db.commit()
     await db.refresh(post)
     
-    registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    registration_link = f"https://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
     await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
                                            {
                                             "title": "Registration",
@@ -150,9 +151,9 @@ async def created_user_admin(email: str = Form(...),
 
 
 @router.put("/{user_id}")
-async def activated_deactivated_user(user_id: int,
+async def activated_deactivated_user(user_id: UUID,
                                      db: AsyncSession = Depends(get_async_session),
-                                     current_user: int = Depends(oauth2.get_current_user)):
+                                     current_user: user_model.User = Depends(oauth2.get_current_user)):
     try:
         if current_user.role != 'admin':
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
@@ -181,11 +182,10 @@ async def activated_deactivated_user(user_id: int,
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def deactivation_user(
-    user_id: int,
-    db: AsyncSession = Depends(get_async_session), 
-    current_user: user_model.User = Depends(oauth2.get_current_user)
-):
+async def deactivation_user(user_id: UUID,
+                            db: AsyncSession = Depends(get_async_session),
+                            current_user: user_model.User = Depends(oauth2.get_current_user)
+                        ):
     """
     Asynchronously deletes a user from the database.
 
