@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import oauth2
 from app.database.async_db import get_async_session
-from app.models import user_model, room_model, messages_model
+from app.models import user_model, messages_model
 from app.schemas import message
 from app.schemas.message import wrap_message
 from sqlalchemy.future import select
@@ -149,7 +149,7 @@ async def get_messages_room(room_id: UUID,
     ).outerjoin(
         user_model.User, messages_model.ChatMessages.receiver_id == user_model.User.id
     ).filter(
-        messages_model.ChatMessages.room_id == existing_room.id  # Використовуємо ID, якщо `room_id` це UUID
+        messages_model.ChatMessages.room_id == existing_room.id
     ).group_by(
         messages_model.ChatMessages.id, user_model.User.id
     ).order_by(
