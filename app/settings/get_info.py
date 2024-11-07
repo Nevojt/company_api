@@ -92,7 +92,7 @@ async def get_room_name(name_room: str, db: AsyncSession):
         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY, detail=str(e))
 
 
-async def get_room_by_id(db: AsyncSession, room_id: UUID):
+async def get_room_by_id(room_id: UUID, db: AsyncSession):
     try:
         result = await db.execute(select(room_model.Rooms).where(room_model.Rooms.id == room_id))
         return result.scalar_one_or_none()
@@ -100,14 +100,14 @@ async def get_room_by_id(db: AsyncSession, room_id: UUID):
         logger.error(f"Error occurred while retrieving room by ID: {e}")
         raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY, detail=str(e))
 
-def has_permission_to_the_room(current_user: user_model.User, room: room_model.Rooms):
+async def has_permission_to_the_room(current_user: user_model.User, room: room_model.Rooms):
     try:
         return current_user.role == "admin" or current_user.id == room.owner
     except Exception as e:
         logger.error(f"Error occurred while checking permissions: {e}")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
-def has_verified_or_blocked_user(current_user: user_model.User):
+async def has_verified_or_blocked_user(current_user: user_model.User):
     try:
         return not current_user.verified or current_user.blocked
     except Exception as e:

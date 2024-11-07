@@ -11,7 +11,7 @@ from .mail import send_mail
 from .routers.user import auth, finds, user, verify_user, user_status, company_user
 from .routers.firebase import user_tokens
 from .routers.messages import message, private_messages, vote
-from .routers.images import upload_file_google, upload_file_supabase, upload_file_backblaze
+from .routers.images import upload_file_backblaze # upload_file_google, upload_file_supabase,
 from .routers.room import rooms, count_users_messages, secret_rooms, user_rooms, ban_user, role_in_room
 from .routers.tabs import tabs_rooms
 from .routers.invitations import invitation_secret_room
@@ -34,20 +34,20 @@ from app.admin import room as admin_room
 
 from app.routers.AI import sayory_router
 
-# import sentry_sdk
-# from app.config.config import settings
-#
-#
-# sentry_sdk.init(
-#     dsn=settings.sentry_url,
-#     # Set traces_sample_rate to 1.0 to capture 100%
-#     # of transactions for tracing.
-#     traces_sample_rate=1.0,
-#     # Set profiles_sample_rate to 1.0 to profile 100%
-#     # of sampled transactions.
-#     # We recommend adjusting this value in production.
-#     profiles_sample_rate=1.0,
-# )
+import sentry_sdk
+from app.config.config import settings
+
+
+sentry_sdk.init(
+    dsn=settings.sentry_url,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 
 
@@ -129,8 +129,8 @@ app.include_router(user_status.router)
 app.include_router(vote.router)
 
 app.include_router(upload_file_backblaze.router)
-app.include_router(upload_file_supabase.router)
-app.include_router(upload_file_google.router)
+# app.include_router(upload_file_supabase.router)
+# app.include_router(upload_file_google.router)
 
 app.include_router(private_messages.router)
 app.include_router(count_users_messages.router)

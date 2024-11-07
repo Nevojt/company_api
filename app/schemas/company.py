@@ -11,7 +11,7 @@ class CompanyCreate(BaseModel):
     contact_email: EmailStr
     contact_phone: Optional[str] = Field(None, max_length=50)
     address: Optional[str] = None
-    # subscription_status: Optional[str] = Field(None, max_length=50)
+    subscription_status: Optional[str] = Field(None, max_length=50)
     subscription_end_date: Optional[str] = None
     subscription_type: Optional[str] = Field(None, max_length=50)
     paid_services: Optional[str] = None

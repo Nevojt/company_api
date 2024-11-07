@@ -1,5 +1,5 @@
 
-from sqlalchemy import JSON, Column, Integer, String, Enum
+from sqlalchemy import JSON, Column, String, Enum
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship

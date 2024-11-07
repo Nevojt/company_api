@@ -9,10 +9,11 @@ docker
 .data
 .idea
 .env
+.env_start_app
 
 .venv
 venv
-users_data.jso
+users_data.json
 start_uvicorn
 sinuous-grove-405612-a7d9d516c960.json
 tests

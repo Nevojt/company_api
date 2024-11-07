@@ -1,7 +1,6 @@
 import logging
 from typing import List
 from fastapi import File, Form, UploadFile, status, HTTPException, Depends, APIRouter, Response
-from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -165,9 +164,9 @@ async def create_room_v2(name_room: str = Form(...),
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/v2/{name_room}", response_model=room_schema.RoomUpdate)
-async def get_room(name_room: str,
-                   db: AsyncSession = Depends(get_async_session)):
+@router.get("/v2/name_room/{name_room}", response_model=room_schema.RoomUpdate)
+async def get_room_by_name(name_room: str,
+                            db: AsyncSession = Depends(get_async_session)):
     """
     Get a specific room by name.
 
@@ -190,9 +189,9 @@ async def get_room(name_room: str,
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/v2/{room_id}", response_model=room_schema.RoomUpdate)
-async def get_room(room_id: UUID,
-                   db: AsyncSession = Depends(get_async_session)):
+@router.get("/v2/room_id/{room_id}", response_model=room_schema.RoomUpdate)
+async def get_room_by_id(room_id: UUID,  # noqa: F811
+                        db: AsyncSession = Depends(get_async_session)):
     """
     Get a specific room by name.
 
@@ -227,18 +226,22 @@ async def update_room_name(room_id: UUID,
     Update a room's name by ID.
     """
     try:
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
         # Fetch room
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Room with ID {room_id} not found")
         if room.block:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Room is blocked")
+        # Check permissions
+        if not await has_permission_to_the_room(current_user, room):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Not enough permissions")
 
         # Check if new name already exists for this room
         room_query_name = await get_room_name(name_room, db)
@@ -246,10 +249,6 @@ async def update_room_name(room_id: UUID,
         if room_query_name:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="New name already exists for this room")
-
-        # Check permissions
-        if not has_permission_to_the_room(current_user, room):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
         # Update the room with new name
         room.name_room = name_room
@@ -272,12 +271,12 @@ async def update_room_image(room_id: UUID,
     Update a room's name by ID.
     """
     try:
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
         # Fetch room
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Room with ID {room_id} not found")
@@ -286,8 +285,9 @@ async def update_room_image(room_id: UUID,
                                 detail="Room is blocked")
 
             # Check permissions
-        if not has_permission_to_the_room(current_user, room):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+        if not await has_permission_to_the_room(current_user, room):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Not enough permissions")
 
         image = await utils.upload_to_backblaze(file, settings.bucket_name_room_image)
         room.image_room = image
@@ -307,12 +307,12 @@ async def update_room_secret(room_id: UUID,
                               current_user: user_model.User = Depends(oauth2.get_current_user)):
 
     try:
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
             # Отримання кімнати
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Room with ID {room_id} not found")
@@ -322,8 +322,9 @@ async def update_room_secret(room_id: UUID,
                                 detail="Room is blocked")
 
         # Check permissions
-        if not has_permission_to_the_room(current_user, room):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+        if not await has_permission_to_the_room(current_user, room):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Not enough permissions")
 
             # Handle room secrecy logic if applicable
         manager_query = await db.execute(
@@ -334,7 +335,8 @@ async def update_room_secret(room_id: UUID,
         if secret:
             if not manager:
                 # Add manager only if not already exists
-                manager = room_model.RoomsManagerSecret(user_id=current_user.id, room_id=room_id)
+                manager = room_model.RoomsManagerSecret(user_id=current_user.id,
+                                                        room_id=room_id)
                 db.add(manager)
         else:
             # Remove manager if exists when making room not secret
@@ -352,7 +354,8 @@ async def update_room_secret(room_id: UUID,
         return {"detail": "Room secret status updated successfully"}
     except Exception as e:
         logger.error(f"Error occurred while updating room secret: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=str(e))
 
 
 @router.put("/v2/description/{room_id}", response_model=room_schema.RoomUpdateDescription)  # Assuming you're using room_id
@@ -364,19 +367,19 @@ async def update_room_description(room_id: UUID,
     Update a room by ID.
     """
     try:
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
         # Fetch room
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
 
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Room with ID {room_id} not found")
 
         # Check permissions
-        if not has_permission_to_the_room(current_user, room):
+        if not await has_permission_to_the_room(current_user, room):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
         # Update the room with new data provided by update_room
@@ -392,7 +395,7 @@ async def update_room_description(room_id: UUID,
 
 
 
-@router.delete("/v2/{room_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/v2/delete/{room_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_room(room_id: UUID, db: AsyncSession = Depends(get_async_session),
                      current_user: user_model.User = Depends(oauth2.get_current_user)):
     """Deletes a room.
@@ -410,18 +413,18 @@ async def delete_room(room_id: UUID, db: AsyncSession = Depends(get_async_sessio
     """
     try:
         hell = await get_room_hell(db)
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
 
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Room with ID {room_id} not found")
 
         # Check permissions
-        if not has_permission_to_the_room(current_user, room):
+        if not await has_permission_to_the_room(current_user, room):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
         # Update user statuses in the room
@@ -448,11 +451,11 @@ async def block_room(room_id: UUID,
                      db: AsyncSession = Depends(get_async_session),
                      current_user: user_model.User = Depends(oauth2.get_current_user)):
     try:
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 
-        room = await get_room_by_id(db, room_id)
+        room = await get_room_by_id(room_id, db)
 
         if room is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -510,7 +513,8 @@ async def get_rooms_info_company(current_user: user_model.User = Depends(oauth2.
                 func.count(messages_model.ChatMessages.id).label('count_messages')
             )
             .outerjoin(messages_model.ChatMessages, room_model.Rooms.name_room == messages_model.ChatMessages.rooms)
-            .where(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True, room_model.Rooms.company_id == current_user.company_id)
+            .where(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True,
+                   room_model.Rooms.company_id == current_user.company_id)
             .group_by(room_model.Rooms.id)
             .order_by(desc('count_messages'))
         )

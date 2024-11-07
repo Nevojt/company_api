@@ -4,7 +4,7 @@ import uuid
 from passlib.context import CryptContext
 import secrets
 import hashlib
-import shortuuid
+# import shortuuid
 import string, random
 import os
 from fastapi import HTTPException, UploadFile
@@ -82,8 +82,8 @@ def generate_access_code_uuid4():
 def generate_user_id_hash(username):
     return hashlib.md5(username.encode()).hexdigest()
 
-def generate_unique_code_shortuuid():
-    return shortuuid.uuid()
+# def generate_unique_code_shortuuid():
+#     return shortuuid.uuid()
 
 # User options
 def generate_unique_filename(filename):
