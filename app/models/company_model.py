@@ -1,5 +1,5 @@
 
-from sqlalchemy import JSON, Column, String, Enum
+from sqlalchemy import JSON, Column, String, Enum, Integer, ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
@@ -10,7 +10,7 @@ from enum import Enum as PythonEnum
 
 class StatusSubscription(str, PythonEnum):
     active = "active"
-    suspend = "suspended"
+    suspended = "suspended"
     inactive = "inactive"
     wait = "wait"
     
@@ -40,3 +40,17 @@ class Company(Base):
     
     users = relationship("User", back_populates="company", cascade="all, delete")
     rooms = relationship("Rooms", back_populates="company", cascade="all, delete")
+
+
+class CompanyDB(Base):
+    __tablename__ = 'companies_credentials'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'), nullable=False)
+    company_id = Column(UUID, ForeignKey('companies.id', ondelete='CASCADE'), nullable=False)
+    database_url = Column(String)
+    database_name = Column(String)
+    port = Column(Integer)
+    username = Column(String)
+    password = Column(String)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))

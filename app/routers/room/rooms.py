@@ -49,7 +49,7 @@ async def get_rooms_info(db: AsyncSession = Depends(get_async_session)):
                 func.count(messages_model.ChatMessages.id).label('count_messages')
             )
             .outerjoin(messages_model.ChatMessages, room_model.Rooms.name_room == messages_model.ChatMessages.rooms)
-            .where(room_model.Rooms.name_room != hell, room_model.Rooms.secret_room != True)
+            .where(room_model.Rooms.name_room != hell, room_model.Rooms.secret_room == False)
             .group_by(room_model.Rooms.id)
             .order_by(desc('count_messages'))
         )
@@ -113,7 +113,7 @@ async def create_room_v2(name_room: str = Form(...),
     try:
 
 
-        if has_verified_or_blocked_user(current_user):
+        if await has_verified_or_blocked_user(current_user):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {current_user.id} is blocked or not verified")
 

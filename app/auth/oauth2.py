@@ -1,6 +1,5 @@
 import logging
 
-from fastapi.encoders import isoformat
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 
@@ -27,14 +26,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 async def create_access_token(user_id: UUID, db: AsyncSession):
     try:
-        user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
-        user = user.scalar()
+        user = await db.execute(select(user_model.User).where(user_model.User.id == user_id))
+        user = user.scalar_one_or_none()
 
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
         to_encode = {
             "exp": int(expire.timestamp()),  # Convert datetime to string
             "user_id": str(user_id),  # Ensure UUID is converted to string
+            "company": str(user.company_id),
             "password_changed": str(user.password_changed)
         }
 
@@ -51,13 +51,16 @@ async def verify_access_token(token: str, credentials_exception, db: AsyncSessio
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id_str: str = payload.get("user_id")
+        company_id_str: str = payload.get("company")
 
-        if user_id_str is None:
+        if user_id_str is None or company_id_str is None:
             raise credentials_exception
 
         user_id = UUID(user_id_str)
-        user = await db.execute(select(user_model.User).filter(user_model.User.id == user_id))
-        user = user.scalar()
+        company_id = UUID(company_id_str)
+        user = await db.execute(select(user_model.User).where(user_model.User.id == user_id,
+                                                               user_model.User.company_id == company_id))
+        user = user.scalar_one_or_none()
 
         if user is None or str(user.password_changed) != payload['password_changed']:
             raise credentials_exception
@@ -98,8 +101,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     try:
         token = await verify_access_token(token, credentials_exception, db)
 
-        user = await db.execute(select(user_model.User).filter(user_model.User.id == token.id))
-        user = user.scalar()
+        user = await db.execute(select(user_model.User).where(user_model.User.id == token.id))
+        user = user.scalar_one_or_none()
         if not user:
             logger.error("Could not find user")
 

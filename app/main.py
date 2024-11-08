@@ -19,7 +19,7 @@ from .routers.invitations import invitation_secret_room
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form, update_mail
-# from .routers.company import company
+from .superAdmin import company
 # from .routers.reports import report_to_reason
 
 from .config.scheduler import setup_scheduler#, scheduler
@@ -86,7 +86,7 @@ app = FastAPI(
     redoc_url="/new-redoc-url",
     title="Chat Company",
     description="Chat documentation Company",
-    version="0.1.5.1.2",
+    version="0.1.5.1.3",
     on_startup=[init_db, startup_event],
     # on_shutdown=[on_shutdown]
 )
@@ -129,8 +129,6 @@ app.include_router(user_status.router)
 app.include_router(vote.router)
 
 app.include_router(upload_file_backblaze.router)
-# app.include_router(upload_file_supabase.router)
-# app.include_router(upload_file_google.router)
 
 app.include_router(private_messages.router)
 app.include_router(count_users_messages.router)
@@ -149,7 +147,7 @@ app.include_router(verify_user.router)
 app.include_router(ass.router)
 
 # Company routes
-# app.include_router(company.router)
+app.include_router(company.router)
 app.include_router(company_user.router)
 
 # Admin routes
