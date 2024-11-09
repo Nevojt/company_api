@@ -25,18 +25,7 @@ async def get_rooms_info(db: Session = Depends(get_db),
                          count_users_sort: Optional[bool] = False,
                          current_user: user_model.User = Depends(oauth2.get_current_user)):
     
-    """
-    Retrieves information about chat rooms, excluding a specific room ('Hell'), along with associated message and user counts.
 
-    Args:
-        db (Session, optional): Database session dependency. Defaults to Depends(get_db).
-
-    Returns:
-        List[schemas.RoomBase]: A list containing information about each room, such as room name, image, count of users, count of messages, and creation date.
-    """
-    
-    # get info rooms and not room "Hell"
-    # rooms = db.query(room_model.Rooms).filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True).order_by(asc(room_model.Rooms.id)).all()
     if current_user.role != 'admin':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} not admin")
@@ -52,23 +41,23 @@ async def get_rooms_info(db: Session = Depends(get_db),
         room_model.Rooms.secret_room,
         room_model.Rooms.block,
         room_model.Rooms.delete_at,
-        func.count(messages_model.Socket.id).label('count_messages')
-    ).outerjoin(messages_model.Socket, room_model.Rooms.name_room == messages_model.Socket.rooms) \
-    .filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room != True) \
+        func.count(messages_model.ChatMessages.id).label('count_messages')
+    ).outerjoin(messages_model.ChatMessages, room_model.Rooms.name_room == messages_model.ChatMessages.rooms) \
+    .filter(room_model.Rooms.name_room != 'Hell', room_model.Rooms.secret_room == False) \
     .group_by(room_model.Rooms.id) \
     .order_by(desc('count_messages')) \
     .all()
     # Count messages for room
     messages_count = db.query(
-        messages_model.Socket.rooms, 
-        func.count(messages_model.Socket.id).label('count')
-    ).group_by(messages_model.Socket.rooms).filter(messages_model.Socket.rooms != 'Hell').all()
+        messages_model.ChatMessages.rooms,
+        func.count(messages_model.ChatMessages.id).label('count')
+    ).group_by(messages_model.ChatMessages.rooms).filter(messages_model.ChatMessages.rooms != 'Hell').all()
 
     # Count users for room
     users_count = db.query(
-        user_model.User_Status.name_room, 
-        func.count(user_model.User_Status.id).label('count')
-    ).group_by(user_model.User_Status.name_room).filter(user_model.User_Status.name_room != 'Hell').all()
+        user_model.UserStatus.name_room,
+        func.count(user_model.UserStatus.id).label('count')
+    ).group_by(user_model.UserStatus.name_room).filter(user_model.UserStatus.name_room != 'Hell').all()
 
     # merge result
     rooms_info = []

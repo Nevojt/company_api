@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
-import logging
+from _log_config.log_config import get_logger
 import pytz
 
-from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
+from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File, Path
 from fastapi import BackgroundTasks
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,10 +26,8 @@ from ...config import utils, crypto_encrypto
 from ...config.start_schema import start_app
 from ...database.async_db import get_async_session
 
+user_logger = get_logger('user', 'user.log')
 
-
-logging.basicConfig(filename='_log/user.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/users",
     tags=['Users'],
@@ -77,7 +75,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
 
 
         # Hash the user's password
-        hashed_password = utils.hash_password(user_data.password)
+        hashed_password = utils.hash(user_data.password)
         user_data.password = hashed_password
 
         verification_token = await crypto_encrypto.generate_encrypted_token(user_data.email)
@@ -98,10 +96,10 @@ async def created_user_v2(background_tasks: BackgroundTasks,
         await db.refresh(new_user)
 
         # Create a User_Status entry for the new user
-        post = user_model.User_Status(user_id=new_user.id,
-                                      user_name=new_user.user_name,
-                                      name_room=hell.name_room,
-                                      room_id=hell.id)
+        post = user_model.UserStatus(user_id=new_user.id,
+                                     user_name=new_user.user_name,
+                                     name_room=hell.name_room,
+                                     room_id=hell.id)
         db.add(post)
         await db.commit()
         await db.refresh(post)
@@ -121,7 +119,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
         print(f"Create User Time: {finish}")
         return new_user
     except Exception as e:
-        logger.error(f"Error creating user: {e}")
+        user_logger.error(f"Error creating user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
@@ -191,7 +189,7 @@ async def delete_user(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except Exception as e:
-        logger.error(f"Error deleting user: {e}")
+        user_logger.error(f"Error deleting user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     
@@ -223,7 +221,7 @@ async def update_user_v2(file: UploadFile = File(...),
         return "updated avatar"
 
     except Exception as e:
-        logger.error(f"Error updating user avatar: {e}")
+        user_logger.error(f"Error updating user avatar: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.put('/v2/description')
@@ -251,11 +249,11 @@ async def description_user_v2(description: str = Form(...),
         return "updated description"
 
     except Exception as e:
-        logger.error(f"Error updating user description: {e}")
+        user_logger.error(f"Error updating user description: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.put('/v2/username')
-async def update_user_v2(user_name: str = Form(...),
+@router.put('/v2/username/{user_name}')
+async def update_user_name_v2(user_name: str = Path(..., description="The username to update"),
                         db: AsyncSession = Depends(get_async_session),
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
     """
@@ -292,7 +290,7 @@ async def update_user_v2(user_name: str = Form(...),
                 detail=f"User with ID: {current_user.id} not found"
             )
 
-        user_status_query = await db.execute(select(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id))
+        user_status_query = await db.execute(select(user_model.UserStatus).filter(user_model.UserStatus.user_id == current_user.id))
         user_status = user_status_query.scalar_one_or_none()
 
         if user_status is None:
@@ -308,7 +306,7 @@ async def update_user_v2(user_name: str = Form(...),
 
         return "updated username"
     except Exception as e:
-        logger.error(f"Error updating user username: {e}")
+        user_logger.error(f"Error updating user username: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.get('/{email}', response_model=user.UserInfo)
@@ -339,7 +337,7 @@ async def get_user_mail(email: EmailStr,
 
         return user_email
     except Exception as e:
-        logger.error(f"Error retrieving user by email: {e}")
+        user_logger.error(f"Error retrieving user by email: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.get('/audit/{user_name}', response_model=user.UserInfo)
@@ -370,7 +368,7 @@ async def get_user_name(user_name: str,
 
         return user_result
     except Exception as e:
-        logger.error(f"Error retrieving user by name: {e}")
+        user_logger.error(f"Error retrieving user by name: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.get('/me/', response_model=user.UserInfo)
@@ -422,7 +420,7 @@ async def created_user_test(user: user.UserCreateDel,
     """
     # Hash the user's password
     company = await get_company(start_app.company_subdomain, db)
-    hashed_password = utils.hash_password(user.password)
+    hashed_password = utils.hash(user.password)
     user.password = hashed_password
 
     # Create a new user and add it to the database
@@ -434,8 +432,8 @@ async def created_user_test(user: user.UserCreateDel,
 
     hell = await get_room_hell(db)
     # Create a User_Status entry for the new user
-    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name,
-                                  name_room=hell.name_room, room_id=hell.id)
+    post = user_model.UserStatus(user_id=new_user.id, user_name=new_user.user_name,
+                                 name_room=hell.name_room, room_id=hell.id)
     db.add(post)
     await db.commit()
     await db.refresh(post)

@@ -1,4 +1,4 @@
-import logging
+from _log_config.log_config import get_logger
 
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
@@ -14,8 +14,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.config import settings
 
-logging.basicConfig(filename='_log/oauth2log.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+oauth2_logger = get_logger('oauth2', 'oauth2log.log')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -41,7 +40,7 @@ async def create_access_token(user_id: UUID, db: AsyncSession):
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
     except Exception as e:
-        logger.error(f"Error creating access token: {e}")
+        oauth2_logger.error(f"Error creating access token: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Error creating access token")
 
@@ -69,9 +68,9 @@ async def verify_access_token(token: str, credentials_exception, db: AsyncSessio
         return token_data
 
     except JWTError:
-        logger.error(f"Invalid JWT token: {token}")
+        oauth2_logger.error(f"Invalid JWT token: {token}")
     except Exception as e:
-        logger.error(f"Error verifying access token: {e}")
+        oauth2_logger.error(f"Error verifying access token: {e}")
 
         raise credentials_exception
 
@@ -104,11 +103,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
         user = await db.execute(select(user_model.User).where(user_model.User.id == token.id))
         user = user.scalar_one_or_none()
         if not user:
-            logger.error("Could not find user")
+            oauth2_logger.error("Could not find user")
 
         return user
     except Exception as e:
-        logger.error(f"Error getting current user: {e}")
+        oauth2_logger.error(f"Error getting current user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Error getting current user")
 
@@ -131,6 +130,6 @@ async def create_refresh_token(user_id: UUID, db: AsyncSession):
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
     except Exception as e:
-        logger.error(f"Error creating refresh token: {e}")
+        oauth2_logger.error(f"Error creating refresh token: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Error creating refresh token")

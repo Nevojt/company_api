@@ -1,4 +1,6 @@
 import logging
+from http import HTTPStatus
+from http.client import HTTPResponse, HTTPMessage
 from uuid import UUID
 from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter, Path
@@ -13,7 +15,12 @@ from app.models.user_model import User
 from app.config.utils import generate_random_code
 
 from app.models.company_model import Company, StatusSubscription
-from app.schemas.company import CompanyCreate, CompanyUpdate, CompanySchema
+from app.schemas.company import (
+    CompanyCreate,
+    CompanyUpdate,
+    CompanySchema,
+    CompanyUpdateSettings,
+)
 
 logging.basicConfig(filename='_log/companies_admin.log', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -142,7 +149,7 @@ async def read_company_by_subdomain(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail="An error occurred while reading the company")
 
-@router.put("/companies/{company_id}", response_model=CompanySchema,)
+@router.put("/companies/info/{company_id}", response_model=CompanySchema,)
 async def update_company_info(
                 company_id: UUID,
                 company: CompanyUpdate,
@@ -172,19 +179,57 @@ async def update_company_info(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail="An error occurred while updating the company")
 
-@router.delete("/companies/{company_id}", response_model=CompanySchema) # , include_in_schema=True
-def delete_company(company_id: int, db: Session = Depends(get_db),
-                   current_user: int = Depends(oauth2.get_current_user)):
+@router.put("/companies/settings/{company_id}", response_model=CompanySchema,)
+async def update_company_settings(
+                company_id: UUID,
+                company: CompanyUpdateSettings,
+                db: AsyncSession = Depends(get_async_session),
+                current_user: User = Depends(oauth2.get_current_user),
+            ):
+    try:
+        if current_user.role != "super_admin":
+            raise HTTPException(status.HTTP_403_FORBIDDEN,
+                                detail="The user is not a super admin, access is denied.")
+
+        db_company_query = await db.execute(select(Company).where(Company.id == company_id))
+        db_company = db_company_query.scalar_one_or_none()
+
+        if db_company is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Company not found")
+
+        for key, value in company.model_dump(exclude_unset=True).items():
+            setattr(db_company, key, value)
+
+        await db.commit()
+        await db.refresh(db_company)
+        return db_company
+    except Exception as e:
+        logger.error(f"Error occurred: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail="An error occurred while updating the company")
+
+
+@router.delete("/companies/delete/{company_id}", response_model=CompanySchema) # , include_in_schema=True
+async def delete_company(company_id: UUID, db: AsyncSession = Depends(get_async_session),
+                    current_user: User = Depends(oauth2.get_current_user),):
     
-    
-    db_company = db.query(Company).filter(Company.id == company_id).first()
-    if db_company is None:
-        raise HTTPException(status_code=404, detail="Company not found")
-    
-    if current_user.role != "super_admin":
-        raise HTTPException(status_code=403,
-                            detail="You are not authorized to delete this company")
-    
-    db.delete(db_company)
-    db.commit()
-    return db_company
+    try:
+        db_company_query = await db.execute(select(Company).where(Company.id == company_id))
+        db_company = db_company_query.scalar_one_or_none()
+
+        if db_company is None:
+            raise HTTPException(status_code=404, detail="Company not found")
+
+        if current_user.role != "super_admin":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="You are not authorized to delete this company")
+
+        await db.delete(db_company)
+        await db.commit()
+        return HTTPException(status_code=status.HTTP_204_NO_CONTENT,
+                             detail="Company deleted")
+    except Exception as e:
+        logger.error(f"Error occurred: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="An error occurred while deleting the company")

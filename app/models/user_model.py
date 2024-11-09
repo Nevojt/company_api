@@ -51,7 +51,7 @@ class User(Base):
         UniqueConstraint('user_name', name='uq_user_name'),
     )
     
-class User_Status(Base):
+class UserStatus(Base):
     __tablename__ = 'user_status' 
     
     id = Column(Integer, primary_key=True, nullable=False, index=True, autoincrement=True)

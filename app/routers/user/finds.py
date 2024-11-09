@@ -52,21 +52,21 @@ def search_users_and_rooms(substring: str, db: Session = Depends(get_db)):
         # Search for rooms
         rooms = db.query(room_model.Rooms).filter(
             room_model.Rooms.name_room != 'Hell',
-            room_model.Rooms.secret_room != True,
+            room_model.Rooms.secret_room == False,
             func.lower(room_model.Rooms.name_room).like(pattern)
         ).all()
 
         # Count messages for room
         messages_count = db.query(
-            messages_model.Socket.rooms,
-            func.count(messages_model.Socket.id).label('count')
-        ).group_by(messages_model.Socket.rooms).filter(messages_model.Socket.rooms != 'Hell').all()
+            messages_model.ChatMessages.rooms,
+            func.count(messages_model.ChatMessages.id).label('count')
+        ).group_by(messages_model.ChatMessages.rooms).filter(messages_model.ChatMessages.rooms != 'Hell').all()
 
         # Count users for room
         users_count = db.query(
-            user_model.User_Status.name_room,
-            func.count(user_model.User_Status.id).label('count')
-        ).group_by(user_model.User_Status.name_room).filter(user_model.User_Status.name_room != 'Hell').all()
+            user_model.UserStatus.name_room,
+            func.count(user_model.UserStatus.id).label('count')
+        ).group_by(user_model.UserStatus.name_room).filter(user_model.UserStatus.name_room != 'Hell').all()
 
 
         users_info =[]

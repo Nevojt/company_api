@@ -3,16 +3,19 @@ from uuid import UUID
 from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter
 
-from sqlalchemy import func, asc
+from sqlalchemy import asc
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import oauth2
 
 from app.database.async_db import get_async_session
-from app.models import user_model, room_model, messages_model
+from app.models import user_model, room_model
 from app.schemas import room as room_schema
 from app.routers.AI.hello import system_notification_change_owner
+from app.settings.get_info import get_count_messages, get_count_users
+
+from app.config.start_schema import start_app
 
 logging.basicConfig(filename='_log/user_rooms.log', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -21,7 +24,7 @@ router = APIRouter(
     prefix='/user_rooms',
     tags=['User rooms'],
 )
-
+hell = start_app.default_room_name
 
 
 @router.get("/", response_model=List[room_schema.RoomFavorite])
@@ -42,23 +45,15 @@ async def get_user_rooms(db: AsyncSession = Depends(get_async_session),
         ).outerjoin(
             room_model.RoomsManagerMyRooms,
             (room_model.RoomsManagerMyRooms.room_id == room_model.Rooms.id) & (room_model.RoomsManagerMyRooms.user_id == current_user.id)
-        ).where(room_model.Rooms.name_room != 'Hell', room_model.Rooms.owner == current_user.id)
+        ).where(room_model.Rooms.name_room != hell, room_model.Rooms.owner == current_user.id)
         .order_by(asc(room_model.Rooms.id)))
         rooms = rooms.all()
 
         # Fetch messages count
-        messages_count = await db.execute(select(
-            messages_model.Socket.rooms,
-            func.count(messages_model.Socket.id).label('count')
-        ).group_by(messages_model.Socket.rooms).where(messages_model.Socket.rooms != 'Hell'))
-        messages_count = messages_count.all()
+        messages_count = await get_count_messages(db)
 
         # Fetch users count
-        users_count = await db.execute(select(
-            user_model.User_Status.name_room,
-            func.count(user_model.User_Status.id).label('count')
-        ).group_by(user_model.User_Status.name_room).where(user_model.User_Status.name_room != 'Hell'))
-        users_count = users_count.all()
+        users_count = await get_count_users(db)
 
         rooms_info = []
         for room, favorite in rooms:
@@ -175,7 +170,7 @@ async def change_room_owner(room_id: UUID,
         db.add(room_query)
         await db.commit()
 
-        role_query = await db.execute(select(room_model.RoleInRoom).filter(room_model.RoleInRoom.room_id == room_id))
+        role_query = await db.execute(select(room_model.RoleInRoom).where(room_model.RoleInRoom.room_id == room_id))
         role_query = role_query.scalar_one_or_none()
 
 

@@ -429,7 +429,7 @@ async def delete_room(room_id: UUID, db: AsyncSession = Depends(get_async_sessio
 
         # Update user statuses in the room
         users_in_room_query = await db.execute(
-                                    select(user_model.User_Status).where(user_model.User_Status.room_id == room_id))
+                                    select(user_model.UserStatus).where(user_model.UserStatus.room_id == room_id))
         users_statuses = users_in_room_query.scalars().all()
 
         for user_status in users_statuses:

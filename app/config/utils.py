@@ -1,50 +1,57 @@
 import shutil
 from typing import Union
 import uuid
-from passlib.context import CryptContext
+
 import secrets
 import hashlib
 # import shortuuid
-import string, random
-import os
+import string, random  # noqa: E401
+
 from fastapi import HTTPException, UploadFile
 from tempfile import NamedTemporaryFile
 from b2sdk.v2 import InMemoryAccountInfo, B2Api
 from .config import settings
+
+import os
+from passlib.context import CryptContext
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
+PEPPER = os.getenv("PASSWORD_PEPPER")
+if not PEPPER:
+    raise ValueError("PASSWORD_PEPPER is not set in the environment variables.")
 
 info = InMemoryAccountInfo()
 b2_api = B2Api(info)
 b2_api.authorize_account("production", settings.backblaze_id, settings.backblaze_key)
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def hash_password(password: str):
-    """
-    Hash a password using the CryptContext from passlib.context.
-
-    Args:
-        password (str): The password to hash.
-
-    Returns:
-        str: The hashed password.
-    """
-    return pwd_context.hash(password)
+pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__rounds=12, deprecated="auto")
 
 
-def verify(plain_password, hashed_password):
-    """
-    Verify that a plaintext password matches a previously hashed password.
+def hash(password: str) -> str:
 
-    Args:
-        plain_password (str): The plaintext password to compare.
-        hashed_password (str): The hashed password to compare against.
+    try:
+        password_with_pepper = f"{password}{PEPPER}"
+        return pwd_context.hash(password_with_pepper)
+    except Exception as e:
+        print(f"Error create password: {e}")
+        raise
 
-    Returns:
-        bool: True if the passwords match, False otherwise.
-    """
-    return pwd_context.verify(plain_password, hashed_password)
+
+def verify(plain_password: str, hashed_password: str) -> bool:
+
+    try:
+
+        password_with_pepper = f"{plain_password}{PEPPER}"
+        return pwd_context.verify(password_with_pepper, hashed_password)
+    except Exception as e:
+        print(f"Error get password: {e}")
+        return False
 
 
 def generate_unique_token(email: str) -> str:

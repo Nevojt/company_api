@@ -58,7 +58,7 @@ async def reset(password: user.UserUpdatePassword,
   
     current_time_utc = datetime.now(pytz.UTC)
     # hashed new password
-    hashed_password = utils.hash_password(password.new_password)
+    hashed_password = utils.hash(password.new_password)
 
     # Update password to database
     current_user.password = hashed_password

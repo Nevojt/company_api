@@ -112,7 +112,7 @@ async def created_user_admin(email: EmailStr = Form(...),
                             detail=f"User with user_name {existing_username_user.user_name} already exists")
     
     # Hash the user's password
-    hashed_password = utils.hash_password(user_data.password)
+    hashed_password = utils.hash(user_data.password)
     user_data.password = hashed_password
     
     verification_token = utils.generate_unique_token(user_data.email)
@@ -133,7 +133,7 @@ async def created_user_admin(email: EmailStr = Form(...),
     await db.refresh(new_user)
     
     # Create a User_Status entry for the new user
-    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+    post = user_model.UserStatus(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
     db.add(post)
     await db.commit()
     await db.refresh(post)

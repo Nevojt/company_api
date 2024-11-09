@@ -2,8 +2,7 @@ import logging
 from uuid import UUID
 from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session
-from sqlalchemy import func
+
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth import oauth2
@@ -39,7 +38,7 @@ async def get_user_rooms_secret(db: AsyncSession = Depends(get_async_session),
         List[room_schema.RoomBase]: A list of room information, including name, image, user count, message count, and creation date.
     """
     hell = start_app.default_room_name
-    if has_verified_or_blocked_user(current_user):
+    if await has_verified_or_blocked_user(current_user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} is blocked or not verified")
 
@@ -53,7 +52,7 @@ async def get_user_rooms_secret(db: AsyncSession = Depends(get_async_session),
         rooms_query = await db.execute(select(room_model.Rooms, room_model.RoomsManagerSecret.favorite
                          ).where(room_model.Rooms.id.in_(user_room_ids),
                                   room_model.Rooms.name_room != hell,
-                                  room_model.Rooms.secret_room == True,
+                                  room_model.Rooms.secret_room,
                                   room_model.RoomsManagerSecret.room_id == room_model.Rooms.id,
                                   room_model.RoomsManagerSecret.user_id == current_user.id
                                   ))
@@ -111,7 +110,7 @@ async def secret_room_update(room_id: UUID,
         HTTPException: If the user is blocked or not verified, a 403 Forbidden error is raised.
         HTTPException: If the room is not found, a 404 Not Found error is raised.
     """
-    if has_verified_or_blocked_user(current_user):
+    if await has_verified_or_blocked_user(current_user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} is blocked or not verified")
 

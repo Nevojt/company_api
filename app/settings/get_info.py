@@ -135,11 +135,11 @@ async def get_count_users(db: AsyncSession):
     try:
         users_count = await db.execute(
             select(
-                user_model.User_Status.name_room,
-                func.count(user_model.User_Status.id).label('count')
+                user_model.UserStatus.name_room,
+                func.count(user_model.UserStatus.id).label('count')
             )
-            .group_by(user_model.User_Status.name_room)
-            .where(user_model.User_Status.name_room != hell)
+            .group_by(user_model.UserStatus.name_room)
+            .where(user_model.UserStatus.name_room != hell)
         )
         users_count = users_count.all()
         return users_count

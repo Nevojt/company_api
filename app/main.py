@@ -11,11 +11,11 @@ from .mail import send_mail
 from .routers.user import auth, finds, user, verify_user, user_status, company_user
 from .routers.firebase import user_tokens
 from .routers.messages import message, private_messages, vote
-from .routers.images import upload_file_backblaze # upload_file_google, upload_file_supabase,
+from .routers.images import upload_file_backblaze
 from .routers.room import rooms, count_users_messages, secret_rooms, user_rooms, ban_user, role_in_room
 from .routers.tabs import tabs_rooms
 from .routers.invitations import invitation_secret_room
-# from .routers.following import following
+from .routers.following import following
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form, update_mail
@@ -119,7 +119,7 @@ app.include_router(tabs_rooms.router)
 app.include_router(ban_user.router)
 app.include_router(role_in_room.router)
 
-# app.include_router(following.router)
+app.include_router(following.router)
 
 app.include_router(user.router)
 app.include_router(user_tokens.router)
