@@ -1,13 +1,15 @@
 
 import os
-from typing import Optional, List, Any
+from typing import Optional, Any
 
 from fastapi import HTTPException, status
 import requests
 from openai import AsyncOpenAI, OpenAI
 from app.config.config import settings
 from app.config.utils import generate_random_code
+from _log_config.log_config import get_logger
 
+ai_functions_logger = get_logger('ai_functions', 'ai_functions.log')
 
 sayori_key=settings.openai_api_key
 
@@ -50,6 +52,7 @@ async def ask_to_gpt(ask_to_chat: str,
             return response
 
     except Exception as e:
+        ai_functions_logger.error(f"Error occurred while asking to GPT: {e}")
         return f"Sorry, I couldn't process your request. {e}"
 
 
@@ -82,5 +85,7 @@ def transcriptions(url: str):
         return transcript
     except requests.RequestException as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
     except Exception as e:
+        ai_functions_logger.error(f"Error occurred while transcribing audio: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

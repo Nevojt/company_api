@@ -7,7 +7,10 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from app.config.config import settings
 from app.config.utils import generate_unique_filename
-import os
+
+from _log_config.log_config import get_logger
+
+b2_logger = get_logger('backblaze', 'backblaze_upload.log')
 
 
 
@@ -62,7 +65,7 @@ async def upload_to_backblaze(file: UploadFile = File(..., limit="25MB")):
         download_url = b2_api.get_download_url_for_file_name(bucket_name, unique_filename)
         return JSONResponse(status_code=200, content=download_url)
     except Exception as e:
-        # Raise a HTTPException with a 500 status code and the error message
+        b2_logger.error(f"Error uploading file {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/list_files")

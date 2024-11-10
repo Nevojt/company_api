@@ -1,7 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import json
 import os
+from _log_config.log_config import get_logger
 
+
+start_logger = get_logger('start_logger','start_app.log')
 
 class Settings(BaseSettings):
     users_data_file: str
@@ -26,12 +29,16 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env_start_app", extra="ignore")
 
     def load_users_data(self):
-        if not os.path.exists(self.users_data_file):
-            print(f"Warning: File {self.users_data_file} not found. Loading default users data.")
+        try:
+            if not os.path.exists(self.users_data_file):
+                print(f"Warning: File {self.users_data_file} not found. Loading default users data.")
+                return []  # Or return a default configuration if appropriate
+            with open(self.users_data_file, 'r') as file:
+                users_data_json = json.load(file)
+            return users_data_json
+        except Exception as e:
+            start_logger.error(f"Error loading users data from {self.users_data_file}: {str(e)}")
             return []  # Or return a default configuration if appropriate
-        with open(self.users_data_file, 'r') as file:
-            users_data_json = json.load(file)
-        return users_data_json
 
 
 start_app = Settings()

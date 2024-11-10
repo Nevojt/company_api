@@ -19,18 +19,18 @@ from .routers.following import following
 from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form, update_mail
-from .superAdmin import company
+# from .superAdmin import company
 # from .routers.reports import report_to_reason
 
 from .config.scheduler import setup_scheduler#, scheduler
 from app.config.init_users import create_room, create_company
 
-from app.database.async_db import async_session_maker, engine_asinc
+from app.database.async_db import async_session_maker, engine_async
 from app.models import user_model, room_model, password_model, company_model, messages_model
 from app.models import following_model, reports_model
 
-from app.admin import user as admin_user
-from app.admin import room as admin_room
+from app.admin.company import company as admin_company
+from app.admin.room import room as admin_room
 
 from app.routers.AI import sayory_router
 
@@ -54,7 +54,7 @@ sentry_sdk.init(
 
 
 async def init_db():
-    async with engine_asinc.begin() as conn:
+    async with engine_async.begin() as conn:
         try:
             await conn.run_sync(user_model.Base.metadata.create_all)
             await conn.run_sync(room_model.Base.metadata.create_all)
@@ -67,8 +67,8 @@ async def init_db():
         except Exception as e:
             print(f"Error during table creation: {e}")
         try:
-            await create_company(engine_asinc)
-            await create_room(engine_asinc)
+            await create_company(engine_async)
+            await create_room(engine_async)
 
         except Exception as e:
             print(f"Error during table creation: {e}")
@@ -147,11 +147,11 @@ app.include_router(verify_user.router)
 app.include_router(ass.router)
 
 # Company routes
-app.include_router(company.router)
+# app.include_router(company.router)
 app.include_router(company_user.router)
 
 # Admin routes
-app.include_router(admin_user.router)
+app.include_router(admin_company.router)
 app.include_router(admin_room.router)
 
 # AI routes

@@ -1,6 +1,7 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from _log_config.log_config import get_logger
 
 from fastapi import Depends
 from app.database.async_db import get_async_session
@@ -9,6 +10,8 @@ from app.config import start_schema
 from app.config.utils import hash, generate_access_code_uuid4
 from app.config.start_schema import start_app
 from app.settings.get_info import get_room_hell
+
+init_logger = get_logger('init_logger', 'init_user.log')
 
 company_id_uuid4 = generate_access_code_uuid4()
 
@@ -37,44 +40,49 @@ async def create_company(engine_asinc_db):
             print("New company created successfully.")
             return new_company
     except Exception as e:
+        init_logger.error(f"Error in create_initial_users: {e}")
         print(f"Error in create_company: {e}")
 
 
 async def create_initial_users(db: AsyncSession = Depends(get_async_session)):
-    users_data = start_schema.users_data
-    company_id = await get_company(db)
-    hell_room = await get_room_hell(db)
-    for user_data in users_data:
-        # Check if a user with the same email or user_name already exists
-        existing_user = await db.execute(
-            select(user_model.User).where(
-                (user_model.User.email == user_data['email']) |
-                (user_model.User.user_name == user_data['user_name'])
+    try:
+        users_data = start_schema.users_data
+        company_id = await get_company(db)
+        hell_room = await get_room_hell(db)
+        for user_data in users_data:
+            # Check if a user with the same email or user_name already exists
+            existing_user = await db.execute(
+                select(user_model.User).where(
+                    (user_model.User.email == user_data['email']) |
+                    (user_model.User.user_name == user_data['user_name'])
+                )
             )
-        )
-        existing_user = existing_user.scalars().first()
-        if existing_user:
-            print(f"User with email {user_data['email']} or username {user_data['user_name']} already exists.")
-            continue  # Skip this user
+            existing_user = existing_user.scalars().first()
+            if existing_user:
+                print(f"User with email {user_data['email']} or username {user_data['user_name']} already exists.")
+                continue  # Skip this user
 
-        user = user_model.User(
-            user_name=user_data["user_name"],
-            email=user_data["email"],
-            password=hash(user_data["password"]),
-            avatar=user_data["avatar"],
-            company_id=company_id.id
-        )
-        db.add(user)
-        await  db.flush()
+            user = user_model.User(
+                user_name=user_data["user_name"],
+                email=user_data["email"],
+                password=hash(user_data["password"]),
+                avatar=user_data["avatar"],
+                company_id=company_id.id
+            )
+            db.add(user)
+            await  db.flush()
 
 
-        user_status = user_model.UserStatus(user_id=user.id,
-                                            user_name=user.user_name,
-                                            name_room=hell_room.name_room,
-                                            room_id=hell_room.id)
-        db.add(user_status)
+            user_status = user_model.UserStatus(user_id=user.id,
+                                                user_name=user.user_name,
+                                                name_room=hell_room.name_room,
+                                                room_id=hell_room.id)
+            db.add(user_status)
 
-    await db.commit()
+        await db.commit()
+    except Exception as e:
+        init_logger.error(f"Error in create_initial_users: {e}")
+        print(f"Error in create_initial_users: {e}")
 
 
 async def create_room(engine_asinc_db):
@@ -113,6 +121,7 @@ async def create_room(engine_asinc_db):
                 print("Room 'Hell' already exists, skipping insertion.")
             await create_initial_users(session)
     except Exception as e:
+        init_logger.error(f"Error in create_room: {e}")
         print(f"Error in create_room: {e}")
 
 async def get_company(session):
@@ -128,5 +137,6 @@ async def get_company(session):
         existing_company = existing_company.scalars().first()
         return existing_company
     except Exception as e:
+        init_logger.error(f"Error getting company {e}")
         print(f"Error in get_company: {e}")
 

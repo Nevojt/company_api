@@ -6,7 +6,9 @@ from sqlalchemy.future import select
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from _log_config.log_config import get_logger
 
+default_logger = get_logger('default', 'default_info.log')
 
 async def get_default_user(db: AsyncSession):
     try:
@@ -21,6 +23,7 @@ async def get_default_user(db: AsyncSession):
 
         return user_default
     except Exception as e:
+        default_logger.error(f"Error in get_default_user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 async def get_default_room(db: AsyncSession):
@@ -36,4 +39,5 @@ async def get_default_room(db: AsyncSession):
 
         return room_default
     except Exception as e:
+        default_logger.error(f"Error in get_default_room: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

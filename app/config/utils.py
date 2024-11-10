@@ -13,7 +13,7 @@ from b2sdk.v2 import InMemoryAccountInfo, B2Api
 from .config import settings
 
 import os
-from passlib.context import CryptContext
+import bcrypt
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -30,28 +30,29 @@ b2_api.authorize_account("production", settings.backblaze_id, settings.backblaze
 
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__rounds=12, deprecated="auto")
 
-
-def hash(password: str) -> str:
-
+def hash(password: str):
     try:
         password_with_pepper = f"{password}{PEPPER}"
-        return pwd_context.hash(password_with_pepper)
+        hashed_password = bcrypt.hashpw(password_with_pepper.encode('utf-8'), bcrypt.gensalt())
+        return hashed_password.decode('utf-8')
     except Exception as e:
-        print(f"Error create password: {e}")
-        raise
+        print(f"Error get password: {e}")
+        return None
 
 
-def verify(plain_password: str, hashed_password: str) -> bool:
 
+def verify(password: str, hashed_password: str):
     try:
-
-        password_with_pepper = f"{plain_password}{PEPPER}"
-        return pwd_context.verify(password_with_pepper, hashed_password)
+        password_with_pepper = f"{password}{PEPPER}"
+        return bcrypt.checkpw(password_with_pepper.encode('utf-8'), hashed_password.encode('utf-8'))
     except Exception as e:
         print(f"Error get password: {e}")
         return False
+
+
+
+
 
 
 def generate_unique_token(email: str) -> str:

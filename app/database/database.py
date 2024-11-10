@@ -30,16 +30,16 @@ async def get_db():
 
 
 # test session database
-       
-while True:   
-    try:
-        conn = psycopg2.connect(host=settings.database_hostname_company, database=settings.database_name_company, user=settings.database_username_company,
-                                password=settings.database_password_company, cursor_factory=RealDictCursor)
-        cursor = conn.cursor()
-        print("Database connection was successful")
-        break
-
-    except Exception as error:
-            print('Connection to database failed')
-            print("Error:",  error)
-            time.sleep(2)
+#
+# while True:
+#     try:
+#         conn = psycopg2.connect(host=settings.database_hostname_company, database=settings.database_name_company, user=settings.database_username_company,
+#                                 password=settings.database_password_company, cursor_factory=RealDictCursor)
+#         cursor = conn.cursor()
+#         print("Database connection was successful")
+#         break
+#
+#     except Exception as error:
+#             print('Connection to database failed')
+#             print("Error:",  error)
+#             time.sleep(2)

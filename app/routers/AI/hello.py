@@ -7,6 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models import user_model
 from app.config.crypto_encrypto import async_encrypt
+from _log_config.log_config import get_logger
+
+
+sayory_logger = get_logger('hello', 'hello.log')
 
 
 messages = ["👋 Вітаю! Я тут, щоб розповісти про можливості нашого додатку.",
@@ -24,15 +28,17 @@ messages = ["👋 Вітаю! Я тут, щоб розповісти про мо
 
 
 async def say_hello_system(receiver_id: UUID):
-
-    async with async_session_maker() as session:
-        sayory = await get_sayory(db=session)
-        for message in messages:
-            encrypted_message = await async_encrypt(message)
-            await insert_sayory(message=encrypted_message,
-                                receiver_id=receiver_id,
-                                sender_id=sayory.id,
-                                session=session)
+    try:
+        async with async_session_maker() as session:
+            sayory = await get_sayory(db=session)
+            for message in messages:
+                encrypted_message = await async_encrypt(message)
+                await insert_sayory(message=encrypted_message,
+                                    receiver_id=receiver_id,
+                                    sender_id=sayory.id,
+                                    session=session)
+    except Exception as e:
+        sayory_logger.error(f"Error say hello Sayory {e}")
 
 
 async def system_notification_change_owner(receiver_id: UUID,
@@ -46,7 +52,7 @@ async def system_notification_change_owner(receiver_id: UUID,
                                 sender_id=sayory.id,
                                 session=session)
     except Exception as e:
-        print(f"Error in system_notification_change_owner: {e}")
+        sayory_logger.error(f"Error in system_notification_change_owner: {e}")
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT,
                             detail="Error in system_notification_change_owner")
 
@@ -57,7 +63,7 @@ async  def get_sayory(db: AsyncSession):
         sayory = sayory_query.scalar_one()
         return sayory
     except Exception as e:
-        print(f"Error in get_sayory: {e}")
+        sayory_logger.error(f"Error in get_sayory: {e}")
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT,
                             detail="Error in get_sayory")
 
@@ -73,6 +79,6 @@ async def insert_sayory(message: str,
         await session.execute(stmt)
         await session.commit()
     except Exception as e:
-        print(f"Error in insert_sayory: {e}")
+        sayory_logger.error(f"Error in insert_sayory: {e}")
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT,
                             detail="Error in insert_sayory")

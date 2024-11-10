@@ -13,7 +13,7 @@ from app.database.database import get_db
 from app.models import user_model, room_model
 
 router = APIRouter(
-    prefix="/admin/rooms",
+    prefix="/admin_rooms",
     tags=["Admin Rooms"],
 )
 

@@ -1,11 +1,13 @@
 import os
 from typing import Optional
-from fastapi import File, UploadFile, status, HTTPException, Depends, APIRouter
+from fastapi import UploadFile, status, HTTPException, APIRouter
 from .ai_functions import ask_to_gpt, transcriptions
 from .ai_spech_function import speech_engine
 from app.config import utils
 
+from _log_config.log_config import get_logger
 
+sayori_logger = get_logger('sayori', 'sayori_router.log')
 
 
 router = APIRouter(
@@ -42,6 +44,7 @@ async def say_to_sayori(say_to_chat: str,
         response = await ask_to_gpt(say_to_chat, temperature, num)
         return {"response": response}
     except Exception as e:
+        sayori_logger.error(f"Error in say_to_sayori: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
@@ -62,37 +65,36 @@ async def transcribe_audio_from_url(url: str):
     - HTTPException: If an error occurs during the transcription process, an HTTPException is raised with a 500 status code
       and the error message as the detail.
     """
-    return transcriptions(url)
-
+    try:
+        return transcriptions(url)
+    except Exception as e:
+        sayori_logger.error(f"Error in transcribe_audio_from_url: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.post("/speech")
 async def speaker_in_text(text: str):
-    """
-    This function converts a given text into speech using a pre-trained text-to-speech model.
-    The generated audio is then uploaded to a storage service and the URL of the uploaded audio is returned.
-
-    Parameters:
-    - text (str): The text to be converted into speech. The text must be a valid string.
-
-    Returns:
-    - dict: A dictionary containing the URL of the uploaded audio. The dictionary has a single key-value pair:
-      {"audio_url": audio_url}, where "audio_url" is the URL of the uploaded audio file.
-
-    Raises:
-    - Exception: If an error occurs during the audio upload process, an exception is raised with an error message.
-    """
-    audio = await speech_engine(text)
-    print(audio)
     try:
-        with open(audio, "rb") as audio_file:
-            file = UploadFile(audio_file, filename=audio.name)
-            audio_url = await utils.upload_to_backblaze(file, "audio-speech")
+        audio = await speech_engine(text)
+        print(audio)
+        try:
+            with open(audio, "rb") as audio_file:
+                file = UploadFile(audio_file, filename=audio.name)
+                audio_url = await utils.upload_to_backblaze(file, "audio-speech")
 
-            if audio.exists():
-                os.remove(audio)
+                if audio.exists():
+                    os.remove(audio)
 
-        return audio_url
+            return audio_url
+        except Exception as e:
+            sayori_logger.error(f"Error in speaker_in_text: {e}", exc_info=True)
+            print(f"Error uploading audio: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
     except Exception as e:
-        print(f"Error uploading audio: {e}")
+        sayori_logger.error(f"Error in speaker_in_text: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
 
 
