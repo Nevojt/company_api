@@ -51,11 +51,13 @@ async def list_mute_users(room_id: UUID,
         if not bans:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"No banned users found in room ID: {room_id}")
-
+        current_time_utc = datetime.now(pytz.timezone('UTC'))
+        current_time_naive = current_time_utc.replace(tzinfo=None)
         users_info = [{
             "id": ban.users.id,
             "user_name": ban.users.user_name,
             "avatar": ban.users.avatar,
+            "mute_minutes": (ban.end_time - current_time_naive) / 60
         } for ban in bans if ban.users]
 
         return users_info
@@ -126,31 +128,15 @@ async def mute_user(user_id: UUID, room_id: UUID, duration_minutes: int,
 
 
 @router.delete('/un-mute-user')
-async def un_mute_user(user_id: int, room_id: int, 
+async def un_mute_user(user_id: UUID, room_id: UUID,
                     db: AsyncSession = Depends(get_async_session), 
                     current_user: user_model.User = Depends(oauth2.get_current_user)):
-    """
-    Un-mute a user in a specific room.
 
-    Parameters:
-    user_id (int): The ID of the user to be un-muted.
-    room_id (int): The ID of the room where the user is to be un-muted.
-    db (AsyncSession): The database session for asynchronous operations.
-    current_user (user_model.User): The current user making the request.
-
-    Returns:
-    dict: A dictionary containing a success message.
-
-    Raises:
-    HTTPException: If the room does not exist, the user is not a moderator or owner of the room, or the user is not muted in the room.
-    """
-    if current_user.blocked == True:
+    if current_user.blocked:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"User with ID {current_user.id} is blocked")
         
-    room_query = select(room_model.Rooms).where(room_model.Rooms.id == room_id)
-    room_result = await db.execute(room_query)
-    room = room_result.scalar_one_or_none()
+    room = await get_room_by_id(room_id, db)
     
     role_room = select(room_model.RoleInRoom).where(room_model.RoleInRoom.room_id == room_id,
                                                 room_model.RoleInRoom.user_id == current_user.id)
@@ -167,9 +153,9 @@ async def un_mute_user(user_id: int, room_id: int,
                             detail="You are not the owner or a moderator of this room.")
 
     
-    delete_ban = select(room_model.Ban).where(room_model.Ban.user_id == user_id, room_model.Ban.room_id == room_id)
-    result = await db.execute(delete_ban)
-    existing_ban = result.scalar()
+    delete_ban = await db.execute(select(room_model.Ban).where(
+        room_model.Ban.user_id == user_id, room_model.Ban.room_id == room_id))
+    existing_ban = delete_ban.scalar_one_or_none()
     
     if not existing_ban:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
