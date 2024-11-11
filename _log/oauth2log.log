@@ -1,2 +1,4 @@
 
 
+2024-11-11 20:30:27,493 - ERROR - Error verifying access token: 401: Could not validate credentials
+2024-11-11 20:30:27,558 - ERROR - Error getting current user: 401: Could not validate credentials

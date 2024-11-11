@@ -1,0 +1,6 @@
+2024-11-11 20:32:35,305 - ERROR - An error occurred while resetting password: 403: User with ID 1c94d848-1023-4bb1-8ee6-395541036e8a is not verified or blocked
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/reset/change_and_block.py", line 49, in reset
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"User with ID {current_user.id} is not verified or blocked")
+fastapi.exceptions.HTTPException: 403: User with ID 1c94d848-1023-4bb1-8ee6-395541036e8a is not verified or blocked
