@@ -80,6 +80,7 @@ class UserInfo(BaseModel):
     id: Annotated[UUID4, Strict(False)]
     email: str
     user_name: str
+    full_name: Optional[str] = None
     avatar: str
     description: Optional[str]
     created_at: datetime

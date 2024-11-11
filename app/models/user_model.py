@@ -26,6 +26,7 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'), nullable=False)
     email = Column(String, nullable=False, unique=True)
     user_name = Column(String, nullable=False, unique=True)
+    full_name = Column(String, nullable=True)
     password = Column(String, nullable=False)
     avatar = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))

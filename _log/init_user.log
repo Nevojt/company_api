@@ -1,0 +1,6 @@
+2024-11-11 12:21:34,542 - ERROR - Error in create_room: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedColumnError'>: column users.full_name does not exist
+[SQL: SELECT users.id, users.email, users.user_name, users.full_name, users.password, users.avatar, users.created_at, users.verified, users.token_verify, users.refresh_token, users.role, users.blocked, users.password_changed, users.company_id, users.active, users.description 
+FROM users 
+WHERE users.user_name = $1::VARCHAR]
+[parameters: ('Hell',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)

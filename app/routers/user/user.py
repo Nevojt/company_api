@@ -18,7 +18,8 @@ from app.models import user_model, room_model
 from app.schemas import user
 
 from app.settings.get_info import (get_company, get_user, get_room_hell,
-                                   get_user_for_email, get_user_for_username, check_deactivation_user)
+                                   get_user_for_email, get_user_for_username, check_deactivation_user,
+                                   has_verified_or_blocked_user)
 
 from app.config.created_image import generate_image_with_letter
 from ...auth import oauth2
@@ -39,6 +40,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
                           company: str = Form("sayorama"),
                           email: EmailStr = Form(...),
                           user_name: str = Form(...),
+                          full_name: str = Form(None),
                           password: str = Form(...),
                           file: UploadFile = File(None),
                           description: str = Form(None),
@@ -90,6 +92,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
         new_user = user_model.User(**user_data.model_dump(),
                                avatar=avatar,
                                description=description,
+                                full_name=full_name,
                                token_verify=verification_token)
         db.add(new_user)
         await db.commit()
@@ -307,6 +310,29 @@ async def update_user_name_v2(user_name: str = Path(..., description="The userna
         return "updated username"
     except Exception as e:
         user_logger.error(f"Error updating user username: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.put('/full_name/')
+async def update_full_name(full_name: str = Form(...),
+                        db: AsyncSession = Depends(get_async_session),
+                        current_user: user_model.User = Depends(oauth2.get_current_user)):
+    try:
+        if await has_verified_or_blocked_user(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User not verification or blocked."
+            )
+        user_data = await get_user(current_user.id, db=db)
+        if user_data is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with ID: {current_user.id} not found"
+            )
+        user_data.full_name = full_name
+        await db.commit()
+        return "updated full name"
+    except Exception as e:
+        user_logger.error(f"Error updating user full name: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.get('/{email}', response_model=user.UserInfo)
