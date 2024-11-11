@@ -1,0 +1,26 @@
+2024-11-11 13:15:42,352 - ERROR - Error fetching rooms in tab: 404: Tab 21 not found
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 168, in get_rooms_in_one_tab
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: Tab 21 not found
+2024-11-11 13:17:30,169 - ERROR - Error fetching rooms in tab: 404: Tab 21 not found
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 168, in get_rooms_in_one_tab
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: Tab 21 not found
+2024-11-11 13:20:54,300 - ERROR - Error fetching rooms in tab: 404: Tab 21 not found
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 168, in get_rooms_in_one_tab
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: Tab 21 not found
+2024-11-11 13:21:02,411 - ERROR - Error adding rooms to tab: 404: Tab not found
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/tabs/tabs_rooms.py", line 245, in add_rooms_to_tab
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
+fastapi.exceptions.HTTPException: 404: Tab not found

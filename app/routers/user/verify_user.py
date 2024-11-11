@@ -29,6 +29,9 @@ async def verify_email(token: str, request: Request,
 
     Returns:
         dict: A message confirming email verification.
+        @param token:
+        @param db:
+        @param request:
     """
     # Query for a user with the matching token_verify field
     # Construct the query
@@ -41,20 +44,14 @@ async def verify_email(token: str, request: Request,
     if not user:
         return templates.TemplateResponse("error_page.html", {"request": request})
 
-
-
-
     #  decryption for token
     email = await crypto_encrypto.decrypt_token(token)
     # print(f"decryption verify_email {email}")
-
-
 
     user.email = email
     # Update the user's verified status
     user.verified = True
     user.token_verify = None  # Clear the token once verified
-
 
     update_mail_data = await update_mail.get_data_for_mail(email, db)
     if update_mail_data:

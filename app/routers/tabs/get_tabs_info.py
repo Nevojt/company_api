@@ -1,17 +1,15 @@
-import logging
+from _log_config.log_config import get_logger
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models import room_model
 from app.settings.get_info import start_app
 
-logging.basicConfig(filename='_log/tabs_info.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = get_logger('tabs_info', 'tabs_info.log')
 
 async def get_tabs_user(user_id: UUID,
                         db: AsyncSession):
     try:
-        hell = start_app.default_room_name
         # Fetch all tabs for the current user
         user_tabs_query = await db.execute(select(room_model.RoomTabsInfo).where(
                                                 room_model.RoomTabsInfo.owner_id == user_id))

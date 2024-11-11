@@ -17,6 +17,7 @@ def setup_scheduler(db_session_factory):
         scheduler.add_job(delete_old_rooms, 'cron', day='*', hour='0', args=[db_session_factory])
         scheduler.add_job(delete_test_users, 'cron', day='*', hour='0', args=[db_session_factory])
         scheduler.add_job(update_access_token, 'interval', hours=12, args=[db_session_factory])
+        scheduler.add_job(unban_users, 'interval', seconds=10, args=[db_session_factory])
         # scheduler.add_job(update_access_token, 'interval', minutes=1, args=[db_session_factory]) # test functionality
 
         scheduler.start()
@@ -69,4 +70,21 @@ async def update_access_token(db_session_factory):
             await db.commit()
     except Exception as e:
         scheduler_logger.error(f"Failed to update access tokens: {str(e)}")
-    
+
+
+async def unban_users(db_session_factory):
+    try:
+        current_time_utc = datetime.now(pytz.timezone("UTC"))
+        current_time_naive = current_time_utc.replace(tzinfo=None)
+        async with db_session_factory() as db:
+            unban_query = await db.execute(select(room_model.Ban))
+            bans = unban_query.scalars().all()
+            to_unban = [ban for ban in bans if ban.end_time <= current_time_naive]
+
+            for ban in to_unban:
+                await db.delete(ban)
+
+            await db.commit()
+
+    except Exception as e:
+        scheduler_logger.error(f"Failed to unban users: {str(e)}")
