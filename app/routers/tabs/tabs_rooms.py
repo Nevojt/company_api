@@ -1,4 +1,4 @@
-import logging
+from _log_config.log_config import get_logger
 from uuid import UUID
 
 from typing import List
@@ -18,8 +18,7 @@ from app.schemas import room as room_schema
 from .get_tabs_info import get_tabs_user, get_one_tab_user, get_room_tab, get_favorite_record, get_room_tab_id
 from app.settings.get_info import get_count_users, get_count_messages, get_room_by_id
 
-logging.basicConfig(filename='_log/tabs_rooms.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = get_logger('tabs_rooms', 'tabs_rooms.log')
 router = APIRouter(
     prefix='/tabs',
     tags=['Tabs User'],
@@ -138,7 +137,7 @@ async def get_user_all_rooms_in_all_tabs(db: AsyncSession = Depends(get_async_se
     except Exception as e:
         logger.error(f"Error fetching user tabs: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="Internal Server Error")
+                            detail=f"Internal Server Error {e}")
 
 
 
@@ -211,7 +210,7 @@ async def get_rooms_in_one_tab(tab_id: int = None,
     except Exception as e:
         logger.error(f"Error fetching rooms in tab: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="Internal Server Error")
+                            detail=f"Internal Server Error {e}")
 
 
 
@@ -234,41 +233,46 @@ async def add_rooms_to_tab(tab_id: int, room_ids: List[UUID],
     Raises:
         HTTPException: If the tab does not exist, any room does not exist, or if any room is already in the specified tab.
     """
-    if current_user.blocked:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with ID {current_user.id} is blocked")
+    try:
+        if current_user.blocked:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail=f"User with ID {current_user.id} is blocked")
 
-    # Check if the tab exists and belongs to the current user
-    tab = await get_one_tab_user(current_user.id, tab_id, db)
+        # Check if the tab exists and belongs to the current user
+        tab = await get_one_tab_user(current_user.id, tab_id, db)
 
-    if not tab:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
+        if not tab:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
 
-    # Process each room
-    for room_id in room_ids:
-        room = await get_room_by_id(db, room_id)
-        if not room:
-            continue
+        # Process each room
+        for room_id in room_ids:
+            room = await get_room_by_id(room_id, db)
+            if not room:
+                continue
 
-        existing_link_query = await db.execute(select(room_model.RoomsTabs).where(room_model.RoomsTabs.room_id == room_id,
-                                                          room_model.RoomsTabs.tab_id == tab_id))
-        existing_link = existing_link_query.scalar_one_or_none()
-        if existing_link:
-            continue  # Skip if room is already in the tab
+            existing_link_query = await db.execute(select(room_model.RoomsTabs).where(room_model.RoomsTabs.room_id == room_id,
+                                                              room_model.RoomsTabs.tab_id == tab_id))
+            existing_link = existing_link_query.scalar_one_or_none()
+            if existing_link:
+                continue  # Skip if room is already in the tab
 
-        # Remove the room from any other tab
-        room_tab = await get_room_tab(room_id, db)
-        if room_tab:
-            await db.delete(room_tab)
+            # Remove the room from any other tab
+            room_tab = await get_room_tab(room_id, db)
+            if room_tab:
+                await db.delete(room_tab)
 
-        # Add the room to the tab
-        new_room_tab = room_model.RoomsTabs(room_id=room_id, tab_id=tab_id,
-                                            user_id=current_user.id, tab_name=tab.name_tab)
-        db.add(new_room_tab)
+            # Add the room to the tab
+            new_room_tab = room_model.RoomsTabs(room_id=room_id, tab_id=tab_id,
+                                                user_id=current_user.id, tab_name=tab.name_tab)
+            db.add(new_room_tab)
 
-    await db.commit()
+        await db.commit()
 
-    return {"message": f"Rooms {room_ids} added to tab {tab_id}"}
+        return {"message": f"Rooms {room_ids} added to tab {tab_id}"}
+    except Exception as e:
+        logger.error(f"Error adding rooms to tab: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Internal Server Error {e}")
 
 
 
@@ -296,7 +300,7 @@ async def update_tab(tab_id: int,
     except Exception as e:
         logger.error(f"Error updating tab: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="Internal Server Error")
+                            detail=f"Internal Server Error {e}")
 
 
 @router.put('/{room_id}')
@@ -320,31 +324,36 @@ async def room_update_to_favorites(room_id: UUID,
         HTTPException: If the user is blocked or not verified, a 403 Forbidden error is raised.
         HTTPException: If the room is not found, a 404 Not Found error is raised.
     """
-    if current_user.blocked:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with ID {current_user.id} is blocked")
+    try:
+        if current_user.blocked:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail=f"User with ID {current_user.id} is blocked")
 
-    # Fetch room
-    room = await get_room_by_id(db, room_id)
-    if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
-    
-    # Check if there is already a favorite record
-    favorite_record = await get_favorite_record(current_user.id,
-                                                room_id, db)
+        # Fetch room
+        room = await get_room_by_id(room_id, db)
+        if room is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
 
-    # Update if exists, else create a new record
-    if favorite_record:
-        favorite_record.favorite = favorite
-    else:
-        new_favorite = room_model.RoomsTabs(
-            favorite=favorite
-        )
-        db.add(new_favorite)
+        # Check if there is already a favorite record
+        favorite_record = await get_favorite_record(current_user.id,
+                                                    room_id, db)
 
-    await db.commit()
-    return {"room_id": room_id, "favorite": favorite}
-    
+        # Update if exists, else create a new record
+        if favorite_record:
+            favorite_record.favorite = favorite
+        else:
+            new_favorite = room_model.RoomsTabs(
+                favorite=favorite
+            )
+            db.add(new_favorite)
+
+        await db.commit()
+        return {"room_id": room_id, "favorite": favorite}
+    except Exception as e:
+        logger.error(f"Error updating room favorite: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Internal Server Error {e}")
+
 
 
 
@@ -367,17 +376,22 @@ async def deleted_tab(tab_id: int,
         Response: An empty response with status code 204 if the tab was deleted successfully.
 
     """
-    if current_user.blocked:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"User with ID {current_user.id} is blocked")
-    tab = await get_one_tab_user(current_user.id, tab_id, db)
-    if not tab:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
-    
-    await db.delete(tab)
-    await db.commit()
-    
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    try:
+        if current_user.blocked:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail=f"User with ID {current_user.id} is blocked")
+        tab = await get_one_tab_user(current_user.id, tab_id, db)
+        if not tab:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
+
+        await db.delete(tab)
+        await db.commit()
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        logger.error(f"Error deleting tab: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Internal Server Error {e}")
     
     
 @router.delete('/delete-room-in-tab/{tab_id}')
@@ -398,18 +412,23 @@ async def delete_room_from_tab(tab_id: int, room_ids: List[UUID],
     """
 
     # Check if the tab exists and belongs to the current user
-    tab = await get_one_tab_user(current_user.id, tab_id, db)
-    if not tab:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
+    try:
+        tab = await get_one_tab_user(current_user.id, tab_id, db)
+        if not tab:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tab not found")
 
-    # Remove specified rooms from the tab
-    for room_id in room_ids:
-        room_link = await get_room_tab_id(room_id, tab_id, db)
-        if not room_link:
-            continue  # If room not found in the tab, skip it
-        
-        await db.delete(room_link)
+        # Remove specified rooms from the tab
+        for room_id in room_ids:
+            room_link = await get_room_tab_id(room_id, tab_id, db)
+            if not room_link:
+                continue  # If room not found in the tab, skip it
 
-    await db.commit()  # Commit all changes at once
+            await db.delete(room_link)
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+        await db.commit()  # Commit all changes at once
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        logger.error(f"Error deleting rooms from tab: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Internal Server Error {e}")

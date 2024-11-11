@@ -279,7 +279,7 @@ async def update_user_name_v2(user_name: str = Path(..., description="The userna
     - HTTPException: If the user is not verified or blocked, or if the user is not found in the database.
     """
     try:
-        if not current_user.verified or current_user.blocked:
+        if not has_verified_or_blocked_user(current_user):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="User not verification or blocked."
