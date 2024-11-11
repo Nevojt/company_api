@@ -8,7 +8,8 @@ from fastapi.staticfiles import StaticFiles
 
 from .mail import send_mail
 
-from .routers.user import auth, finds, user, verify_user, user_status, company_user
+from .routers.user import auth, user, verify_user, user_status, company_user
+from .routers.search import finds
 from .routers.firebase import user_tokens
 from .routers.messages import message, private_messages, vote
 from .routers.images import upload_file_backblaze

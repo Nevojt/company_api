@@ -2,7 +2,7 @@ from _log_config.log_config import get_logger
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
+
 from app.database.async_db import get_async_session
 from app.auth import oauth2
 from app.models import user_model, room_model
