@@ -1,4 +1,4 @@
-import logging
+from _log_config.log_config import get_logger
 from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy.future import select
@@ -9,8 +9,8 @@ from app.models import company_model, room_model, user_model, messages_model
 from app.config.start_schema import start_app
 
 
-logging.basicConfig(filename='_log/get_info.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+
+logger = get_logger('get_info', 'get_info.log')
 
 hell = start_app.default_room_name
 

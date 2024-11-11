@@ -1,4 +1,4 @@
-import logging
+from _log_config.log_config import get_logger
 from uuid import UUID
 from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter
@@ -10,13 +10,12 @@ from app.config.start_schema import start_app
 from app.database.async_db import get_async_session
 
 from app.models import room_model, user_model
+from app.routers.reports.functions_report import get_room_id
 from app.schemas import room as room_schema
 
-from app.settings.get_info import has_verified_or_blocked_user, get_count_users, get_count_messages
+from app.settings.get_info import has_verified_or_blocked_user, get_count_users, get_count_messages, get_room_by_id
 
-
-logging.basicConfig(filename='_log/secret_rooms.log', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = get_logger('secret_rooms', 'secret_rooms.log')
 router = APIRouter(
     prefix='/secret',
     tags=['Secret Rooms'],
@@ -115,9 +114,8 @@ async def secret_room_update(room_id: UUID,
                             detail=f"User with ID {current_user.id} is blocked or not verified")
 
     # Fetch room
-    room_query = await db.execute(select(room_model.Rooms).where(room_model.Rooms.id == room_id,
-                                                     room_model.Rooms.owner == current_user.id))
-    room = room_query.scalar_one_or_none()
+    room = await get_room_by_id(room_id, db)
+
     if room is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     
