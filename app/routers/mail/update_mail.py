@@ -17,6 +17,7 @@ from ...auth import oauth2
 from app.models import user_model, password_model
 from app.config import utils, crypto_encrypto
 from app.config.config import settings
+from ...settings.get_info import get_user
 
 update_logger = get_logger('update_mail', 'update_mail.log')
 
@@ -26,7 +27,8 @@ router = APIRouter(
 )
 
 @router.post("/")
-async def update_email(email: EmailStr = Form(...),
+async def update_email(background_tasks: BackgroundTasks,
+                       email: EmailStr = Form(...),
                        password: str = Form(...),
                        db: AsyncSession = Depends(get_async_session),
                        current_user: user_model.User = Depends(oauth2.get_current_user)):
@@ -69,14 +71,27 @@ async def update_email(email: EmailStr = Form(...),
 
         update_linc = f"https://{settings.url_address_dns}/api/update-mail/success_update_linc?token={token}"
         # update_linc = f"http://127.0.0.1:8000/api/update-mail/success_update_linc?token={token}"
-        await send_mail_for_change_email("Changing your account email", current_user.email,
-                                                      {
-                                                          "title": "Changing your account email.",
-                                                          "name": current_user.user_name,
-                                                          "update_link": update_linc,
-                                                          "reset_code": update_code
-                                                      }
-                                                      )
+
+        background_tasks.add_task(
+            send_mail_for_change_email,
+            "Changing your account email",
+            current_user.email,
+            {
+                "title": "Changing your account email.",
+                "name": current_user.user_name,
+                "update_link": update_linc,
+                "reset_code": update_code
+            }
+        )
+        #
+        # await send_mail_for_change_email("Changing your account email", current_user.email,
+        #                                               {
+        #                                                   "title": "Changing your account email.",
+        #                                                   "name": current_user.user_name,
+        #                                                   "update_link": update_linc,
+        #                                                   "reset_code": update_code
+        #                                               }
+        #                                               )
 
 
         return "Send email confirmation"
@@ -110,7 +125,7 @@ async def update_email_link(background_tasks: BackgroundTasks,
                                   db=db)
 
         # Деактивувати запис у MailUpdateModel
-        # mail_update_record.is_active = False
+        mail_update_record.is_active = False
         await db.commit()
 
 
@@ -143,12 +158,10 @@ async def update_email_code(background_tasks: BackgroundTasks,
                                 user_id=mail_update_record.user_id,
                                 new_email=mail_update_record.new_email,
                                 db=db)
-        # await get_and_update_user_email(user_id=mail_update_record.user_id,
-        #                                 new_email=mail_update_record.new_email,
-        #                                 db=db)
 
-        # mail_update_record.is_active = False
+        mail_update_record.is_active = False
         await db.commit()
+        return {"message": "Email updated successfully."}
     except Exception as e:
         update_logger.error(f"Error in update_email_code: {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -166,6 +179,7 @@ async def get_data_for_token(token: str,
         return mail_update_record
     except Exception as e:
         update_logger.error(f"Error get data token {e}")
+
 
 async def get_data_for_mail(email: str,
                             db: AsyncSession = Depends(get_async_session)):
@@ -186,11 +200,11 @@ async def get_and_update_user_email(user_id: UUID,
                                     new_email: str,
                                     db: AsyncSession = Depends(get_async_session)):
     try:
-        user_query = await db.execute(select(user_model.User).where(user_model.User.id == user_id))
-        user = user_query.scalar_one_or_none()
+        user = await get_user(user_id, db)
 
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="User not found.")
 
         token_verify = await crypto_encrypto.generate_encrypted_token(new_email)
         user.token_verify = token_verify
