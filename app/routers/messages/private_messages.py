@@ -25,9 +25,10 @@ async def get_private_recipient(
     """
     Fetches a list of private message recipients and senders for the current user.
     """
-    result = []
+
     try:
         # Query for recipients and senders
+        result = []
         messages_query = select(messages_model.PrivateMessage, user_model.User).join(
             user_model.User, messages_model.PrivateMessage.receiver_id == user_model.User.id
         ).filter(
@@ -69,6 +70,7 @@ async def get_private_recipient(
                                 detail="Sorry, no recipients or senders found.")
     except Exception as e:
         private_logger.error(f"Error retrieving recipients: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Internal server error: {e}")
 
     return result
