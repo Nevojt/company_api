@@ -29,8 +29,8 @@ class WrappedSocketMessage(BaseModel):
     message: ChatMessagesSchema
 
 
-async def wrap_message(socket_model_instance: ChatMessagesSchema) -> WrappedSocketMessage:
-    return WrappedSocketMessage(message=socket_model_instance)
+async def wrap_message(chat_model_instance: ChatMessagesSchema) -> WrappedSocketMessage:
+    return WrappedSocketMessage(message=chat_model_instance)
 
 class ChatReturnMessage(BaseModel):
     model_config = ConfigDict(from_attributes=True)

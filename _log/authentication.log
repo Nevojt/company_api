@@ -16,3 +16,9 @@ Traceback (most recent call last):
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Invalid Credentials")
 fastapi.exceptions.HTTPException: 401: Invalid Credentials
+2024-11-16 18:12:16,823 - ERROR - Error processing Authentication 401: Invalid Credentials
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/user/auth.py", line 80, in login
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Credentials")
+fastapi.exceptions.HTTPException: 401: Invalid Credentials
