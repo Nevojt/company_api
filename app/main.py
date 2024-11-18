@@ -21,7 +21,7 @@ from .routers.token_test import ass
 from .routers.reset import password_reset, password_reset_mobile, change_and_block
 from .routers.mail import contact_form, update_mail
 # from .superAdmin import company
-# from .routers.reports import report_to_reason
+from .routers.reports import report_to_reason
 
 from .config.scheduler import setup_scheduler#, scheduler
 from app.config.init_users import create_room, create_company
@@ -90,6 +90,11 @@ app = FastAPI(
     version="0.1.5.1.3",
     on_startup=[init_db, startup_event],
     # on_shutdown=[on_shutdown]
+    license_info={
+        "name": "Apache License",
+        "version": "2.0.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    }
 )
 
 
@@ -112,6 +117,7 @@ app.add_middleware(
 
 app.include_router(message.router)
 
+app.include_router(report_to_reason.router)
 app.include_router(rooms.router)
 app.include_router(user_rooms.router)
 app.include_router(secret_rooms.router)
