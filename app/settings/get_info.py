@@ -59,7 +59,7 @@ async def get_user_for_email(email: str, db: AsyncSession):
 
 async def get_user_for_username(user_name: str, db: AsyncSession):
     try:
-        username_query = await db.execute(select(user_model.User).where(user_model.User.email == user_name))
+        username_query = await db.execute(select(user_model.User).where(user_model.User.user_name == user_name))
         existing_username = username_query.scalar_one_or_none()
         return existing_username
     except Exception as e:
