@@ -4,3 +4,69 @@ FROM users
 WHERE users.user_name = $1::VARCHAR]
 [parameters: ('Hell',)]
 (Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 21:59:52,014 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 21:59:52,142 - ERROR - Error in create_initial_users: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: INSERT INTO companies (id, name, subdomain, contact_email, contact_phone, address, subscription_status, subscription_end_date, subscription_type, paid_services, company_code, logo_url, description, services, additional_contacts, code_verification) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::statussubscription, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::VARCHAR, $16::VARCHAR) RETURNING companies.created_at, companies.updated_at]
+[parameters: (UUID('6f449ac8-6ef6-4ac5-a123-812ab74c8e46'), 'Sayorama Pablic', 'sayorama', 'pablic@sayorama.eu', '1234567890', '123 Example St', 'wait', None, None, None, None, 'https://example.com/logo.png', 'Just an example company', None, None, None)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-20 21:59:52,258 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 21:59:52,381 - ERROR - Error in create_room: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: SELECT users.id, users.email, users.user_name, users.full_name, users.password, users.avatar, users.created_at, users.verified, users.token_verify, users.refresh_token, users.role, users.blocked, users.password_changed, users.company_id, users.active, users.description 
+FROM users 
+WHERE users.user_name = $1::VARCHAR]
+[parameters: ('Hell',)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-20 22:01:20,696 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:20,859 - ERROR - Error in create_initial_users: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: INSERT INTO companies (id, name, subdomain, contact_email, contact_phone, address, subscription_status, subscription_end_date, subscription_type, paid_services, company_code, logo_url, description, services, additional_contacts, code_verification) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::statussubscription, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::VARCHAR, $16::VARCHAR) RETURNING companies.created_at, companies.updated_at]
+[parameters: (UUID('9a646421-825a-4aa8-a10d-5925a3f2ec5c'), 'Sayorama Pablic', 'sayorama', 'pablic@sayorama.eu', '1234567890', '123 Example St', 'wait', None, None, None, None, 'https://example.com/logo.png', 'Just an example company', None, None, None)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-20 22:01:21,018 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:21,182 - ERROR - Error in create_room: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: SELECT users.id, users.email, users.user_name, users.full_name, users.password, users.avatar, users.created_at, users.verified, users.token_verify, users.refresh_token, users.role, users.blocked, users.password_changed, users.company_id, users.active, users.description 
+FROM users 
+WHERE users.user_name = $1::VARCHAR]
+[parameters: ('Hell',)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-20 22:03:17,186 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:03:17,340 - ERROR - Error in create_initial_users: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: INSERT INTO companies (id, name, subdomain, contact_email, contact_phone, address, subscription_status, subscription_end_date, subscription_type, paid_services, company_code, logo_url, description, services, additional_contacts, code_verification) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::statussubscription, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::VARCHAR, $16::VARCHAR) RETURNING companies.created_at, companies.updated_at]
+[parameters: (UUID('04dd5b95-94de-4b44-866a-e2401432e686'), 'Sayorama Pablic', 'sayorama', 'pablic@sayorama.eu', '1234567890', '123 Example St', 'wait', None, None, None, None, 'https://example.com/logo.png', 'Just an example company', None, None, None)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-20 22:03:17,500 - ERROR - Error getting company (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "companies" does not exist
+[SQL: SELECT companies.id, companies.name, companies.subdomain, companies.contact_email, companies.contact_phone, companies.address, companies.created_at, companies.updated_at, companies.subscription_status, companies.subscription_end_date, companies.subscription_type, companies.paid_services, companies.company_code, companies.logo_url, companies.description, companies.services, companies.additional_contacts, companies.settings, companies.code_verification 
+FROM companies 
+WHERE companies.subdomain = $1::VARCHAR OR companies.contact_email = $2::VARCHAR]
+[parameters: ('sayorama', 'pablic@sayorama.eu')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:03:17,654 - ERROR - Error in create_room: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.InFailedSQLTransactionError'>: current transaction is aborted, commands ignored until end of transaction block
+[SQL: SELECT users.id, users.email, users.user_name, users.full_name, users.password, users.avatar, users.created_at, users.verified, users.token_verify, users.refresh_token, users.role, users.blocked, users.password_changed, users.company_id, users.active, users.description 
+FROM users 
+WHERE users.user_name = $1::VARCHAR]
+[parameters: ('Hell',)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)

@@ -8,8 +8,7 @@ docker
 .vagrant
 .data
 .idea
-.env
-.env_start_app
+
 
 .venv
 venv

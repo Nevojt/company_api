@@ -29,24 +29,24 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 auth_logger = get_logger('auth', "authentication.log")
 
 
-@asynccontextmanager
-async def lifespan(_: APIRouter):
-    redis_connection = redis.from_url(f"redis://{settings.redis_url}", encoding="utf8")
-    await FastAPILimiter.init(redis_connection)
-    yield
-    await redis_connection.close()
+# @asynccontextmanager
+# async def lifespan(_: APIRouter):
+#     redis_connection = redis.from_url(f"redis://{settings.redis_url}", encoding="utf8")
+#     await FastAPILimiter.init(redis_connection)
+#     yield
+#     await redis_connection.close()
 
 
-router = APIRouter(lifespan=lifespan,
+# router = APIRouter(lifespan=lifespan,
+#                 tags=['Authentication'])
+# @router.post('/login', response_model=Token, dependencies=[Depends(RateLimiter(times=3, seconds=10)),
+#                                                                 Depends(RateLimiter(times=5, minutes=1)),
+#                                                                 Depends(RateLimiter(times=10, minutes=10))])
+router = APIRouter(
                 tags=['Authentication'])
 
-# router = APIRouter(
-#                 tags=['Authentication'])
 
 
-@router.post('/login', response_model=Token, dependencies=[Depends(RateLimiter(times=3, seconds=10)),
-                                                                Depends(RateLimiter(times=5, minutes=1)),
-                                                                Depends(RateLimiter(times=10, minutes=10))])
 # @router.post('/login', response_model=Token)
 async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
                 db: AsyncSession = Depends(async_db.get_async_session)):

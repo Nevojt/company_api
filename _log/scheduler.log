@@ -1,0 +1,64 @@
+2024-11-20 22:00:02,605 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:00:12,654 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:00:22,605 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:00:32,662 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:00:42,622 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:00:52,660 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:02,602 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:31,459 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:41,453 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:01:51,463 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:01,465 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:11,458 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:21,452 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:31,450 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:41,452 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2024-11-20 22:02:51,454 - ERROR - Failed to unban users: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "bans" does not exist
+[SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
+FROM bans]
+(Background on this error at: https://sqlalche.me/e/20/f405)

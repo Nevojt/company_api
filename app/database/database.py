@@ -7,7 +7,7 @@ import time
 from app.config.config import settings
 
 
-SQLALCHEMY_DATABASE_URL = f'postgresql+asyncpg://{settings.database_name_company}:{settings.database_password_company}@{settings.database_hostname_company}:{settings.database_port}/{settings.database_username_company}'
+SQLALCHEMY_DATABASE_URL = f'postgresql+asyncpg://{settings.database_name}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_username}'
 
 
 

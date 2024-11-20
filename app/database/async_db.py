@@ -10,9 +10,9 @@ from app.config.config import settings
 
 # URL налаштування для підключення до бази даних
 ASYNC_SQLALCHEMY_DATABASE_URL = (
-    f'postgresql+asyncpg://{settings.database_username_company}:'
-    f'{settings.database_password_company}@{settings.database_hostname_company}:'
-    f'{settings.database_port}/{settings.database_name_company}'
+    f'postgresql+asyncpg://{settings.database_username}:'
+    f'{settings.database_password}@{settings.database_hostname}:'
+    f'{settings.database_port}/{settings.database_name}'
 )
 
 # Створення асинхронного двигуна
@@ -30,10 +30,10 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 while True:
     try:
         conn = psycopg2.connect(
-            host=settings.database_hostname_company,
-            database=settings.database_name_company,
-            user=settings.database_username_company,
-            password=settings.database_password_company,
+            host=settings.database_hostname,
+            database=settings.database_name,
+            user=settings.database_username,
+            password=settings.database_password,
             cursor_factory=RealDictCursor,
         )
         cursor = conn.cursor()

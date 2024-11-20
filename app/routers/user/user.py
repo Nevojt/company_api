@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from _log_config.log_config import get_logger
 import pytz
-
+from uuid import UUID
 from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File, Path
 from fastapi import BackgroundTasks
 from pydantic import EmailStr
@@ -334,6 +334,20 @@ async def update_full_name(full_name: str = Form(...),
     except Exception as e:
         user_logger.error(f"Error updating user full name: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get('/get_user_by_id/{user_id}', response_model=user.UserInfo)
+async def get_user_by_id(user_id: UUID,
+                         db: AsyncSession = Depends(get_async_session)):
+    try:
+        user_info = await get_user(user_id, db)
+        return user_info
+    except Exception as e:
+        user_logger.error(f"Error retrieving user by ID: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+
 
 @router.get('/{email}', response_model=user.UserInfo)
 async def get_user_mail(email: EmailStr,
