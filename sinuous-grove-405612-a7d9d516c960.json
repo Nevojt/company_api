@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sinuous-grove-405612",
+  "private_key_id": "a7d9d516c960fea3f2f735ae9c367cfb960bdd46",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMNZuyIrbko07E\nrWllsEbpPgHf8s9W/DBtI0PHhOK8zmNb5409CdaQnC0+qvHCLMngS558mwln7/Ko\nyxxLxIxEZz4Z5wicVfkDvh1vofFdCd1e3qZIMYr+x1aDcXsL4Gu8bnQcBfADR1/7\n/GKOhzBa287j1lI0GNXm2sMpPdfAEKmjwvoJ6JWZLCirIae6cnJtGF6tIGMPwurg\nSNjDKm4GG9mrV+yS1n2MinHGJ5tNc7ebOJN1lbxxgVXNEZF4k34uL36m/X44hcOa\noVxMgmf7NjaqITTGDO1QpjVNokIE2K17+BcSG9Ivmo+m0nL8mnl32YafIVWQMIn5\nOxmvXaoVAgMBAAECggEAAX7qUBJlGA4iT/XXo69cwHaJ2FWNyiptOWEjfzUFppIs\nSuy4OzqwQR1o4ZLO5k70muBNNLRgJ15+Psbop6+QHnUlkLHKj79ydoaXN2RJ88P4\n6SoE1bYuVMag8Grke00J6Y2HtLD8A4mQHz4QsXTsipHU0Mt7et/+sfU5m/GLxTHC\nIOJkbWll92AGX8jAVqdNZeQR2VNG3jursRzVl49fRZiwNxLocQMLZ9lPWonhqegu\nYrFTeDW0LFuPrv7Byu5zltpY7XWfZmrYiUytHgQqVycyIe9I/f1ZaGCsstepPc5g\nBNmoZsu6Ud4vbz72ZuQ1eNtDALZvsBSsEXQtyRaK2QKBgQDqaWnwl0C3zSmow3rN\nkJwjOxUxc3nFyVddPABYX9RgbNEQ0POua9F9T/uZL4KCO6ztVcOQVdt7/dKaj0jQ\nRcU7DMMlpkmdjnh3GxvXB8giqTaoEzRyq7Q3isllRJDVSdkVjm15gzLWcn+bb8dn\n0tzFFXmUaV4tVp7kFc/TlG2InQKBgQDfBCGZPKhP92bV3fKNdT39CpDd5YhrEGJp\nva1HtKnZz1QQuhmJENaSeRYK0V9MzCZvwT1jD0Fe6X3WPOHzoKXzDOMagDpwD5IE\nti9hguVkQL37HxKpPAJyiHiIJV6OIsuTipjv8FHPI3nVTTXu19JFZ8EjRIR9ttWV\nIv8xPZlB2QKBgD8KdHRAqSYFJfP+BlOsVWFgLVXsQU6A1F79mPYrZ3k7KoqEN1Ss\nKF20GezbixStKdd2Hi79+BYDcBUi/akNanpz9zNz4g5eV2Vow/bzX856hXl0GMHS\nDZh2Wa1DYFQMFTan5CcusohbqJfL2uvAGKFkIhtYrvwwdHDQsOCs5Tw9AoGAVa2m\notJ071PjBCMivkneqMpYYYd/Y3KF/I3MdpHn9y/54fs9ODVp2hf+6eUKMdz0n1ak\nGNyRhr85gwcc35ZGaxv2XAYLbWXt+TVs+o9pRZzB4CpN5wqQ/iOD+vowW3busx46\nJ2Qyadv9QH9LSxlLRTLZNo1qQUnuwD8Tv30k1fECgYEAsXs5qnGMBYR7YyR2ysme\nQz3K96QDO9OJTCkTx6nwZwGNTtxNWiVACpq+k3yMC1h/meF3JoOL5343y4skIZje\nUZFHo1R43i+WYx19dt5FeR5Ikq+n2hH4jThOuTofFK0Rh6jS5BMkOe7NcA3d+V9B\neD1LiVl7GJ1yRUezWwolmLQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "chat-busket@sinuous-grove-405612.iam.gserviceaccount.com",
+  "client_id": "101461595132747112363",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chat-busket%40sinuous-grove-405612.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
