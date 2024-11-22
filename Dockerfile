@@ -39,6 +39,8 @@ ENV PATH="/api/.venv/bin:$PATH"
 
 # Скидаємо entrypoint, щоб Docker не використовував команду `uv` за замовчуванням
 ENTRYPOINT []
+#
+
 
 # Запускаємо FastAPI додаток
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
