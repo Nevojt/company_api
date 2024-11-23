@@ -8,11 +8,19 @@ docker
 .vagrant
 .data
 .idea
+<<<<<<< HEAD
 .env
 
 .venv
 venv
 users_data.jso
+=======
+
+
+.venv
+venv
+users_data.json
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 start_uvicorn
 sinuous-grove-405612-a7d9d516c960.json
 tests

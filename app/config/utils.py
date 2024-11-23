@@ -1,21 +1,45 @@
 import shutil
 from typing import Union
 import uuid
+<<<<<<< HEAD
 from passlib.context import CryptContext
 import secrets
 import hashlib
 import string, random
 import os
+=======
+
+import secrets
+import hashlib
+# import shortuuid
+import string, random  # noqa: E401
+
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 from fastapi import HTTPException, UploadFile
 from tempfile import NamedTemporaryFile
 from b2sdk.v2 import InMemoryAccountInfo, B2Api
 from .config import settings
 
+<<<<<<< HEAD
+=======
+import os
+import bcrypt
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
+PEPPER = os.getenv("PASSWORD_PEPPER")
+if not PEPPER:
+    raise ValueError("PASSWORD_PEPPER is not set in the environment variables.")
+
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 info = InMemoryAccountInfo()
 b2_api = B2Api(info)
 b2_api.authorize_account("production", settings.backblaze_id, settings.backblaze_key)
 
 
+<<<<<<< HEAD
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -44,6 +68,33 @@ def verify(plain_password, hashed_password):
         bool: True if the passwords match, False otherwise.
     """
     return pwd_context.verify(plain_password, hashed_password)
+=======
+
+
+
+def hash(password: str):
+    try:
+        password_with_pepper = f"{password}{PEPPER}"
+        hashed_password = bcrypt.hashpw(password_with_pepper.encode('utf-8'), bcrypt.gensalt())
+        return hashed_password.decode('utf-8')
+    except Exception as e:
+        print(f"Error get password: {e}")
+        return None
+
+
+
+def verify(password: str, hashed_password: str):
+    try:
+        password_with_pepper = f"{password}{PEPPER}"
+        return bcrypt.checkpw(password_with_pepper.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception as e:
+        print(f"Error get password: {e}")
+        return False
+
+
+
+
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 
 def generate_unique_token(email: str) -> str:
@@ -74,10 +125,22 @@ def generate_random_code(length=10):
     return ''.join(secrets.choice(characters) for _ in range(length))
 
 
+<<<<<<< HEAD
 def generate_access_code():
     return str(uuid.uuid4())
 
 
+=======
+def generate_access_code_uuid4():
+    return uuid.uuid4()
+
+
+def generate_user_id_hash(username):
+    return hashlib.md5(username.encode()).hexdigest()
+
+# def generate_unique_code_shortuuid():
+#     return shortuuid.uuid()
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 # User options
 def generate_unique_filename(filename):
@@ -99,6 +162,13 @@ def generate_unique_filename(filename):
     unique_filename = f"{file_name}_{unique_suffix}{file_extension}"
     return unique_filename
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 async def upload_to_backblaze(file: Union[UploadFile, str], image_backed: str) -> str:
     """
     Uploads a file or a file at a given path to the specified Backblaze B2 bucket.

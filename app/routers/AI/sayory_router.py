@@ -1,9 +1,22 @@
+<<<<<<< HEAD
 from typing import Optional
 from fastapi import File, UploadFile, status, HTTPException, Depends, APIRouter
 from .ai_functions import ask_to_gpt, transcriptions
 from .ai_spech_function import speech_engine
 
 
+=======
+import os
+from typing import Optional
+from fastapi import UploadFile, status, HTTPException, APIRouter
+from .ai_functions import ask_to_gpt, transcriptions
+from .ai_spech_function import speech_engine
+from app.config import utils
+
+from _log_config.log_config import get_logger
+
+sayori_logger = get_logger('sayori', 'sayori_router.log')
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 
 router = APIRouter(
@@ -40,6 +53,10 @@ async def say_to_sayori(say_to_chat: str,
         response = await ask_to_gpt(say_to_chat, temperature, num)
         return {"response": response}
     except Exception as e:
+<<<<<<< HEAD
+=======
+        sayori_logger.error(f"Error in say_to_sayori: {e}", exc_info=True)
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
@@ -60,8 +77,44 @@ async def transcribe_audio_from_url(url: str):
     - HTTPException: If an error occurs during the transcription process, an HTTPException is raised with a 500 status code
       and the error message as the detail.
     """
+<<<<<<< HEAD
     return transcriptions(url)
 
 @router.post("/speech")
 async def speaker_in_text(text: str):
   return await speech_engine(text)
+=======
+    try:
+        return transcriptions(url)
+    except Exception as e:
+        sayori_logger.error(f"Error in transcribe_audio_from_url: {e}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post("/speech")
+async def speaker_in_text(text: str):
+    try:
+        audio = await speech_engine(text)
+        print(audio)
+        try:
+            with open(audio, "rb") as audio_file:
+                file = UploadFile(audio_file, filename=audio.name)
+                audio_url = await utils.upload_to_backblaze(file, "audio-speech")
+
+                if audio.exists():
+                    os.remove(audio)
+
+            return audio_url
+        except Exception as e:
+            sayori_logger.error(f"Error in speaker_in_text: {e}", exc_info=True)
+            print(f"Error uploading audio: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
+    except Exception as e:
+        sayori_logger.error(f"Error in speaker_in_text: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+
+
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824

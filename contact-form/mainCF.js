@@ -48,7 +48,11 @@ document.getElementById('contactForm').addEventListener('submit', function(event
         .then(response => response.text())
         .then(data => {
             alert(data);
+<<<<<<< HEAD
             window.location.href = 'https://sayorama.eu/api';  // Redirect to home page
+=======
+            window.location.href = 'https://company.sayorama.eu/api';  // Redirect to home page
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
         })
         .catch(error => {
             console.error('Error:', error);

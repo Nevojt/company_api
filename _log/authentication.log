@@ -1,1 +1,28 @@
+<<<<<<< HEAD
 
+=======
+2024-11-11 17:59:13,145 - ERROR - Error processing Authentication 401: Invalid Credentials
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/user/auth.py", line 80, in login
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Credentials")
+fastapi.exceptions.HTTPException: 401: Invalid Credentials
+2024-11-11 20:43:35,078 - ERROR - Error processing Authentication 401: Invalid Credentials
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/user/auth.py", line 80, in login
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Credentials")
+fastapi.exceptions.HTTPException: 401: Invalid Credentials
+2024-11-11 20:43:53,897 - ERROR - Error processing Authentication 401: Invalid Credentials
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/user/auth.py", line 80, in login
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Credentials")
+fastapi.exceptions.HTTPException: 401: Invalid Credentials
+2024-11-16 18:12:16,823 - ERROR - Error processing Authentication 401: Invalid Credentials
+Traceback (most recent call last):
+  File "/home/dmytro/company/api/app/routers/user/auth.py", line 80, in login
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Credentials")
+fastapi.exceptions.HTTPException: 401: Invalid Credentials
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824

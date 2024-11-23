@@ -1,0 +1,4 @@
+
+2024-11-20 22:48:26,164 - ERROR - Error retrieving user by name: 204: User with user name roomdefault not found
+2024-11-20 22:48:35,472 - ERROR - Error retrieving user by name: 204: User with user name room not found
+2024-11-20 22:48:48,239 - ERROR - Error retrieving user by name: 204: User with user name Room not found

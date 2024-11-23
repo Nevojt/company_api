@@ -1,0 +1,11 @@
+[
+    {"user_name": "Room", "email": "roomdefault@sayorama.eu", "password": "password123", "avatar": "None"},
+    {"user_name": "SayOry", "email": "sayory@sayorama.eu", "password": "password456", "avatar": "https://f003.backblazeb2.com/file/usravatar/girl_5_G5zHY9KxdP.webp"},
+    {"user_name": "Test1", "email": "test_user@test.testing", "password": "password123", "avatar": "None"},
+    {"user_name": "Verify", "email": "testuserverify@test.testing", "password": "password123", "avatar": "None"},
+    {"user_name": "Update User", "email": "testuserverifyupdate@test.testing", "password": "password123", "avatar": "None"},
+    {"user_name": "UpdatePassword", "email": "testuserupdatepassword@test.testing", "password": "NewPassword", "avatar": "None"},
+    {"user_name": "TestUserDelete", "email": "deleteuser@test.testing", "password": "password12", "avatar": "None"},
+    {"user_name": "TestUserResetPassword", "email": "resetpassword@test.testing", "password": "NewPassword", "avatar": "None"},
+    {"user_name": "TestUserChangeEmail", "email": "utest_user_room@gmail.com", "password": "password123", "avatar": "None"}
+]

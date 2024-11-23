@@ -1,0 +1,1 @@
+2024-11-11 13:10:18,730 - ERROR - Error occurred while retrieving room by ID: 'UUID' object has no attribute 'execute'
