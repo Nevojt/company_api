@@ -1,4 +1,4 @@
-version: '3.13'
+version: '3.12'
 services:
   fastapi:
     build: .
@@ -7,10 +7,10 @@ services:
     env_file:
       - .env
       - .env_start_app
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
+#    depends_on:
+#      - redis
+#
+#  redis:
+#    image: redis:alpine
+#    ports:
+#      - "6379:6379"
