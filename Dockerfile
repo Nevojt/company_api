@@ -1,11 +1,13 @@
 # Використовуємо офіційний Python базовий образ
-FROM python:3.12-slim
+FROM python:3.10-slim
+
 # Встановлюємо необхідні бібліотеки для роботи FastAPI
-WORKDIR /api
-COPY requirements.txt /api/
+WORKDIR /app
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
+
 # Копіюємо весь код в робочу директорію контейнера
-COPY . /api
+COPY . /app
 
 
 
