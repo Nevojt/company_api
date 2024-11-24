@@ -22,7 +22,7 @@ class ChatMessages(Base):
     receiver_id = Column(UUID, ForeignKey('users.id', ondelete='SET NULL'))
     rooms = Column(String, ForeignKey('rooms.name_room', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     room_id = Column(UUID, ForeignKey('rooms.id', ondelete='CASCADE'))
-    id_return = Column(Integer)
+    id_return = Column(UUID, nullable=True)
 
     edited = Column(Boolean, server_default='false') 
     return_message = Column(JSON, server_default=None)
@@ -45,7 +45,7 @@ class PrivateMessage(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     is_read = Column(Boolean, nullable=False, server_default='false')
     edited = Column(Boolean, server_default='false')
-    id_return = Column(Integer)
+    id_return = Column(UUID, nullable=True)
     deleted = Column(Boolean, server_default='false')
     room_id = Column(UUID, nullable=True)
     is_sent = Column(Boolean, default=False)
