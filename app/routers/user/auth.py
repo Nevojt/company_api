@@ -17,10 +17,10 @@ from app.models import user_model
 from app.schemas.token import Token
 from _log_config.log_config import get_logger
 
-import redis.asyncio as redis
-from contextlib import asynccontextmanager
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
+# import redis.asyncio as redis
+# from contextlib import asynccontextmanager
+# from fastapi_limiter import FastAPILimiter
+# from fastapi_limiter.depends import RateLimiter
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
@@ -47,7 +47,7 @@ router = APIRouter(
 
 
 
-# @router.post('/login', response_model=Token)
+@router.post('/login', response_model=Token)
 async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
                 db: AsyncSession = Depends(async_db.get_async_session)):
 #
