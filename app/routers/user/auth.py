@@ -1,16 +1,15 @@
 
-<<<<<<< HEAD
+
 # import logging
 from typing import Annotated
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-=======
+
 from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -22,31 +21,27 @@ from ...auth import oauth2
 from app.config.config import settings
 from app.models import user_model
 from app.schemas.token import Token
-<<<<<<< HEAD
-=======
+
+
 from _log_config.log_config import get_logger
 
-import redis.asyncio as redis
-from contextlib import asynccontextmanager
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
+# import redis.asyncio as redis
+# from contextlib import asynccontextmanager
+# from fastapi_limiter import FastAPILimiter
+# from fastapi_limiter.depends import RateLimiter
+
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
-<<<<<<< HEAD
-# logging.basicConfig(filename='_log/authentication.log', format='%(asctime)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=['Authentication'])
-
-@router.post('/login', response_model=Token)
-async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
-                db: AsyncSession = Depends(async_db.get_async_session)):
+# @router.post('/login', response_model=Token)
+# async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
+#                 db: AsyncSession = Depends(async_db.get_async_session)):
         
-=======
+
 auth_logger = get_logger('auth', "authentication.log")
 
 
@@ -68,11 +63,10 @@ router = APIRouter(
 
 
 
-# @router.post('/login', response_model=Token)
+@router.post('/login', response_model=Token)
 async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
                 db: AsyncSession = Depends(async_db.get_async_session)):
-#
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
     """
     OAuth2-compatible token login, get an access token for future requests.
 
@@ -98,16 +92,7 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
         result = await db.execute(query)
         user = result.scalar_one_or_none()
 
-<<<<<<< HEAD
-        print(user.active)
 
-        if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-        
-        if user.blocked:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail=f"User with ID {user.id} is blocked")
-=======
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Invalid Credentials")
@@ -116,28 +101,20 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is blocked")
 
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
         if not user.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail=f"User with ID {user.id} is not active")
         
         if not utils.verify(user_credentials.password, user.password):
-<<<<<<< HEAD
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
 
-        access_token = await oauth2.create_access_token(data={"user_id": user.id}, db=db)
-        
-        refresh_token = await oauth2.create_refresh_token(user_id=user.id, db=db)
-=======
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail="Invalid Credentials")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
 
         access_token = await oauth2.create_access_token(user_id=user.id,
                                                         db=db)
         
         refresh_token = await oauth2.create_refresh_token(user_id=user.id,
                                                           db=db)
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
         user.refresh_token = refresh_token
         await db.commit()
 
@@ -148,32 +125,21 @@ async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()
             "token_type": "bearer"}
         
     except HTTPException as ex_error:
-<<<<<<< HEAD
-        # logger.error(f"Error processing Authentication {ex_error}", exc_info=True)
-=======
+
         auth_logger.error(f"Error processing Authentication {ex_error}", exc_info=True)
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
         # Re-raise HTTPExceptions without modification
         raise
     except Exception as e:
         # Log the exception or handle it as you see fit
-<<<<<<< HEAD
-        # logger.error(f"An error occurred: Authentication {e}", exc_info=True)
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while processing the request.")
 
-@router.post("/refresh")
-async def refresh_access_token(refresh_token: str, db: AsyncSession = Depends(async_db.get_async_session)):
-=======
-        auth_logger.error(f"An error occurred: Authentication {e}", exc_info=True)
-        # print(f"An error occurred: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="An error occurred while processing the request.")
 
 @router.post("/refresh")
 async def refresh_access_token(refresh_token: str,
                                db: AsyncSession = Depends(async_db.get_async_session)):
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
     """
     Endpoint to refresh an access token using a refresh token.
 
@@ -196,16 +162,14 @@ async def refresh_access_token(refresh_token: str,
     
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
-<<<<<<< HEAD
-        user_id: str = payload.get("user_id")
-=======
+
         user_id_str: str = payload.get("user_id")
 
         if user_id_str is None:
             raise credentials_exception
 
         user_id = UUID(user_id_str)
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
+
         
         query = select(user_model.User).where(user_model.User.id == user_id)
         result = await db.execute(query)
@@ -218,15 +182,8 @@ async def refresh_access_token(refresh_token: str,
         if user_id is None:
             raise credentials_exception
         
-<<<<<<< HEAD
-        new_access_token = await oauth2.create_access_token({"user_id": user_id}, db=db)
-        return {"access_token": new_access_token, "token_type": "bearer"}
-    except JWTError:
-        raise credentials_exception
-=======
         new_access_token = await oauth2.create_access_token(user_id=user_id, db=db)
         return {"access_token": new_access_token, "token_type": "bearer"}
     except JWTError:
         auth_logger.error(f"Invalid refresh token: {refresh_token}", exc_info=True)
         raise credentials_exception
->>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
