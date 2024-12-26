@@ -88,7 +88,11 @@ async def reset_password(reset: PasswordResetMobile, db: AsyncSession = Depends(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Code reset not active")
     
+<<<<<<< HEAD
+    stmt_update = update(user_model.User).where(user_model.User.email == reset.email).values(password=utils.hash_password(
+=======
     stmt_update = update(user_model.User).where(user_model.User.email == reset.email).values(password=utils.hash(
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
         reset.password),
                                                                                              blocked=False,
                                                                                              password_changed=current_time_utc)

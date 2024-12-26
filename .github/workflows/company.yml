@@ -3,7 +3,7 @@ name: Deploy API Public
 on:
   push:
     branches:
-      - company
+      - main
 
 jobs:
   build-and-deploy:

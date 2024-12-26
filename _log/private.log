@@ -1,0 +1,17 @@
+2024-09-24 00:00:01,820 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-09-25 00:00:00 CEST)" was missed by 0:00:01.817572
+2024-09-24 00:00:02,090 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-09-25 00:00:00 CEST)" was missed by 0:00:02.085011
+2024-09-25 00:00:01,027 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-09-26 00:00:00 CEST)" was missed by 0:00:01.007325
+2024-10-07 00:00:01,314 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.314379
+2024-10-07 00:00:01,322 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.322316
+2024-10-07 00:00:01,328 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.326702
+2024-10-07 00:00:01,334 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.334737
+2024-10-07 00:00:01,334 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.334739
+2024-10-07 00:00:01,334 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.334571
+2024-10-07 00:00:01,327 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.313644
+2024-10-07 00:00:01,335 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-10-08 00:00:00 CEST)" was missed by 0:00:01.335620
+2024-10-29 05:56:00,345 - WARNING - Run time of job "update_access_token (trigger: interval[4:00:00], next run at: 2024-10-29 09:55:55 CET)" was missed by 0:00:04.831123
+2024-10-31 00:00:01,300 - WARNING - Run time of job "delete_test_users (trigger: cron[day='*', hour='0'], next run at: 2024-11-01 00:00:00 CET)" was missed by 0:00:01.299406
+2024-10-31 00:00:02,519 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-11-01 00:00:00 CET)" was missed by 0:00:02.519423
+2024-10-31 00:00:02,552 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-11-01 00:00:00 CET)" was missed by 0:00:02.550962
+2024-10-31 00:00:02,578 - WARNING - Run time of job "delete_old_rooms (trigger: cron[day='*', hour='0'], next run at: 2024-11-01 00:00:00 CET)" was missed by 0:00:02.575587
+2024-10-31 15:35:51,945 - WARNING - Run time of job "update_access_token (trigger: interval[4:00:00], next run at: 2024-10-31 19:35:50 CET)" was missed by 0:00:01.896216
