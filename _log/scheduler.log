@@ -62,3 +62,4 @@ FROM bans]
 [SQL: SELECT bans.id, bans.user_id, bans.room_id, bans.start_time, bans.end_time 
 FROM bans]
 (Background on this error at: https://sqlalche.me/e/20/f405)
+2025-01-23 19:59:15,729 - ERROR - Failed to setup scheduler: 'Multiple conflicting time zone configurations found:\n/etc/timezone: Europe/Berlin\n/etc/localtime is a symlink to: Europe/Warsaw\nFix the configuration, or set the time zone in a TZ environment variable.\n'
