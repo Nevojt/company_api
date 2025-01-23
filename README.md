@@ -16,7 +16,7 @@ This module serves as a pivotal segment of the main application, focusing primar
 
 - **Database Management**: Utilized `SQL` for structured data queries, with `SQLALCHEMY` as an ORM for efficient data operations. All data is hosted on a `PostgreSQL` database ensuring reliability and scalability.
 
-- **Virtualization & Hosting**: The project is hosted on a virtual machine procured from `Google Cloud Platform`. 
+- **Virtualization & Hosting**: The project is hosted on a virtual machine procured from `Contabo`. 
 
 - **Web Server**: For serving the main site, I employed the `Nginx` server, known for its stability and performance.
 
