@@ -1,7 +1,13 @@
 
+<<<<<<< HEAD
+from pydantic import BaseModel, ConfigDict      #, HttpUrl
+from datetime import datetime
+from typing import Optional, List
+=======
 from pydantic import BaseModel, ConfigDict, UUID4, Strict    #, HttpUrl
 from datetime import datetime
 from typing import Optional, List, Annotated
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 
 
@@ -9,8 +15,13 @@ from typing import Optional, List, Annotated
 class RoomBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
+<<<<<<< HEAD
+    id: int
+    owner: int
+=======
     id: Annotated[UUID4, Strict(False)]
     owner: Annotated[UUID4, Strict(False)]
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     name_room: str
     image_room: str
     count_users: int
@@ -19,7 +30,10 @@ class RoomBase(BaseModel):
     secret_room: bool
     block: Optional[bool] = None
     description: Optional[str] = None
+<<<<<<< HEAD
+=======
     delete_at: Optional[datetime] = None
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
         
 class RoomFavorite(RoomBase):
     favorite: bool
@@ -45,6 +59,14 @@ class RoomPost(RoomBase):
 class RoomUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
+<<<<<<< HEAD
+    id: int
+    name_room: str
+    image_room: str
+    owner: int
+    created_at: datetime
+    secret_room: Optional[Optional[bool]]
+=======
     id: Annotated[UUID4, Strict(False)]
     name_room: str
     image_room: str
@@ -54,6 +76,7 @@ class RoomUpdate(BaseModel):
     block: bool
     description: Optional[str] = None
     delete_at: Optional[datetime] = None
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
        
 class RoomUpdateDescription(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -61,7 +84,11 @@ class RoomUpdateDescription(BaseModel):
         
 class RoomManager(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+<<<<<<< HEAD
+    room_id: int
+=======
     room_id: Annotated[UUID4, Strict(False)]
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     
         
 class RoomTabsCreate(BaseModel):

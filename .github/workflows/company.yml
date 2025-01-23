@@ -1,3 +1,4 @@
+
 #name: Deploy API Public
 #
 #on:
@@ -86,6 +87,7 @@
 #        password: ${{ secrets.DOCKER_PASSWORD_PUBLIC }}
 #
 #    - name: Build and push Docker image
+
 #      run: |
 #        docker build -t nevojt/public_api:${{ github.sha }} -t nevojt/public_api:latest .
 #        docker push nevojt/public_api:${{ github.sha }}

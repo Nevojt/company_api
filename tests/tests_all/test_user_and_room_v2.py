@@ -10,10 +10,15 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.schemas import user, token
 from .utils import random_email, random_lower_string
+<<<<<<< HEAD
+
+client = TestClient(app)
+=======
 from faker import Faker
 
 client = TestClient(app)
 faker = Faker()
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -30,16 +35,36 @@ async def async_session():
 
 @pytest.fixture
 def test_user_create():
+<<<<<<< HEAD
+    return {"email": random_email(),
+            "password": "password123"}
+=======
     return {"subdomain": "test.sayorama",
             "user_name": faker.user_name(),
             "email": faker.email(),
             "password": faker.password(),
             "description": faker.text()
             }
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 @pytest.mark.asyncio
 async def test_create_user_v2(test_user_create, async_session):
     async with AsyncClient(app=app, base_url="http://test") as client:
+<<<<<<< HEAD
+        user_name = random_lower_string()
+        email = test_user_create["email"]
+        password = test_user_create["password"]
+
+        response = await client.post(
+            "/users/v2",
+            data={
+                "email": email,
+                "user_name": user_name,
+                "password": password
+            },
+            files={"file": (None, "", "application/octet-stream")}
+        )
+=======
         user_name = test_user_create["user_name"]
         email = test_user_create["email"]
         password = test_user_create["password"]
@@ -57,6 +82,7 @@ async def test_create_user_v2(test_user_create, async_session):
                                     },
                                     files={"avatar": (None, "", "application/octet-stream")}
                                     )
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
         assert response.status_code == 201
         new_user = user.UserOut(**response.json())

@@ -1,46 +1,36 @@
+<<<<<<< HEAD
 # Використовуємо офіційний Python базовий образ
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+FROM python:3.12-slim
 
-# Оновлюємо та встановлюємо необхідні системні залежності
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Створюємо робочу директорію
+# Встановлюємо необхідні бібліотеки для роботи FastAPI
 WORKDIR /api
+COPY requirements.txt /api/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Увімкнення компіляції байт-коду для швидшого запуску
-ENV UV_COMPILE_BYTECODE=1
+# Копіюємо весь код в робочу директорію контейнера
+COPY . /api
 
-# Задаємо спосіб кешування залежностей
-ENV UV_LINK_MODE=copy
+# Вказуємо команду для запуску FastAPI через uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+=======
+# Use the official Python base image
+FROM python:3.10-slim
 
-# Встановлення залежностей, використовуючи кешовану директорію
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev
+# Install necessary libraries for PostgreSQL
+RUN apt-get update && apt-get install -y libpq-dev gcc
 
-# Копіюємо решту коду проєкту
-ADD . /api
+# Set the working directory in the container
+WORKDIR /app
 
-# Копіюємо .env файли
-COPY .env /api/.env
-COPY .env_start_app /api/.env_start_app
+# Copy the requirements file into the container
+COPY requirements.txt /app/
 
-# Встановлюємо проєктні залежності
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+# Install Python packages
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Додаємо папку віртуального середовища на початок PATH
-ENV PATH="/api/.venv/bin:$PATH"
+# Copy the rest of the code into the container
+COPY . /app
 
-# Скидаємо entrypoint, щоб Docker не використовував команду `uv` за замовчуванням
-ENTRYPOINT []
-#
-
-
-# Запускаємо FastAPI додаток
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the FastAPI application
+CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824

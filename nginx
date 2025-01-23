@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        rewrite ^/(.*)$ /api/$1 last;
+        }
+        location /api {
+                proxy_pass http://localhost:8000;
+=======
 # You should look at the following URL's in order to grasp a solid understanding
 # of Nginx configuration files in order to fully unleash the power of Nginx.
 # https://www.nginx.com/resources/wiki/start/
@@ -183,10 +194,19 @@ server {
 		limit_req zone=api_zone burst=10 nodelay;
 		proxy_pass http://api_backend_public;
         #        proxy_pass http://localhost:8000;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_http_version 1.1;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header Upgrade $http_upgrade;
+<<<<<<< HEAD
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $http_host;
+                proxy_set_header X-NginX-Proxy true;
+                proxy_redirect off;
+        }
+        location /ws/ {
+=======
                 proxy_set_header Connection "upgrade";
                 #proxy_set_header Host $http_host;
                 proxy_set_header X-NginX-Proxy true;
@@ -194,6 +214,7 @@ server {
 	}
 	location /ws/ {
 		limit_req zone=api_zone burst=10 nodelay;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_pass http://localhost:8800;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
@@ -201,14 +222,22 @@ server {
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+<<<<<<< HEAD
+                proxy_set_header Host $http_host;
+=======
                # proxy_set_header Host $http_host;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
                 # Таймаути
                 proxy_read_timeout 600s;
                 proxy_send_timeout 600s;
         }
+<<<<<<< HEAD
+        location /private/ {
+=======
 	location /private/ {
 		limit_req zone=api_zone burst=10 nodelay;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_pass http://localhost:8080;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
@@ -216,14 +245,22 @@ server {
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+<<<<<<< HEAD
+                proxy_set_header Host $http_host;
+=======
                # proxy_set_header Host $http_host;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
                 # Таймаути
                 proxy_read_timeout 600s;
                 proxy_send_timeout 600s;
         }
+<<<<<<< HEAD
+        location /notification {
+=======
 	location /notification {
 		limit_req zone=api_zone burst=10 nodelay;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_pass http://localhost:8008;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
@@ -231,27 +268,43 @@ server {
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+<<<<<<< HEAD
+                proxy_set_header Host $http_host;
+=======
                 #proxy_set_header Host $http_host;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
                 # Таймаути
                 proxy_read_timeout 600s;
                 proxy_send_timeout 600s;
         }
+<<<<<<< HEAD
+        location /tattoo/app {
+                proxy_pass http://localhost:8900;
+=======
 
         location /meet {
 		limit_req zone=api_zone burst=10 nodelay;
                 proxy_pass http://localhost:7777;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_http_version 1.1;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header Upgrade $http_upgrade;
+<<<<<<< HEAD
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $http_host;
+=======
                 proxy_set_header Connection "upgrade";
                 proxy_set_header Host $host;
                # proxy_set_header Host $http_host;
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                 proxy_set_header X-NginX-Proxy true;
                 proxy_redirect off;
         }
 
+<<<<<<< HEAD
+=======
 	# pass PHP scripts to FastCGI server
 	#
 	#location ~ \.php$ {
@@ -292,4 +345,5 @@ server {
     return 404; # managed by Certbot
 
 
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 }

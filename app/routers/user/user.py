@@ -1,5 +1,31 @@
 from datetime import datetime
 from typing import List
+<<<<<<< HEAD
+from fastapi import Form, Response, status, HTTPException, Depends, APIRouter, UploadFile, File
+
+import pytz
+from sqlalchemy.orm import Session
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.mail import send_mail
+
+from ...config import utils
+from app.config.config import settings
+from app.config.hello import say_hello_system, system_notification_sayory
+
+from .created_image import generate_image_with_letter
+from ...auth import oauth2
+from ...database.async_db import get_async_session
+from ...database.database import get_db
+from app.models import user_model, room_model
+from app.schemas import user
+
+
+
+
+
+=======
 from _log_config.log_config import get_logger
 import pytz
 from uuid import UUID
@@ -28,6 +54,7 @@ from ...config.start_schema import start_app
 from ...database.async_db import get_async_session
 
 user_logger = get_logger('user', 'user.log')
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 router = APIRouter(
     prefix="/users",
@@ -35,16 +62,174 @@ router = APIRouter(
 )
 
 
+<<<<<<< HEAD
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
+async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_async_session)):
+    """
+    This function creates a new user in the database.
+
+    Args:
+        user (schemas.UserCreate): The user data to create.
+        db (AsyncSession): The database session to use.
+
+    Returns:
+        schemas.UserOut: The newly created user.
+
+    Raises:
+        HTTPException: If a user with the given email already exists.
+    """
+    
+    # Check if a user with the given email already exists
+    query = select(user_model.User).where(user_model.User.email == user.email)
+    result = await db.execute(query)
+    existing_user = result.scalar_one_or_none()
+
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+                            detail=f"User {existing_user.email} already exists")
+    
+    # Hash the user's password
+    hashed_password = utils.hash_password(user.password)
+    user.password = hashed_password
+    
+    verification_token = utils.generate_unique_token(user.email)
+    
+    # Create a new user and add it to the database
+    new_user = user_model.User(**user.model_dump(),
+                           token_verify=verification_token)
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    
+    # Create a User_Status entry for the new user
+    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+    db.add(post)
+    await db.commit()
+    await db.refresh(post)
+    
+    registration_link = f"http://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
+                                           {
+                                            "title": "Registration",
+                                            "name": user.user_name,
+                                            "registration_link": registration_link
+                                            })
+    await say_hello_system(new_user.id)
+    
+    return new_user
+
+@router.post("/v2", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
+async def created_user_v2(email: str = Form(...),
+                          user_name: str = Form(...),
+=======
 @router.post("/v2", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
 async def created_user_v2(background_tasks: BackgroundTasks,
                           company: str = Form("sayorama"),
                           email: EmailStr = Form(...),
                           user_name: str = Form(...),
                           full_name: str = Form(None),
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                           password: str = Form(...),
                           file: UploadFile = File(None),
                           description: str = Form(None),
                           db: AsyncSession = Depends(get_async_session)):
+<<<<<<< HEAD
+    """
+    This function creates a new user in the database.
+
+    Args:
+        email (str): The email of the user.
+        user_name (str): The user name of the user.
+        password (str): The password of the user.
+        file (UploadFile): The avatar file of the user.
+        bucket_name (str): The name of the Backblaze B2 bucket to upload the file to.
+        db (AsyncSession): The database session to use.
+
+    Returns:
+        schemas.UserOut: The newly created user.
+
+    Raises:
+        HTTPException: If a user with the given email already exists.
+    """
+    
+    company = 1
+    
+    existing_deactivated_user = select(user_model.UserDeactivation).where((user_model.UserDeactivation.email == email) |
+        (user_model.UserDeactivation.user_name == user_name))
+    
+    deactivated_result = await db.execute(existing_deactivated_user)
+    existing_deactivated_user = deactivated_result.scalar_one_or_none()
+    
+
+    if existing_deactivated_user:
+        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+                            detail=f"User with email {email} or user_name {user_name} is deactivated")
+
+    
+    user_data = user.UserCreateV2(email=email, user_name=user_name, password=password)
+
+# Check if a user with the given email already exists
+    email_query = select(user_model.User).where(user_model.User.email == user_data.email)
+    email_result = await db.execute(email_query)
+    existing_email_user = email_result.scalar_one_or_none()
+
+    if existing_email_user:
+        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+                            detail=f"User with email {existing_email_user.email} already exists")
+    
+    # Check if a user with the given user_name already exists
+    username_query = select(user_model.User).where(user_model.User.user_name == user_data.user_name)
+    username_result = await db.execute(username_query)
+    existing_username_user = username_result.scalar_one_or_none()
+
+    if existing_username_user:
+        raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY,
+                            detail=f"User with user_name {existing_username_user.user_name} already exists")
+    
+    # Hash the user's password
+    hashed_password = utils.hash_password(user_data.password)
+    user_data.password = hashed_password
+    
+    verification_token = utils.generate_unique_token(user_data.email)
+    
+    if file is None:
+        generate_image_with_letter(user_name)
+        avatar = await utils.upload_to_backblaze(settings.rout_image, settings.bucket_name_user_avatar)
+    else:
+        avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
+        
+    # Create a new user and add it to the database
+    new_user = user_model.User(**user_data.model_dump(),
+                           avatar=avatar,
+                           description=description,
+                           company_id=company, # Default company id
+                           token_verify=verification_token)
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    
+    # Create a User_Status entry for the new user
+    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+    db.add(post)
+    await db.commit()
+    await db.refresh(post)
+    
+    registration_link = f"https://{settings.url_address_dns}/api/success_registration?token={new_user.token_verify}"
+    await send_mail.send_registration_mail("Thank you for registration!", new_user.email,
+                                           {
+                                            "title": "Registration",
+                                            "name": user_data.user_name,
+                                            "registration_link": registration_link
+                                            })
+    await say_hello_system(new_user.id)
+    
+    return new_user
+
+
+
+
+
+=======
     try:
         start = datetime.now()
         company = await get_company(company, db)
@@ -124,6 +309,7 @@ async def created_user_v2(background_tasks: BackgroundTasks,
     except Exception as e:
         user_logger.error(f"Error creating user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 
 
@@ -131,7 +317,11 @@ async def created_user_v2(background_tasks: BackgroundTasks,
 async def delete_user(
     password: user.UserDelete,
     db: AsyncSession = Depends(get_async_session), 
+<<<<<<< HEAD
+    current_user: int = Depends(oauth2.get_current_user)
+=======
     current_user: user_model.User = Depends(oauth2.get_current_user)
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 ):
     """
     Asynchronously deletes a user from the database.
@@ -150,6 +340,118 @@ async def delete_user(
     Returns:
     - Response: An empty response with a 204 No Content status, indicating successful deletion.
     """
+<<<<<<< HEAD
+    
+    query = select(user_model.User).where(user_model.User.id == current_user.id)
+    result = await db.execute(query)
+    existing_user = result.scalar_one_or_none()
+
+    # If the user does not exist, raise a 404 error
+    if not existing_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User with ID  does not exist.")
+    # Check if the user is verified
+    if not existing_user.verified or existing_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only verified users can delete their profiles or user in blocked."
+        )
+    
+    if not utils.verify(password.password, existing_user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password."
+        )
+        
+    query_room = select(room_model.Rooms).where(room_model.Rooms.owner == current_user.id)
+    result_room = await db.execute(query_room)
+    rooms_to_update = result_room.scalars().all()
+    
+    for room in rooms_to_update:
+        query_moderators = select(room_model.RoleInRoom).where(room_model.RoleInRoom.room_id == room.id, room_model.RoleInRoom.role == 'moderator')
+        result_moderators = await db.execute(query_moderators)
+        moderator = result_moderators.scalars().first()
+        
+        message = f"Room {room.name_room} is now owned by YOU"
+        if moderator:
+            room.owner = moderator.user_id
+            moderator.role = 'owner'
+            await system_notification_sayory(moderator.user_id, message)
+        else:
+            room.owner = 0
+        room.delete_at = datetime.now(pytz.utc)
+        
+    await db.commit()
+
+    
+    # delete user
+    await db.delete(existing_user)
+    await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+     
+        
+@router.put('/', response_model=user.UserInfo)
+async def update_user(update: user.UserUpdate, 
+                      db: Session = Depends(get_db), 
+                      current_user: user_model.User = Depends(oauth2.get_current_user)):
+    """
+    Update a user's information.
+
+    Args:
+        update (schemas.UserUpdate): The updated user information.
+        db (Session): The database session to use.
+        current_user (user_model.User): The currently authenticated user.
+
+    Returns:
+        schemas.UserInfo: The updated user information.
+
+    Raises:
+        HTTPException: If the user does not exist or if the user is not authorized to update the specified user.
+    """
+    if current_user.id is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not permitted to update other users' profiles."
+        )
+        
+    if not current_user.verified or current_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not verification or blocked."
+        )
+        
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_result = user_query.first()
+    
+    if user_result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID: {current_user.id} not found"
+        )
+    
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
+    
+    if user_status is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User status for ID: {current_user.id} not found"
+        )
+    
+    # Assuming model_dump() returns a dictionary of attributes to update
+    update_data = update.model_dump()
+
+    user_query.update(update_data, synchronize_session=False)
+    user_status_query.update({"user_name": update.user_name}, synchronize_session="fetch")
+    
+    db.commit()
+
+    # Re-fetch or update the user object to reflect the changes
+    updated_user = user_query.first()
+    return updated_user
+=======
     try:
 
         if not current_user.verified or current_user.blocked:
@@ -195,10 +497,90 @@ async def delete_user(
         user_logger.error(f"Error deleting user: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     
     
 @router.put('/v2/avatar')
 async def update_user_v2(file: UploadFile = File(...), 
+<<<<<<< HEAD
+                        db: Session = Depends(get_db), 
+                        current_user: user_model.User = Depends(oauth2.get_current_user)):
+
+        
+    if not current_user.verified or current_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not verification or blocked."
+        )
+        
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_data = user_query.first()
+    
+    if user_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID: {current_user.id} not found"
+        )
+    
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
+    
+    if user_status is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User status for ID: {current_user.id} not found"
+        )
+    avatar = await utils.upload_to_backblaze(file, settings.bucket_name_user_avatar)
+    
+    update = user.UserUpdateAvatar(avatar=avatar)
+    update_data = update.model_dump()
+
+    user_query.update(update_data, synchronize_session=False)
+    db.commit()
+    return "updated avatar"
+
+@router.put('/v2/description')
+async def description_user_v2(description: str = Form(...), 
+                        db: Session = Depends(get_db), 
+                        current_user: user_model.User = Depends(oauth2.get_current_user)):
+
+        
+    if not current_user.verified or current_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not verification or blocked."
+        )
+        
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_data = user_query.first()
+    
+    if user_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID: {current_user.id} not found"
+        )
+    
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
+    
+    if user_status is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User status for ID: {current_user.id} not found"
+        )
+    
+    
+    update = user.UserUpdateDescription(description=description)
+    update_data = update.model_dump()
+
+    user_query.update(update_data, synchronize_session=False)
+    db.commit()
+    return "updated description"
+
+@router.put('/v2/username')
+async def update_user_v2(user_name: str = Form(...),
+                        db: Session = Depends(get_db), 
+=======
                         db: AsyncSession = Depends(get_async_session),
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
 
@@ -258,6 +640,7 @@ async def description_user_v2(description: str = Form(...),
 @router.put('/v2/username/{user_name}')
 async def update_user_name_v2(user_name: str = Path(..., description="The username to update"),
                         db: AsyncSession = Depends(get_async_session),
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
                         current_user: user_model.User = Depends(oauth2.get_current_user)):
     """
     Update a user's username.
@@ -278,6 +661,47 @@ async def update_user_name_v2(user_name: str = Path(..., description="The userna
     Raises:
     - HTTPException: If the user is not verified or blocked, or if the user is not found in the database.
     """
+<<<<<<< HEAD
+        
+    if not current_user.verified or current_user.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not verification or blocked."
+        )
+        
+    user_query = db.query(user_model.User).filter(user_model.User.id == current_user.id)
+    user_data = user_query.first()
+    
+    if user_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID: {current_user.id} not found"
+        )
+    
+    user_status_query = db.query(user_model.User_Status).filter(user_model.User_Status.user_id == current_user.id)
+    user_status = user_status_query.first()
+    
+    if user_status is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User status for ID: {current_user.id} not found"
+        )
+    
+    update = user.UserUpdateUsername(user_name=user_name)
+    update_data = update.model_dump()
+
+    user_query.update(update_data, synchronize_session=False)
+    user_status_query.update({"user_name": update.user_name}, synchronize_session="fetch")
+    db.commit()
+
+    # Re-fetch or update the user object to reflect the changes
+    updated_user = user_query.first()
+    return "updated username"
+
+
+@router.get('/{email}', response_model=user.UserInfo)
+def get_user_mail(email: str, db: Session = Depends(get_db)):
+=======
     try:
         if not has_verified_or_blocked_user(current_user):
             raise HTTPException(
@@ -352,6 +776,7 @@ async def get_user_by_id(user_id: UUID,
 @router.get('/{email}', response_model=user.UserInfo)
 async def get_user_mail(email: EmailStr,
                         db: AsyncSession = Depends(get_async_session)):
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     """
     Get a user by their email.
 
@@ -367,6 +792,19 @@ async def get_user_mail(email: EmailStr,
     """
     
     # Query the database for a user with the given email
+<<<<<<< HEAD
+    user = db.query(user_model.User).filter(user_model.User.email == email).first()
+    
+    # If the user is not found, raise an HTTP 404 error
+    if not user:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT,
+                            detail=f"User with email {email} not found")
+        
+    return user
+
+@router.get('/audit/{user_name}', response_model=user.UserInfo)
+def get_user_name(user_name: str, db: Session = Depends(get_db)):
+=======
     try:
         user_email = await get_user_for_email(email, db)
 
@@ -383,6 +821,7 @@ async def get_user_mail(email: EmailStr,
 @router.get('/audit/{user_name}', response_model=user.UserInfo)
 async def get_user_name(user_name: str,
                   db: AsyncSession = Depends(get_async_session)):
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     """
     Get a user by their use_name.
 
@@ -398,6 +837,16 @@ async def get_user_name(user_name: str,
     """
     
     # Query the database for a user with the given email
+<<<<<<< HEAD
+    user = db.query(user_model.User).filter(user_model.User.user_name == user_name).first()
+    
+    # If the user is not found, raise an HTTP 404 error
+    if not user:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT,
+                            detail=f"User with user name {user_name} not found")
+        
+    return user
+=======
     try:
         user_result = await get_user_for_username(user_name, db)
 
@@ -410,6 +859,7 @@ async def get_user_name(user_name: str,
     except Exception as e:
         user_logger.error(f"Error retrieving user by name: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
 @router.get('/me/', response_model=user.UserInfo)
 async def read_current_user(current_user: user.UserOut = Depends(oauth2.get_current_user)):
@@ -437,13 +887,21 @@ async def read_users(db: AsyncSession = Depends(get_async_session)):
 
 
 @router.post("/test", status_code=status.HTTP_201_CREATED, response_model=user.UserOut, include_in_schema=False)
+<<<<<<< HEAD
+async def created_user_test(user: user.UserCreateDel, db: AsyncSession = Depends(get_async_session)):
+=======
 async def created_user_test(user: user.UserCreateDel,
                             db: AsyncSession = Depends(get_async_session)):
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     """
     This function creates a new user in the database. It takes a UserCreateDel object as input, which contains the user's details.
 
     Parameters:
+<<<<<<< HEAD
+    - user (user.UserCreateDel): An object containing the user's details, including their email, password, and user name.
+=======
     - user (user.UserCreateDel): An object containing the user's details, including their email, password
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     - db (AsyncSession): The database session used to perform database operations.
 
     The function performs the following steps:
@@ -459,6 +917,19 @@ async def created_user_test(user: user.UserCreateDel,
     10. Returns the new user object.
     """
     # Hash the user's password
+<<<<<<< HEAD
+    hashed_password = utils.hash_password(user.password)
+    user.password = hashed_password
+
+    # Create a new user and add it to the database
+    new_user = user_model.User(**user.model_dump())
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    
+    # Create a User_Status entry for the new user
+    post = user_model.User_Status(user_id=new_user.id, user_name=new_user.user_name, name_room="Hell", room_id=1)
+=======
     company = await get_company(start_app.company_subdomain, db)
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -474,6 +945,7 @@ async def created_user_test(user: user.UserCreateDel,
     # Create a User_Status entry for the new user
     post = user_model.UserStatus(user_id=new_user.id, user_name=new_user.user_name,
                                  name_room=hell.name_room, room_id=hell.id)
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
     db.add(post)
     await db.commit()
     await db.refresh(post)
@@ -489,6 +961,8 @@ async def created_user_test(user: user.UserCreateDel,
 
 #  OLD CODE
 
+<<<<<<< HEAD
+=======
 
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=user.UserOut)
 # async def created_user(user: user.UserCreate, db: AsyncSession = Depends(get_async_session)):
@@ -544,3 +1018,4 @@ async def created_user_test(user: user.UserCreateDel,
 #     await say_hello_system(new_user.id)
 #
 #     return new_user
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824

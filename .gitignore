@@ -26,9 +26,16 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-#sinuous-grove-405612-a7d9d516c960.json
-#app/_log
-#users_data.json
+.env*
+sinuous-grove-405612-a7d9d516c960.json
+app/_log
+users_data.json
+
+
+sinuous-grove-405612-a7d9d516c960.json
+app/_log
+users_data.json
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -57,7 +64,11 @@ cover/
 
 #  Castom
 *.png
+
+start_uvicorn
+
 #start_uvicorn
+
 
 # Translations
 *.mo

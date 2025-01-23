@@ -1,7 +1,11 @@
 import base64
 from cryptography.fernet import Fernet, InvalidToken
 from app.config.config import settings 
+<<<<<<< HEAD
+   
+=======
 import secrets
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
    
 key = settings.key_crypto
 cipher = Fernet(key)
@@ -12,6 +16,13 @@ def is_base64(s):
     except Exception:
         return False
 
+<<<<<<< HEAD
+
+async def async_decrypt(encoded_data: str):
+    if not is_base64(encoded_data):
+       
+        return encoded_data  
+=======
 async def async_encrypt(data: str):
     if data is None:
         return None
@@ -23,11 +34,16 @@ async def async_decrypt(encoded_data: str):
 
     if not is_base64(encoded_data):
         return encoded_data
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824
 
     try:
         encrypted = base64.b64decode(encoded_data.encode('utf-8'))
         decrypted = cipher.decrypt(encrypted).decode('utf-8')
         return decrypted
+<<<<<<< HEAD
+    except InvalidToken:
+        return None
+=======
     except InvalidToken as e:
         return None
 
@@ -57,3 +73,4 @@ async def decrypt_token(token: str) -> str:
     # Decrypt the email
     decrypted_email = cipher_suite.decrypt(encrypted_email.encode())
     return decrypted_email.decode()
+>>>>>>> b76081a8ec4b9a820a3d0f1adef71c7e7cef6824

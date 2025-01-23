@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)"
+fi
+
+ssh-add ~/.ssh/git_conect_key
+
+git pull origin main
+
+sudo systemctl restart api.service
