@@ -81,5 +81,5 @@ async def get_rooms_info(db: Session = Depends(get_db),
             rooms_info.sort(key=lambda x: x.count_users, reverse=True)
 
     return rooms_info
-
+# ADD commit
 
